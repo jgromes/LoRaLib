@@ -1,2 +1,3 @@
 examples/* linguist-documentation=false
+src/* linguist-documentation=false
 *.h linguist-language=c++
