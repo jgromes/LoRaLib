@@ -2,9 +2,12 @@
 
 ## Arduino library for LoRa modules based on SX1278 chip
 
+## This is not the shield you are looking for!
+If you're looking for the shield to use with this library, it has its own repository: [https://github.com/jgromes/LoRenz](https://github.com/jgromes/LoRenz)
+
 DISCLAIMER: This library is provided 'AS IS'. See `license.txt` for details.
 
-This library enables easy long range communaction with SX1278-based LoRa modules. This library was designed to be used with LoRenz Rev.B shields or modules (see [LoRenz repository](https://github.com/jgromes/LoRenz) for details and Eagle files). However, they are not required and this library can be used with any LoRa module, as long as it is based on the SX1278 chip.
+This library enables easy long range communaction with SX1278-based LoRa modules. It was designed to be used with LoRenz Rev.B shields or modules. However, they are not required and this library can be used with any LoRa module, as long as it is based on the SX1278 chip.
 
 ## Library reference
 The following is a list of currently implemented features and their description, see `/examples/` for examples of their usage.
