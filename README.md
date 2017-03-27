@@ -43,7 +43,7 @@ The following is a list of currently implemented features and their description,
 
 * `int init()` 
 
-  This method has to be called isnside Arduino `setup()` function before any calls to other methods. Much like in other libraries, this method handles the initial setup of the SX1278 chip.
+  This method has to be called inside Arduino `setup()` function before any calls to other methods from this library. Much like in other libraries, this method handles the initial setup of the SX1278 chip.
 
 * `int tx(packet* pack)`
 
