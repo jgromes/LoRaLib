@@ -40,6 +40,11 @@ The following is a list of currently implemented features and their description,
     
     Multiple LoRenz Rev.B shields/modules can be connected to a single Arduino, however, on each of them, a different position on the NSS pin header has to be shorted out. Since there are 4 positions on the NSS pin header, the maximum of simultaneously connected LoRenz Rev.B shields/modules is 4. Any number of other LoRa modules can be connected and used with this library as long as their SPI NSS connection is not the same as the ones already used for LoRenz Rev.B shield(s)/module(s)
 
+
+* `int init()` 
+
+  This method has to be called isnside Arduino `setup()` function before any calls to other methods. Much like in other libraries, this method handles the initial setup of the SX1278 chip.
+
 * `int tx(packet* pack)`
 
   This function will attempt to transmit the `packet pack` in LoRa mode. For information on the packet structure, see the third part of this document. In case the supplied packet is larger than 256 bytes, the function will return -1. In case of a successful transmission, the function will return 0.
