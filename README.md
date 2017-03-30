@@ -4,6 +4,11 @@
 
 ---
 
+## Work in progress warning
+This library is still early in developement. New core features might be added and the ones that are in might be changed at any moment! Watch this repo for progress updates.
+
+---
+
 ### This is not the shield you are looking for!
 If you're looking for the shield to use with this library, it has its own repository: [https://github.com/jgromes/LoRenz](https://github.com/jgromes/LoRenz)
 
