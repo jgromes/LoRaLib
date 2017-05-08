@@ -2,6 +2,9 @@
 
 LoRa::LoRa(int nss, uint8_t bw, uint8_t cr, uint8_t sf) {
   _nss = nss;
+  _bw = bw;
+  _cr = cr;
+  _sf = sf;
   
   pinMode(_nss, OUTPUT);
   pinMode(_sck, OUTPUT);
@@ -11,17 +14,66 @@ LoRa::LoRa(int nss, uint8_t bw, uint8_t cr, uint8_t sf) {
   pinMode(_dio0, INPUT);
   
   SPI.begin();
-  randomSeed(analogRead(5));
+}
+
+uint8_t LoRa::init() {
+  #ifdef DEBUG
+    Serial.begin(9600);
+    Serial.println();
+  #endif
   
-  if(EEPROM.read(8) == 0) {
+  randomSeed(analogRead(1));
+  
+  if(EEPROM.read(8) == 255) {
     generateLoRaAdress();
+    EEPROM.write(8, 0);
+    delay(100);
   }
   
+  #ifdef DEBUG
+    Serial.print("LoRa node address string: ");
+  #endif
   for(uint8_t i = 0; i < 8; i++) {
     _LoRaAddress[i] = EEPROM.read(i);
+    #ifdef DEBUG
+      Serial.print(_LoRaAddress[i], HEX);
+      if(i < 7) {
+        Serial.print(":");
+      } else {
+        Serial.println();
+      }
+    #endif
+    delay(100);
   }
   
-  config(bw, cr, sf);
+  #ifdef VERBOSE
+    Serial.println("Register dump:");
+    uint8_t inByte;
+    for(uint8_t adr = 0x01; adr <= 0x70; adr++) {
+      Serial.print(adr, HEX);
+      Serial.print('\t');
+      inByte = readRegister(adr);
+      Serial.print(inByte, HEX);
+      Serial.print('\t');
+      Serial.println(inByte, BIN);
+    }
+    Serial.println("Done.");
+  #endif
+  
+  if(readRegister(SX1278_REG_VERSION) != 0x12) {
+    #ifdef DEBUG
+      Serial.print("No SX1278 found!");
+    #endif
+    SPI.end();
+    while(true);
+  }
+  #ifdef DEBUG
+    else {
+      Serial.println("Found SX1278! (match by SX1278_REG_VERSION == 0x12)");
+    }
+  #endif
+  
+  config(_bw, _cr, _sf);
 }
 
 int LoRa::tx(packet* pack) {
@@ -64,7 +116,9 @@ packet* LoRa::rx(uint8_t mode, uint8_t packetLength) {
     setRegValue(SX1278_REG_FIFO_ADDR_PTR, SX1278_FIFO_RX_BASE_ADDR_MAX);
     
     setMode(SX1278_RXSINGLE);
+    //wait for RX done on DIO0
     while(!digitalRead(_dio0)) {
+      //timeout on DIO1
       if(digitalRead(_dio1)) {
         return nullptr;
       }
@@ -93,7 +147,7 @@ packet* LoRa::rx(uint8_t mode, uint8_t packetLength) {
     
     return(pack);
   } else if (mode == SX1278_RXCONTINUOUS) {
-    
+    //TODO: implement RXCONTINUOUS MODE
   }
   
   return nullptr;
@@ -116,7 +170,7 @@ void LoRa::setPacketSourceStr(packet* pack, const char* address) {
 }
 
 uint8_t* LoRa::getPacketSource(packet* pack) {
-  uint8_t src[24];
+  uint8_t* src = new uint8_t[24];
   for(uint8_t i = 0; i < 8; i++) {
     src[i] = pack->source[i];
   }
@@ -147,7 +201,7 @@ void LoRa::setPacketDestinationStr(packet* pack, const char* address) {
 }
 
 uint8_t* LoRa::getPacketDestination(packet* pack) {
-  uint8_t dest[24];
+  uint8_t* dest = new uint8_t[24];
   for(uint8_t i = 0; i < 8; i++) {
     dest[i] = pack->destination[i];
   }
@@ -155,7 +209,7 @@ uint8_t* LoRa::getPacketDestination(packet* pack) {
 }
 
 const char* LoRa::getPacketDestinationStr(packet* pack) {
-  char* des = new char[24];
+  char* dest = new char[24];
   for(uint8_t i = 0; i < 8; i++) {
     dest[3*i] = reparseChar(pack->destination[i] >> 4);
     dest[3*i+1] = reparseChar(pack->destination[i] & 0x0F);
@@ -270,7 +324,9 @@ void LoRa::writeRegisterBurstStr(uint8_t reg, const char* data, uint8_t numBytes
 uint8_t LoRa::readRegister(uint8_t reg) {
   uint8_t inByte;
   digitalWrite(_nss, LOW);
+  SPI.beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE0));
   SPI.transfer(reg | SX1278_READ);
+  SPI.endTransaction();
   inByte = SPI.transfer(0x00);
   digitalWrite(_nss, HIGH);
   return(inByte);
@@ -278,8 +334,10 @@ uint8_t LoRa::readRegister(uint8_t reg) {
 
 void LoRa::writeRegister(uint8_t reg, uint8_t data) {
   digitalWrite(_nss, LOW);
+  SPI.beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE0));
   SPI.transfer(reg | SX1278_WRITE);
   SPI.transfer(data);
+  SPI.endTransaction();
   digitalWrite(_nss, HIGH);
 }
 

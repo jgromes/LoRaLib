@@ -10,6 +10,12 @@
 #include <SPI.h>
 #include <EEPROM.h>
 
+#define DEBUG
+
+#ifdef DEBUG
+  //#define VERBOSE
+#endif
+
 //SX1278 register map
 #define SX1278_REG_FIFO                               0x00
 #define SX1278_REG_OP_MODE                            0x01
@@ -204,17 +210,18 @@
 #define SX1278_FIFO_RX_BASE_ADDR_MAX                  0b00000000  //  7     0     allocate the entire FIFO buffer for RX only
 
 struct packet {
-  uint8_t source[8];
-  uint8_t destination[8];
-  const char* data;
+  uint8_t source[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+  uint8_t destination[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+  const char* data = "";
 };
 
 class LoRa {
   public:
     LoRa(int nss = 7, uint8_t bw = SX1278_BW_8, uint8_t cr = SX1278_CR_4_5, uint8_t sf = SX1278_SF_7);
+    uint8_t init();
     
     int tx(packet* pack);
-    packet* rx(uint8_t mode = SX1278_RXSINGLE, uint8_t packetLength = 0);
+    packet* rx(uint8_t mode = SX1278_RXSINGLE, uint8_t packetLength = 0); //TODO: explain implicit header mode in documentation
     
     void setMode(uint8_t mode);
     
@@ -233,6 +240,7 @@ class LoRa {
   private:
     uint8_t _LoRaAddress[8];
     int _nss;
+    uint8_t _bw, _cr, _sf;
     int _reset = 10;
     int _dio0 = 9;
     int _dio1 = 8;
