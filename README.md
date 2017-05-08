@@ -5,7 +5,7 @@
 ---
 
 ## Work in progress warning
-This library is still early in developement. New core features might be added and the ones that are in might be changed at any moment! Watch this repo for progress updates.
+This library is still early in developement. New core features might be added and the ones that are in might be changed at any moment! Watch this repo for progress updates. To get notifications about every commit, use the following link to set up an RSS feed reader: https://github.com/jgromes/LoRaLib/commits/master.atom.
 
 ---
 
