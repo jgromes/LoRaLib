@@ -1,5 +1,5 @@
-#ifndef _LoRaLib_H
-#define _LoRaLib_H
+#ifndef _LORALIB_H
+#define _LORALIB_H
 
 #if ARDUINO >= 100
   #include "Arduino.h"
@@ -209,10 +209,21 @@
 //SX1278_REG_FIFO_RX_BASE_ADDR
 #define SX1278_FIFO_RX_BASE_ADDR_MAX                  0b00000000  //  7     0     allocate the entire FIFO buffer for RX only
 
-struct packet {
-  uint8_t source[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-  uint8_t destination[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-  const char* data = "";
+class packet {
+  public:
+    packet(const char* src = "", const char* dest = "", const char* dat = "");
+    
+    uint8_t source[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+    uint8_t destination[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+    const char* data = "";
+    uint8_t length = 0;
+    
+    const char* getSourceStr(void);
+    const char* getDestinationStr(void);
+  
+  private:
+    uint8_t parseByte(char c);
+    char reparseChar(uint8_t b);
 };
 
 class LoRa {
@@ -220,23 +231,11 @@ class LoRa {
     LoRa(int nss = 7, uint8_t bw = SX1278_BW_8, uint8_t cr = SX1278_CR_4_5, uint8_t sf = SX1278_SF_7);
     uint8_t init();
     
-    int tx(packet* pack);
-    packet* rx(uint8_t mode = SX1278_RXSINGLE, uint8_t packetLength = 0); //TODO: explain implicit header mode in documentation
+    int tx(packet& pack);
+    int rx(packet& pack, uint8_t mode = SX1278_RXSINGLE); //TODO: explain implicit header mode in documentation
     
     void setMode(uint8_t mode);
     
-    void setPacketSource(packet* pack, uint8_t* address);
-    void setPacketSourceStr(packet* pack, const char* address);
-    uint8_t* getPacketSource(packet* pack);
-    const char* getPacketSourceStr(packet* pack);
-    
-    void setPacketDestination(packet* pack, uint8_t* address);
-    void setPacketDestinationStr(packet* pack, const char* address);
-    uint8_t* getPacketDestination(packet* pack);
-    const char* getPacketDestinationStr(packet* pack);
-    
-    void setPacketData(packet* pack, const char* data);
-    const char* getPacketData(packet* pack);
   private:
     uint8_t _LoRaAddress[8];
     int _nss;
@@ -249,14 +248,12 @@ class LoRa {
       int _sck = 13;
       int _miso = 12;
       int _mosi = 11;
-    #else 
-      #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
-        int _sck = 52;
-        int _miso = 50;
-        int _mosi = 51;
-      #else
-        #error "Unsupported board selected, please select Arduino UNO or Mega"
-      #endif
+    #elif defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
+      int _sck = 52;
+      int _miso = 50;
+      int _mosi = 51;
+    #else
+      #error "Unsupported board selected, please select Arduino UNO or Mega"
     #endif
     
     void config(uint8_t bw, uint8_t cr, uint8_t sf);
@@ -273,10 +270,6 @@ class LoRa {
     void writeRegister(uint8_t reg, uint8_t data);
     
     void generateLoRaAdress(void);
-    
-    uint8_t getPacketLength(packet* pack);
-    uint8_t parseByte(char c);
-    char reparseChar(uint8_t b);
 };
 
 #endif

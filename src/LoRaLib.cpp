@@ -1,5 +1,73 @@
 #include "LoRaLib.h"
 
+//TODO: overload contructor for array-like addresses
+packet::packet(const char* src, const char* dest, const char* dat) {
+  //convert & save source
+  for(uint8_t i = 0; i < 8; i++) {
+    source[i] = (parseByte(src[3*i]) << 4) | parseByte(src[3*i + 1]);
+  }
+  
+  //convert & save destination
+  for(uint8_t i = 0; i < 8; i++) {
+    destination[i] = (parseByte(dest[3*i]) << 4) | parseByte(dest[3*i + 1]);
+  }
+  
+  //save data
+  data = dat;
+  
+  //get & save length
+  length = 0;
+  for(uint8_t i = 0; i < 240; i++) {
+    if(data[i] == '\0') {
+      length = i + 17;
+    }
+  }
+}
+
+const char* packet::getSourceStr(void) {
+  char* src = new char[24];
+  for(uint8_t i = 0; i < 8; i++) {
+    src[3*i] = reparseChar(source[i] >> 4);
+    src[3*i+1] = reparseChar(source[i] & 0x0F);
+    src[3*i+2] = ':';
+  }
+  src[23] = '\0';
+  return(src);
+}
+
+const char* packet::getDestinationStr(void) {
+  char* dest = new char[24];
+  for(uint8_t i = 0; i < 8; i++) {
+    dest[3*i] = reparseChar(destination[i] >> 4);
+    dest[3*i+1] = reparseChar(destination[i] & 0x0F);
+    dest[3*i+2] = ':';
+  }
+  dest[23] = '\0';
+  return(dest);
+}
+
+uint8_t packet::parseByte(char c) {
+  if((c >= 48) && (c <= 57)) {
+    return(c - 48);
+  } else if((c >= 65) && (c <= 70)) {
+    return(c - 55);
+  } else if((c >= 97) && (c <= 102)) {
+    return(c - 87);
+  }
+  return 0;
+}
+
+char packet::reparseChar(uint8_t b) {
+  if((b >= 0) && (b <= 9)) {
+    return(b + 48);
+  } else if((b >= 10) && (b <= 16)) {
+    return(b + 55);
+  }
+  return 0;
+}
+
+//-------------------------------------------------------------
+
 LoRa::LoRa(int nss, uint8_t bw, uint8_t cr, uint8_t sf) {
   _nss = nss;
   _bw = bw;
@@ -22,7 +90,7 @@ uint8_t LoRa::init() {
     Serial.println();
   #endif
   
-  randomSeed(analogRead(1));
+  randomSeed(analogRead(5));
   
   if(EEPROM.read(8) == 255) {
     generateLoRaAdress();
@@ -76,7 +144,7 @@ uint8_t LoRa::init() {
   config(_bw, _cr, _sf);
 }
 
-int LoRa::tx(packet* pack) {
+int LoRa::tx(packet& pack) {
   setMode(SX1278_STANDBY);
   setRegValue(SX1278_REG_PA_DAC, SX1278_PA_BOOST_ON, 2, 0);
   setRegValue(SX1278_REG_HOP_PERIOD, SX1278_HOP_PERIOD_OFF);
@@ -84,17 +152,16 @@ int LoRa::tx(packet* pack) {
   clearIRQFlags();
   setRegValue(SX1278_REG_IRQ_FLAGS_MASK, SX1278_MASK_IRQ_FLAG_TX_DONE);
   
-  uint8_t packetLength = getPacketLength(pack);
-  if(packetLength > 256) {
+  if(pack.length > 256) {
     return -1;
   }
-  setRegValue(SX1278_REG_PAYLOAD_LENGTH, packetLength);
+  setRegValue(SX1278_REG_PAYLOAD_LENGTH, pack.length);
   setRegValue(SX1278_REG_FIFO_TX_BASE_ADDR, SX1278_FIFO_TX_BASE_ADDR_MAX);
   setRegValue(SX1278_REG_FIFO_ADDR_PTR, SX1278_FIFO_TX_BASE_ADDR_MAX);
   
-  writeRegisterBurst(SX1278_REG_FIFO, pack->source, 8);
-  writeRegisterBurst(SX1278_REG_FIFO, pack->destination, 8);
-  writeRegisterBurstStr(SX1278_REG_FIFO, pack->data, packetLength - 16);
+  writeRegisterBurst(SX1278_REG_FIFO, pack.source, 8);
+  writeRegisterBurst(SX1278_REG_FIFO, pack.destination, 8);
+  writeRegisterBurstStr(SX1278_REG_FIFO, pack.data, pack.length - 16);
   
   setMode(SX1278_TX);
   while(!digitalRead(_dio0));
@@ -103,7 +170,7 @@ int LoRa::tx(packet* pack) {
   return 0;
 }
 
-packet* LoRa::rx(uint8_t mode, uint8_t packetLength) {
+int LoRa::rx(packet& pack, uint8_t mode) {
   setMode(SX1278_STANDBY);
   if(mode == SX1278_RXSINGLE) {
     setRegValue(SX1278_REG_PA_DAC, SX1278_PA_BOOST_OFF);
@@ -120,111 +187,41 @@ packet* LoRa::rx(uint8_t mode, uint8_t packetLength) {
     while(!digitalRead(_dio0)) {
       //timeout on DIO1
       if(digitalRead(_dio1)) {
-        return nullptr;
+        return(-1);
       }
     }
     
     if(readRegister(SX1278_REG_IRQ_FLAGS)) {
-      return nullptr;
+      return(-1);
     }
     
     uint8_t sf = getRegValue(SX1278_REG_MODEM_CONFIG_2, 7, 4) & 0b00001111;
     if(sf != SX1278_SF_6) {
-      packetLength = getRegValue(SX1278_REG_RX_NB_BYTES);
+      pack.length = getRegValue(SX1278_REG_RX_NB_BYTES);
     }
     
-    packet* pack = new packet;
-    const char* data = new char[packetLength - 16];
+    const char* data = new char[pack.length - 16];
     
     for(uint8_t i = 0; i < 8; i++) {
-      pack->source[i] = readRegister(SX1278_REG_FIFO);
+      pack.source[i] = readRegister(SX1278_REG_FIFO);
     }
     for(uint8_t i = 0; i < 8; i++) {
-      pack->destination[i] = readRegister(SX1278_REG_FIFO);
+      pack.destination[i] = readRegister(SX1278_REG_FIFO);
     }
-    data = readRegisterBurstStr(SX1278_REG_FIFO, packetLength - 16);
-    pack->data = data;
+    data = readRegisterBurstStr(SX1278_REG_FIFO, pack.length - 16);
+    pack.data = data;
+    delete[] data;
     
-    return(pack);
+    return(0);
   } else if (mode == SX1278_RXCONTINUOUS) {
     //TODO: implement RXCONTINUOUS MODE
   }
   
-  return nullptr;
+  return(1);
 }
 
 void LoRa::setMode(uint8_t mode) {
   setRegValue(SX1278_REG_OP_MODE, mode, 2, 0);
-}
-
-void LoRa::setPacketSource(packet* pack, uint8_t* address) {
-  for(uint8_t i = 0; i < 8; i++) {
-    pack->source[i] = address[i];
-  }
-}
-
-void LoRa::setPacketSourceStr(packet* pack, const char* address) {
-  for(uint8_t i = 0; i < 8; i++) {
-    pack->source[i] = (parseByte(address[3*i]) << 4) | parseByte(address[3*i + 1]);
-  }
-}
-
-uint8_t* LoRa::getPacketSource(packet* pack) {
-  uint8_t* src = new uint8_t[24];
-  for(uint8_t i = 0; i < 8; i++) {
-    src[i] = pack->source[i];
-  }
-  return(src);
-}
-
-const char* LoRa::getPacketSourceStr(packet* pack) {
-  char* src = new char[24];
-  for(uint8_t i = 0; i < 8; i++) {
-    src[3*i] = reparseChar(pack->source[i] >> 4);
-    src[3*i+1] = reparseChar(pack->source[i] & 0x0F);
-    src[3*i+2] = ':';
-  }
-  src[23] = '\0';
-  return(src);
-}
-
-void LoRa::setPacketDestination(packet* pack, uint8_t* address) {
-  for(uint8_t i = 0; i < 8; i++) {
-    pack->destination[i] = address[i];
-  }
-}
-
-void LoRa::setPacketDestinationStr(packet* pack, const char* address) {
-  for(uint8_t i = 0; i < 8; i++) {
-    pack->destination[i] = (parseByte(address[3*i]) << 4) | parseByte(address[3*i + 1]);
-  }
-}
-
-uint8_t* LoRa::getPacketDestination(packet* pack) {
-  uint8_t* dest = new uint8_t[24];
-  for(uint8_t i = 0; i < 8; i++) {
-    dest[i] = pack->destination[i];
-  }
-  return(dest);
-}
-
-const char* LoRa::getPacketDestinationStr(packet* pack) {
-  char* dest = new char[24];
-  for(uint8_t i = 0; i < 8; i++) {
-    dest[3*i] = reparseChar(pack->destination[i] >> 4);
-    dest[3*i+1] = reparseChar(pack->destination[i] & 0x0F);
-    dest[3*i+2] = ':';
-  }
-  dest[23] = '\0';
-  return(dest);
-}
-
-void LoRa::setPacketData(packet* pack, const char* data) {
-  pack->data = data;
-}
-
-const char* LoRa::getPacketData(packet* pack) {
-  return(pack->data);
 }
 
 void LoRa::config(uint8_t bw, uint8_t cr, uint8_t sf) {
@@ -345,32 +342,4 @@ void LoRa::generateLoRaAdress(void) {
   for(uint8_t i = 0; i < 8; i++) {
     EEPROM.write(i, (uint8_t)random(0, 256));
   }
-}
-
-uint8_t LoRa::getPacketLength(packet* pack) {
-  for(uint8_t i = 0; i < 240; i++) {
-    if(pack->data[i] == '\0') {
-      return(i + 17);
-    }
-  }
-}
-
-uint8_t LoRa::parseByte(char c) {
-  if((c >= 48) && (c <= 57)) {
-    return(c - 48);
-  } else if((c >= 65) && (c <= 70)) {
-    return(c - 55);
-  } else if((c >= 97) && (c <= 102)) {
-    return(c - 87);
-  }
-  return 0;
-}
-
-char LoRa::reparseChar(uint8_t b) {
-  if((b >= 0) && (b <= 9)) {
-    return(b + 48);
-  } else if((b >= 10) && (b <= 16)) {
-    return(b + 55);
-  }
-  return 0;
 }
