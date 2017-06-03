@@ -209,9 +209,11 @@
 //SX1278_REG_FIFO_RX_BASE_ADDR
 #define SX1278_FIFO_RX_BASE_ADDR_MAX                  0b00000000  //  7     0     allocate the entire FIFO buffer for RX only
 
+//TODO: move packet class into a separate file
 class packet {
   public:
     packet(const char* src = "", const char* dest = "", const char* dat = "");
+    packet(uint8_t* src, uint8_t* dest, const char* dat);
     
     uint8_t source[8] = {0, 0, 0, 0, 0, 0, 0, 0};
     uint8_t destination[8] = {0, 0, 0, 0, 0, 0, 0, 0};
@@ -231,13 +233,13 @@ class LoRa {
     LoRa(int nss = 7, uint8_t bw = SX1278_BW_8, uint8_t cr = SX1278_CR_4_5, uint8_t sf = SX1278_SF_7);
     uint8_t init();
     
-    int tx(packet& pack);
-    int rx(packet& pack, uint8_t mode = SX1278_RXSINGLE); //TODO: explain implicit header mode in documentation
+    uint8_t tx(packet& pack);
+    uint8_t rx(packet& pack, uint8_t mode = SX1278_RXSINGLE); //TODO: explain implicit header mode in documentation
     
     void setMode(uint8_t mode);
     
   private:
-    uint8_t _LoRaAddress[8];
+    uint8_t _LoRaAddress[8] = {0, 0, 0, 0, 0, 0, 0, 0};
     int _nss;
     uint8_t _bw, _cr, _sf;
     int _reset = 10;

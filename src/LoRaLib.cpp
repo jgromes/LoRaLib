@@ -1,6 +1,5 @@
 #include "LoRaLib.h"
 
-//TODO: overload contructor for array-like addresses
 packet::packet(const char* src, const char* dest, const char* dat) {
   //convert & save source
   for(uint8_t i = 0; i < 8; i++) {
@@ -12,8 +11,24 @@ packet::packet(const char* src, const char* dest, const char* dat) {
     destination[i] = (parseByte(dest[3*i]) << 4) | parseByte(dest[3*i + 1]);
   }
   
+  //get & save length
+  length = 0;
+  for(uint8_t i = 0; i < 240; i++) {
+    if(data[i] == '\0') {
+      length = i + 17;
+    }
+  }
+  
   //save data
   data = dat;
+}
+
+packet::packet(uint8_t* src, uint8_t* dest, const char* dat) {
+  //copy source & destination
+  for(uint8_t i = 0; i < 8; i++) {
+    source[i] = src[i];
+    destination[i] = dest[i];
+  }
   
   //get & save length
   length = 0;
@@ -22,6 +37,9 @@ packet::packet(const char* src, const char* dest, const char* dat) {
       length = i + 17;
     }
   }
+  
+  //copy data
+  data = dat;
 }
 
 const char* packet::getSourceStr(void) {
@@ -58,7 +76,7 @@ uint8_t packet::parseByte(char c) {
 }
 
 char packet::reparseChar(uint8_t b) {
-  if((b >= 0) && (b <= 9)) {
+  if(b <= 9) {
     return(b + 48);
   } else if((b >= 10) && (b <= 16)) {
     return(b + 55);
@@ -144,7 +162,7 @@ uint8_t LoRa::init() {
   config(_bw, _cr, _sf);
 }
 
-int LoRa::tx(packet& pack) {
+uint8_t LoRa::tx(packet& pack) {
   setMode(SX1278_STANDBY);
   setRegValue(SX1278_REG_PA_DAC, SX1278_PA_BOOST_ON, 2, 0);
   setRegValue(SX1278_REG_HOP_PERIOD, SX1278_HOP_PERIOD_OFF);
@@ -153,7 +171,7 @@ int LoRa::tx(packet& pack) {
   setRegValue(SX1278_REG_IRQ_FLAGS_MASK, SX1278_MASK_IRQ_FLAG_TX_DONE);
   
   if(pack.length > 256) {
-    return -1;
+    return(1);
   }
   setRegValue(SX1278_REG_PAYLOAD_LENGTH, pack.length);
   setRegValue(SX1278_REG_FIFO_TX_BASE_ADDR, SX1278_FIFO_TX_BASE_ADDR_MAX);
@@ -167,10 +185,10 @@ int LoRa::tx(packet& pack) {
   while(!digitalRead(_dio0));
   clearIRQFlags();
   
-  return 0;
+  return(0);
 }
 
-int LoRa::rx(packet& pack, uint8_t mode) {
+uint8_t LoRa::rx(packet& pack, uint8_t mode) {
   setMode(SX1278_STANDBY);
   if(mode == SX1278_RXSINGLE) {
     setRegValue(SX1278_REG_PA_DAC, SX1278_PA_BOOST_OFF);
@@ -187,12 +205,12 @@ int LoRa::rx(packet& pack, uint8_t mode) {
     while(!digitalRead(_dio0)) {
       //timeout on DIO1
       if(digitalRead(_dio1)) {
-        return(-1);
+        return(1);
       }
     }
     
     if(readRegister(SX1278_REG_IRQ_FLAGS)) {
-      return(-1);
+      return(1);
     }
     
     uint8_t sf = getRegValue(SX1278_REG_MODEM_CONFIG_2, 7, 4) & 0b00001111;
@@ -200,17 +218,15 @@ int LoRa::rx(packet& pack, uint8_t mode) {
       pack.length = getRegValue(SX1278_REG_RX_NB_BYTES);
     }
     
-    const char* data = new char[pack.length - 16];
-    
     for(uint8_t i = 0; i < 8; i++) {
       pack.source[i] = readRegister(SX1278_REG_FIFO);
     }
+    
     for(uint8_t i = 0; i < 8; i++) {
       pack.destination[i] = readRegister(SX1278_REG_FIFO);
     }
-    data = readRegisterBurstStr(SX1278_REG_FIFO, pack.length - 16);
-    pack.data = data;
-    delete[] data;
+    
+    pack.data  = readRegisterBurstStr(SX1278_REG_FIFO, pack.length - 16);
     
     return(0);
   } else if (mode == SX1278_RXCONTINUOUS) {
