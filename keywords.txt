@@ -7,29 +7,24 @@
 #######################################
 
 LoRaLib	KEYWORD1
-LoRa	KEYWORD1
 packet	KEYWORD1
+LoRa	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
 
-setMode	KEYWORD2
-tx	KEYWORD2
-rx	KEYWORD2
 source	KEYWORD2
 destination	KEYWORD2
 data	KEYWORD2
-setPacketSource	KEYWORD2
-setPacketSourceStr	KEYWORD2
-getPacketSource	KEYWORD2
-getPacketSourceStr	KEYWORD2
-setPacketDestination	KEYWORD2
-setPacketDestinationStr	KEYWORD2
-getPacketDestination	KEYWORD2
-getPacketDestinationStr	KEYWORD2
-setPacketData	KEYWORD2
-getPacketData	KEYWORD2
+length	KEYWORD2
+getSourceStr	KEYWORD2
+getDestinationStr	KEYWORD2
+
+init	KEYWORD2
+tx	KEYWORD2
+rx	KEYWORD2
+setMode	KEYWORD2
 
 #######################################
 # Constants (LITERAL1)
