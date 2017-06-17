@@ -16,6 +16,18 @@
   //#define VERBOSE
 #endif
 
+#define BYTE_TO_BINARY(byte)  \
+  (byte & 0x80 ? '1' : '0'), \
+  (byte & 0x40 ? '1' : '0'), \
+  (byte & 0x20 ? '1' : '0'), \
+  (byte & 0x10 ? '1' : '0'), \
+  (byte & 0x08 ? '1' : '0'), \
+  (byte & 0x04 ? '1' : '0'), \
+  (byte & 0x02 ? '1' : '0'), \
+  (byte & 0x01 ? '1' : '0') 
+
+#define LORA_NODE_ADDRESS_SELF  0
+
 //SX1278 register map
 #define SX1278_REG_FIFO                               0x00
 #define SX1278_REG_OP_MODE                            0x01
@@ -212,8 +224,12 @@
 //TODO: move packet class into a separate file
 class packet {
   public:
-    packet(const char* src = "", const char* dest = "", const char* dat = "");
+    packet(void);
+    packet(const char* dest, const char* dat);
+    packet(uint8_t* dest, const char* dat);
+    packet(const char* src, const char* dest, const char* dat);
     packet(uint8_t* src, uint8_t* dest, const char* dat);
+    
     
     uint8_t source[8] = {0, 0, 0, 0, 0, 0, 0, 0};
     uint8_t destination[8] = {0, 0, 0, 0, 0, 0, 0, 0};
@@ -222,8 +238,11 @@ class packet {
     
     const char* getSourceStr(void);
     const char* getDestinationStr(void);
+    
+    uint8_t* getLoraAddress(void);
   
   private:
+    void init(uint8_t* src, uint8_t* dest, const char* dat);
     uint8_t parseByte(char c);
     char reparseChar(uint8_t b);
 };
@@ -238,13 +257,21 @@ class LoRa {
     
     void setMode(uint8_t mode);
     
+    #ifdef VERBOSE
+      void regDump(void);
+    #endif
+    
+    #ifdef DEBUG
+      void printStatus(void);
+    #endif
+    
   private:
     uint8_t _LoRaAddress[8] = {0, 0, 0, 0, 0, 0, 0, 0};
     int _nss;
     uint8_t _bw, _cr, _sf;
     int _reset = 10;
-    int _dio0 = 9;
-    int _dio1 = 8;
+    int _dio0 = 2; //2 for new, 9 for old
+    int _dio1 = 3; //3 for new, 8 for old
     
     #if defined(__AVR_ATmega168__) || defined(__AVR_ATmega328P__)
       int _sck = 13;
@@ -259,7 +286,7 @@ class LoRa {
     #endif
     
     void config(uint8_t bw, uint8_t cr, uint8_t sf);
-    uint8_t setRegValue(uint8_t reg, uint8_t value, uint8_t msb = 7, uint8_t lsb = 0); //TODO: add msb/lsb value check
+    uint8_t setRegValue(uint8_t reg, uint8_t value, uint8_t msb = 7, uint8_t lsb = 0);
     uint8_t getRegValue(uint8_t reg, uint8_t msb = 7, uint8_t lsb = 0);
     void clearIRQFlags(void);
     

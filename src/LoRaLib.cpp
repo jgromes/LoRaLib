@@ -1,29 +1,50 @@
 #include "LoRaLib.h"
 
+packet::packet(void) {
+  uint8_t* src = getLoraAddress();
+  uint8_t dest[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+  const char* data = "";
+  
+  init(src, dest, data);
+}
+
+packet::packet(const char* dest, const char* dat) {
+  uint8_t* src = getLoraAddress();
+  uint8_t destTmp[8];
+  
+  for(uint8_t i = 0; i < 8; i++) {
+    destTmp[i] = (parseByte(dest[3*i]) << 4) | parseByte(dest[3*i + 1]);
+  }
+  
+  init(src, destTmp, dat);
+}
+
+packet::packet(uint8_t* dest, const char* dat) {
+  uint8_t* src = getLoraAddress();
+  
+  init(src, dest, dat);
+}
+
 packet::packet(const char* src, const char* dest, const char* dat) {
-  //convert & save source
+  uint8_t srcTmp[8];
+  uint8_t destTmp[8];
+
   for(uint8_t i = 0; i < 8; i++) {
-    source[i] = (parseByte(src[3*i]) << 4) | parseByte(src[3*i + 1]);
+    srcTmp[i] = (parseByte(src[3*i]) << 4) | parseByte(src[3*i + 1]);
   }
   
-  //convert & save destination
   for(uint8_t i = 0; i < 8; i++) {
-    destination[i] = (parseByte(dest[3*i]) << 4) | parseByte(dest[3*i + 1]);
+    destTmp[i] = (parseByte(dest[3*i]) << 4) | parseByte(dest[3*i + 1]);
   }
   
-  //get & save length
-  length = 0;
-  for(uint8_t i = 0; i < 240; i++) {
-    if(data[i] == '\0') {
-      length = i + 17;
-    }
-  }
-  
-  //save data
-  data = dat;
+  init(srcTmp, destTmp, dat);
 }
 
 packet::packet(uint8_t* src, uint8_t* dest, const char* dat) {
+  init(src, dest, dat);
+}
+
+void packet::init(uint8_t* src, uint8_t* dest, const char* dat) {
   //copy source & destination
   for(uint8_t i = 0; i < 8; i++) {
     source[i] = src[i];
@@ -62,6 +83,14 @@ const char* packet::getDestinationStr(void) {
   }
   dest[23] = '\0';
   return(dest);
+}
+
+uint8_t* packet::getLoraAddress(void) {
+  uint8_t* loraAddress = new uint8_t[8];
+  for(uint8_t i = 0; i < 8; i++) {
+    loraAddress[i] = EEPROM.read(i);
+  }
+  return(loraAddress);
 }
 
 uint8_t packet::parseByte(char c) {
@@ -132,23 +161,23 @@ uint8_t LoRa::init() {
     delay(100);
   }
   
-  #ifdef VERBOSE
-    Serial.println("Register dump:");
-    uint8_t inByte;
-    for(uint8_t adr = 0x01; adr <= 0x70; adr++) {
-      Serial.print(adr, HEX);
-      Serial.print('\t');
-      inByte = readRegister(adr);
-      Serial.print(inByte, HEX);
-      Serial.print('\t');
-      Serial.println(inByte, BIN);
+  uint8_t i = 0;
+  bool flagFound = false;
+  while((i < 5) && !flagFound) {
+    if(readRegister(SX1278_REG_VERSION) == 0x12) {
+      flagFound = true;
+    } else {
+      #ifdef DEBUG
+        Serial.print("SX1278 not found! (");
+        Serial.print(i + 1);
+        Serial.println(" of 5 tries)");
+      #endif
     }
-    Serial.println("Done.");
-  #endif
+  }
   
-  if(readRegister(SX1278_REG_VERSION) != 0x12) {
+  if(!flagFound) {
     #ifdef DEBUG
-      Serial.print("No SX1278 found!");
+      Serial.println("No SX1278 found!");
     #endif
     SPI.end();
     while(true);
@@ -163,16 +192,23 @@ uint8_t LoRa::init() {
 }
 
 uint8_t LoRa::tx(packet& pack) {
+  // set mode to STANDBY
   setMode(SX1278_STANDBY);
-  setRegValue(SX1278_REG_PA_DAC, SX1278_PA_BOOST_ON, 2, 0);
+  
+  // tx init
+  setRegValue(SX1278_REG_PA_DAC, SX1278_PA_BOOST_OFF, 2, 0);
   setRegValue(SX1278_REG_HOP_PERIOD, SX1278_HOP_PERIOD_OFF);
   setRegValue(SX1278_REG_DIO_MAPPING_1, SX1278_DIO0_TX_DONE, 7, 6);
   clearIRQFlags();
   setRegValue(SX1278_REG_IRQ_FLAGS_MASK, SX1278_MASK_IRQ_FLAG_TX_DONE);
   
+  
+  // check packet length
   if(pack.length > 256) {
     return(1);
   }
+  
+  // write packet to FIFO
   setRegValue(SX1278_REG_PAYLOAD_LENGTH, pack.length);
   setRegValue(SX1278_REG_FIFO_TX_BASE_ADDR, SX1278_FIFO_TX_BASE_ADDR_MAX);
   setRegValue(SX1278_REG_FIFO_ADDR_PTR, SX1278_FIFO_TX_BASE_ADDR_MAX);
@@ -181,8 +217,17 @@ uint8_t LoRa::tx(packet& pack) {
   writeRegisterBurst(SX1278_REG_FIFO, pack.destination, 8);
   writeRegisterBurstStr(SX1278_REG_FIFO, pack.data, pack.length - 16);
   
+  // start transmission
   setMode(SX1278_TX);
-  while(!digitalRead(_dio0));
+  
+  // wait for TxDone flag
+  while(!digitalRead(_dio0)) {
+    #ifdef DEBUG
+      Serial.print('.');
+    #endif
+  }
+  
+  // clear all flags
   clearIRQFlags();
   
   return(0);
@@ -205,6 +250,9 @@ uint8_t LoRa::rx(packet& pack, uint8_t mode) {
     while(!digitalRead(_dio0)) {
       //timeout on DIO1
       if(digitalRead(_dio1)) {
+        #ifdef DEBUG
+          Serial.println("RX symbolic timeout!");
+        #endif
         return(1);
       }
     }
@@ -213,7 +261,7 @@ uint8_t LoRa::rx(packet& pack, uint8_t mode) {
       return(1);
     }
     
-    uint8_t sf = getRegValue(SX1278_REG_MODEM_CONFIG_2, 7, 4) & 0b00001111;
+    uint8_t sf = getRegValue(SX1278_REG_MODEM_CONFIG_2, 7, 4);
     if(sf != SX1278_SF_6) {
       pack.length = getRegValue(SX1278_REG_RX_NB_BYTES);
     }
@@ -241,14 +289,18 @@ void LoRa::setMode(uint8_t mode) {
 }
 
 void LoRa::config(uint8_t bw, uint8_t cr, uint8_t sf) {
+  // set mode to SLEEP
   setMode(SX1278_SLEEP);
   
+  // set LoRa mode
   setRegValue(SX1278_REG_OP_MODE, SX1278_LORA, 7, 7);
   
+  // set carrier frequency
   setRegValue(SX1278_REG_FRF_MSB, SX1278_FRF_MSB);
   setRegValue(SX1278_REG_FRF_MID, SX1278_FRF_MID);
   setRegValue(SX1278_REG_FRF_LSB, SX1278_FRF_LSB);
   
+  // output power configuration
   setRegValue(SX1278_REG_PA_CONFIG, SX1278_PA_SELECT_BOOST | SX1278_MAX_POWER | SX1278_OUTPUT_POWER);
   setRegValue(SX1278_REG_OCP, SX1278_OCP_ON | SX1278_OCP_TRIM, 5, 0);
   setRegValue(SX1278_REG_LNA, SX1278_LNA_GAIN_1 | SX1278_LNA_BOOST_HF_ON);
@@ -273,20 +325,20 @@ void LoRa::config(uint8_t bw, uint8_t cr, uint8_t sf) {
 }
 
 uint8_t LoRa::setRegValue(uint8_t reg, uint8_t value, uint8_t msb, uint8_t lsb) {
-  if((msb > 7) || (lsb > 7)) {
+  if((msb > 7) || (lsb > 7) || (lsb > msb)) {
     return 0xFF;
   }
   uint8_t currentValue = readRegister(reg);
-  uint8_t newValue = currentValue & ((0b11111111 << (msb + 1)) | (0b11111111 >> (8 - lsb)));
+  uint8_t newValue = currentValue & ((0b11111111 << (msb + 1)) & (0b11111111 >> (8 - lsb)));
   writeRegister(reg, newValue | value);
 }
 
 uint8_t LoRa::getRegValue(uint8_t reg, uint8_t msb, uint8_t lsb) {
-  if((msb > 7) || (lsb > 7)) {
+  if((msb > 7) || (lsb > 7) || (lsb > msb)) {
     return 0xFF;
   }
   uint8_t rawValue = readRegister(reg);
-  uint8_t maskedValue = rawValue & ((0b11111111 << lsb) | (0b11111111 >> (7 - msb)));
+  uint8_t maskedValue = rawValue & ((0b11111111 << lsb) & (0b11111111 >> (7 - msb)));
   return(maskedValue);
 }
 
@@ -359,3 +411,184 @@ void LoRa::generateLoRaAdress(void) {
     EEPROM.write(i, (uint8_t)random(0, 256));
   }
 }
+
+#ifdef VERBOSE
+  void LoRa::regDump(void) {
+    Serial.println("Register dump:");
+    uint8_t inByte;
+    char buffHex[2];
+    char buffBin[8];
+    for(uint8_t adr = 0x01; adr <= 0x70; adr++) {
+      sprintf(buffHex, "0x%02X", adr);
+      Serial.print(buffHex);
+      Serial.print('\t');
+      
+      inByte = readRegister(adr);
+      sprintf(buffHex, "0x%02X", inByte);
+      Serial.print(buffHex);
+      Serial.print('\t');
+      
+      sprintf(buffBin, "%c%c%c%c %c%c%c%c", BYTE_TO_BINARY(inByte));
+      Serial.println(buffBin);
+    }
+    Serial.println("Done.");
+  }
+#endif
+
+#ifdef DEBUG
+  void LoRa::printStatus(void) {
+    // modulation
+    Serial.print("Modulation:\t\t");
+    switch(getRegValue(SX1278_REG_OP_MODE, 7, 7)) {
+      case SX1278_LORA:
+        Serial.println("LoRa");
+        break;
+      case SX1278_FSK_OOK:
+        Serial.println("FSK/OOK");
+        break;
+      default:
+        Serial.println("unknown");
+    }
+    
+    // op mode
+    Serial.print("Mode:\t\t\t");
+    switch(getRegValue(SX1278_REG_OP_MODE, 2, 0)) {
+      case SX1278_SLEEP:
+        Serial.println("SX1278_SLEEP");
+        break;
+      case SX1278_STANDBY:
+        Serial.println("SX1278_STANDBY");
+        break;
+      case SX1278_FSTX:
+        Serial.println("SX1278_FSTX");
+        break;
+      case SX1278_TX:
+        Serial.println("SX1278_TX");
+        break;
+      case SX1278_FSRX:
+        Serial.println("SX1278_FSRX");
+        break;
+      case SX1278_RXCONTINUOUS:
+        Serial.println("SX1278_RXCONTINUOUS");
+        break;
+      case SX1278_RXSINGLE:
+        Serial.println("SX1278_RXSINGLE");
+        break;
+      case SX1278_CAD:
+        Serial.println("SX1278_CAD");
+        break;
+      default:
+        Serial.println("unknown");
+    }
+    
+    // bandwidth
+    Serial.print("Bandwidth:\t\t");
+    switch(getRegValue(SX1278_REG_MODEM_CONFIG_1, 7, 4)) {
+      case SX1278_BW_0:
+        Serial.println("7.80 kHz");
+        break;
+      case SX1278_BW_1:
+        Serial.println("10.40 kHz");
+        break;
+      case SX1278_BW_2:
+        Serial.println("15.60 kHz");
+        break;
+      case SX1278_BW_3:
+        Serial.println("20.80 kHz");
+        break;
+      case SX1278_BW_4:
+        Serial.println("31.25 kHz");
+        break;
+      case SX1278_BW_5:
+        Serial.println("41.70 kHz");
+        break;
+      case SX1278_BW_6:
+        Serial.println("62.50 kHz");
+        break;
+      case SX1278_BW_7:
+        Serial.println("125.00 kHz");
+        break;
+      case SX1278_BW_8:
+        Serial.println("250.00 kHz");
+        break;
+      case SX1278_BW_9:
+        Serial.println("500.00 kHz");
+        break;
+      default:
+        Serial.println("unknown");
+    }
+    
+    // error coding rate
+    Serial.print("Error Coding Rate:\t");
+    switch(getRegValue(SX1278_REG_MODEM_CONFIG_1, 3, 1)) {
+      case SX1278_CR_4_5:
+        Serial.println("4/5");
+        break;
+      case SX1278_CR_4_6:
+        Serial.println("4/6");
+        break;
+      case SX1278_CR_4_7:
+        Serial.println("4/7");
+        break;
+      case SX1278_CR_4_8:
+        Serial.println("4/8");
+        break;
+      default:
+        Serial.println("unknown");
+    }
+    
+    // spreading factor
+    Serial.print("Spreading Factor:\t");
+    switch(getRegValue(SX1278_REG_MODEM_CONFIG_2, 7, 4)) {
+      case SX1278_SF_6:
+        Serial.println("64");
+        break;
+      case SX1278_SF_7:
+        Serial.println("128");
+        break;
+      case SX1278_SF_8:
+        Serial.println("256");
+        break;
+      case SX1278_SF_9:
+        Serial.println("512");
+        break;
+      case SX1278_SF_10:
+        Serial.println("1024");
+        break;
+      case SX1278_SF_11:
+        Serial.println("2048");
+        break;
+      case SX1278_SF_12:
+        Serial.println("4096");
+        break;
+      default:
+        Serial.println("unknown");
+    }
+    
+    // header mode
+    Serial.print("Header Mode:\t\t");
+    switch(getRegValue(SX1278_REG_MODEM_CONFIG_1, 0, 0)) {
+      case SX1278_HEADER_EXPL_MODE:
+        Serial.println("explicit");
+        break;
+      case SX1278_HEADER_IMPL_MODE:
+        Serial.println("implicit");
+        break;
+      default:
+        Serial.println("unknown");
+    }
+    
+    // crc
+    Serial.print("RX CRC:\t\t\t");
+    switch(getRegValue(SX1278_REG_MODEM_CONFIG_1, 0, 0)) {
+      case SX1278_RX_CRC_MODE_OFF:
+        Serial.println("disabled");
+        break;
+      case SX1278_RX_CRC_MODE_ON:
+        Serial.println("enabled");
+        break;
+      default:
+        Serial.println("unknown");
+    }
+  }
+#endif
