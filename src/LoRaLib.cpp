@@ -1,15 +1,17 @@
 #include "LoRaLib.h"
 
 packet::packet(void) {
-  uint8_t* src = getLoraAddress();
+  uint8_t src[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+  getLoraAddress(src);
   uint8_t dest[8] = {0, 0, 0, 0, 0, 0, 0, 0};
   const char* data = "";
   
   init(src, dest, data);
 }
 
-packet::packet(const char* dest, const char* dat) {
-  uint8_t* src = getLoraAddress();
+packet::packet(const char dest[24], const char dat[240]) {
+  uint8_t src[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+  getLoraAddress(src);
   uint8_t destTmp[8];
   
   for(uint8_t i = 0; i < 8; i++) {
@@ -19,13 +21,14 @@ packet::packet(const char* dest, const char* dat) {
   init(src, destTmp, dat);
 }
 
-packet::packet(uint8_t* dest, const char* dat) {
-  uint8_t* src = getLoraAddress();
+packet::packet(uint8_t dest[8], const char dat[240]) {
+  uint8_t src[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+  getLoraAddress(src);
   
   init(src, dest, dat);
 }
 
-packet::packet(const char* src, const char* dest, const char* dat) {
+packet::packet(const char src[24], const char dest[24], const char dat[240]) {
   uint8_t srcTmp[8];
   uint8_t destTmp[8];
 
@@ -40,57 +43,52 @@ packet::packet(const char* src, const char* dest, const char* dat) {
   init(srcTmp, destTmp, dat);
 }
 
-packet::packet(uint8_t* src, uint8_t* dest, const char* dat) {
+packet::packet(uint8_t src[8], uint8_t dest[8], const char dat[240]) {
   init(src, dest, dat);
 }
 
-void packet::init(uint8_t* src, uint8_t* dest, const char* dat) {
+void packet::init(uint8_t src[8], uint8_t dest[8], const char dat[240]) {
   //copy source & destination
   for(uint8_t i = 0; i < 8; i++) {
     source[i] = src[i];
     destination[i] = dest[i];
   }
   
-  //get & save length
+  //copy data, get & save length
   length = 0;
   for(uint8_t i = 0; i < 240; i++) {
+    data[i] = dat[i];
     if(data[i] == '\0') {
       length = i + 17;
     }
   }
-  
-  //copy data
-  data = dat;
 }
 
-const char* packet::getSourceStr(void) {
-  char* src = new char[24];
+uint8_t packet::getSourceStr(char src[24]) {
   for(uint8_t i = 0; i < 8; i++) {
     src[3*i] = reparseChar(source[i] >> 4);
     src[3*i+1] = reparseChar(source[i] & 0x0F);
     src[3*i+2] = ':';
   }
   src[23] = '\0';
-  return(src);
+  return(0);
 }
 
-const char* packet::getDestinationStr(void) {
-  char* dest = new char[24];
+uint8_t packet::getDestinationStr(char dest[24]) {
   for(uint8_t i = 0; i < 8; i++) {
     dest[3*i] = reparseChar(destination[i] >> 4);
     dest[3*i+1] = reparseChar(destination[i] & 0x0F);
     dest[3*i+2] = ':';
   }
   dest[23] = '\0';
-  return(dest);
+  return(0);
 }
 
-uint8_t* packet::getLoraAddress(void) {
-  uint8_t* loraAddress = new uint8_t[8];
+uint8_t packet::getLoraAddress(uint8_t addr[8]) {
   for(uint8_t i = 0; i < 8; i++) {
-    loraAddress[i] = EEPROM.read(i);
+    addr[i] = EEPROM.read(i);
   }
-  return(loraAddress);
+  return(0);
 }
 
 uint8_t packet::parseByte(char c) {
@@ -125,8 +123,8 @@ LoRa::LoRa(int nss, uint8_t bw, uint8_t cr, uint8_t sf) {
   pinMode(_sck, OUTPUT);
   pinMode(_miso, INPUT);
   pinMode(_mosi, OUTPUT);
-  pinMode(_reset, OUTPUT);
   pinMode(_dio0, INPUT);
+  pinMode(_dio1, INPUT);
   
   SPI.begin();
 }
@@ -163,15 +161,23 @@ uint8_t LoRa::init() {
   
   uint8_t i = 0;
   bool flagFound = false;
-  while((i < 5) && !flagFound) {
-    if(readRegister(SX1278_REG_VERSION) == 0x12) {
+  while((i < 10) && !flagFound) {
+    uint8_t version = readRegister(SX1278_REG_VERSION);
+    if(version == 0x12) {
       flagFound = true;
     } else {
       #ifdef DEBUG
         Serial.print("SX1278 not found! (");
         Serial.print(i + 1);
-        Serial.println(" of 5 tries)");
+        Serial.print(" of 10 tries) SX1278_REG_VERSION == ");
+        
+        char buffHex[5];
+        sprintf(buffHex, "0x%02X", version);
+        Serial.print(buffHex);
+        Serial.println();
       #endif
+      delay(1000);
+      i++;
     }
   }
   
@@ -201,7 +207,6 @@ uint8_t LoRa::tx(packet& pack) {
   setRegValue(SX1278_REG_DIO_MAPPING_1, SX1278_DIO0_TX_DONE, 7, 6);
   clearIRQFlags();
   setRegValue(SX1278_REG_IRQ_FLAGS_MASK, SX1278_MASK_IRQ_FLAG_TX_DONE);
-  
   
   // check packet length
   if(pack.length > 256) {
@@ -238,27 +243,27 @@ uint8_t LoRa::rx(packet& pack, uint8_t mode) {
   if(mode == SX1278_RXSINGLE) {
     setRegValue(SX1278_REG_PA_DAC, SX1278_PA_BOOST_OFF);
     setRegValue(SX1278_REG_HOP_PERIOD, SX1278_HOP_PERIOD_MAX);
-    setRegValue(SX1278_REG_DIO_MAPPING_1, SX1278_DIO0_RX_DONE | SX1278_DIO1_RX_TIMEOUT, 7, 5);
+    setRegValue(SX1278_REG_DIO_MAPPING_1, SX1278_DIO0_RX_DONE | SX1278_DIO1_RX_TIMEOUT, 7, 4);
     clearIRQFlags();
-    setRegValue(SX1278_REG_IRQ_FLAGS_MASK, (SX1278_MASK_IRQ_FLAG_PAYLOAD_CRC_ERROR & SX1278_MASK_IRQ_FLAG_VALID_HEADER));
+    setRegValue(SX1278_REG_IRQ_FLAGS_MASK, (SX1278_MASK_IRQ_FLAG_RX_DONE & SX1278_MASK_IRQ_FLAG_RX_TIMEOUT));
     
     setRegValue(SX1278_REG_FIFO_RX_BASE_ADDR, SX1278_FIFO_RX_BASE_ADDR_MAX);
     setRegValue(SX1278_REG_FIFO_ADDR_PTR, SX1278_FIFO_RX_BASE_ADDR_MAX);
     
     setMode(SX1278_RXSINGLE);
-    //wait for RX done on DIO0
+    // wait for RX done on DIO0
     while(!digitalRead(_dio0)) {
-      //timeout on DIO1
+      //Serial.println(readRegister(SX1278_REG_IRQ_FLAGS), BIN);
       if(digitalRead(_dio1)) {
-        #ifdef DEBUG
-          Serial.println("RX symbolic timeout!");
-        #endif
+        // timeout on DIO1
+        clearIRQFlags();
         return(1);
       }
     }
     
-    if(readRegister(SX1278_REG_IRQ_FLAGS)) {
-      return(1);
+    // check PayloadCrcError flag
+    if(getRegValue(SX1278_REG_IRQ_FLAGS, 5, 5) == SX1278_CLEAR_IRQ_FLAG_PAYLOAD_CRC_ERROR) {
+      return(2);
     }
     
     uint8_t sf = getRegValue(SX1278_REG_MODEM_CONFIG_2, 7, 4);
@@ -274,11 +279,11 @@ uint8_t LoRa::rx(packet& pack, uint8_t mode) {
       pack.destination[i] = readRegister(SX1278_REG_FIFO);
     }
     
-    pack.data  = readRegisterBurstStr(SX1278_REG_FIFO, pack.length - 16);
+    readRegisterBurstStr(SX1278_REG_FIFO, pack.length - 16, pack.data);
     
     return(0);
   } else if (mode == SX1278_RXCONTINUOUS) {
-    //TODO: implement RXCONTINUOUS MODE
+    // TODO: implement RXCONTINUOUS MODE
   }
   
   return(1);
@@ -306,18 +311,23 @@ void LoRa::config(uint8_t bw, uint8_t cr, uint8_t sf) {
   setRegValue(SX1278_REG_LNA, SX1278_LNA_GAIN_1 | SX1278_LNA_BOOST_HF_ON);
   
   if(sf == SX1278_SF_6) {
-    setRegValue(SX1278_REG_MODEM_CONFIG_2, SX1278_SF_6 | SX1278_TX_MODE_SINGLE | SX1278_RX_CRC_MODE_ON | SX1278_RX_TIMEOUT_MSB);
+    setRegValue(SX1278_REG_MODEM_CONFIG_2, SX1278_SF_6 | SX1278_TX_MODE_SINGLE | SX1278_RX_CRC_MODE_ON, 7, 2);
     setRegValue(SX1278_REG_MODEM_CONFIG_1, bw | cr | SX1278_HEADER_IMPL_MODE);
     setRegValue(SX1278_REG_DETECT_OPTIMIZE, SX1278_DETECT_OPTIMIZE_SF_6, 2, 0);
     setRegValue(SX1278_REG_DETECTION_THRESHOLD, SX1278_DETECTION_THRESHOLD_SF_6);
   } else {
-    setRegValue(SX1278_REG_MODEM_CONFIG_2, sf | SX1278_TX_MODE_SINGLE | SX1278_RX_CRC_MODE_ON | SX1278_RX_TIMEOUT_MSB);
+    setRegValue(SX1278_REG_MODEM_CONFIG_2, sf | SX1278_TX_MODE_SINGLE | SX1278_RX_CRC_MODE_ON, 7, 2);
     setRegValue(SX1278_REG_MODEM_CONFIG_1, bw | cr | SX1278_HEADER_EXPL_MODE);
     setRegValue(SX1278_REG_DETECT_OPTIMIZE, SX1278_DETECT_OPTIMIZE_SF_7_12, 2, 0);
     setRegValue(SX1278_REG_DETECTION_THRESHOLD, SX1278_DETECTION_THRESHOLD_SF_7_12);
   }
   
-  setRegValue(SX1278_REG_SYMB_TIMEOUT_LSB, SX1278_RX_TIMEOUT_LSB);
+  //set rx timeout length
+  /*uint16_t timeoutRx = 1023;
+  setRegValue(SX1278_REG_MODEM_CONFIG_2, (uint8_t)(timeoutRx >> 8), 1, 0);
+  setRegValue(SX1278_REG_SYMB_TIMEOUT_LSB, (uint8_t)timeoutRx);*/
+  
+  //set default preamble length
   setRegValue(SX1278_REG_PREAMBLE_MSB, SX1278_PREAMBLE_LENGTH_MSB);
   setRegValue(SX1278_REG_PREAMBLE_LSB, SX1278_PREAMBLE_LENGTH_LSB);
   
@@ -346,26 +356,24 @@ void LoRa::clearIRQFlags(void) {
   writeRegister(SX1278_REG_IRQ_FLAGS, 0b11111111);
 }
 
-uint8_t* LoRa::readRegisterBurst(uint8_t reg, uint8_t numBytes) {
-  uint8_t* inBytes = new uint8_t[numBytes];
+uint8_t LoRa::readRegisterBurst(uint8_t reg, uint8_t numBytes, uint8_t* inBytes) {
   digitalWrite(_nss, LOW);
   SPI.transfer(reg | SX1278_READ);
   for(uint8_t i = 0; i< numBytes; i++) {
     inBytes[i] = SPI.transfer(reg);
   }
   digitalWrite(_nss, HIGH);
-  return(inBytes);
+  return(0);
 }
 
-const char* LoRa::readRegisterBurstStr(uint8_t reg, uint8_t numBytes) {
-  char* inBytes = new char[numBytes];
+uint8_t LoRa::readRegisterBurstStr(uint8_t reg, uint8_t numBytes, char* inBytes) {
   digitalWrite(_nss, LOW);
   SPI.transfer(reg | SX1278_READ);
   for(uint8_t i = 0; i< numBytes; i++) {
     inBytes[i] = SPI.transfer(reg);
   }
   digitalWrite(_nss, HIGH);
-  return(inBytes);
+  return(0);
 }
 
 void LoRa::writeRegisterBurst(uint8_t reg, uint8_t* data, uint8_t numBytes) {
@@ -415,15 +423,14 @@ void LoRa::generateLoRaAdress(void) {
 #ifdef VERBOSE
   void LoRa::regDump(void) {
     Serial.println("Register dump:");
-    uint8_t inByte;
-    char buffHex[2];
-    char buffBin[8];
+    char buffHex[5];
+    char buffBin[10];
     for(uint8_t adr = 0x01; adr <= 0x70; adr++) {
       sprintf(buffHex, "0x%02X", adr);
       Serial.print(buffHex);
       Serial.print('\t');
       
-      inByte = readRegister(adr);
+      uint8_t inByte = readRegister(adr);
       sprintf(buffHex, "0x%02X", inByte);
       Serial.print(buffHex);
       Serial.print('\t');
