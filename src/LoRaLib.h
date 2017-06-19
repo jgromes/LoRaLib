@@ -10,10 +10,10 @@
 #include <SPI.h>
 #include <EEPROM.h>
 
-#define DEBUG
+//#define DEBUG
 
 #ifdef DEBUG
-  #define VERBOSE
+  //#define VERBOSE
 #endif
 
 #define BYTE_TO_BINARY(byte)  \
@@ -246,7 +246,7 @@ class packet {
 
 class LoRa {
   public:
-    LoRa(int nss = 7, uint8_t bw = SX1278_BW_8, uint8_t cr = SX1278_CR_4_5, uint8_t sf = SX1278_SF_12);
+    LoRa(int nss = 7, uint8_t bw = SX1278_BW_9, uint8_t cr = SX1278_CR_4_5, uint8_t sf = SX1278_SF_12);
     uint8_t init();
     
     uint8_t tx(packet& pack);
