@@ -236,10 +236,10 @@ class packet {
     uint8_t getSourceStr(char src[24]);
     uint8_t getDestinationStr(char dest[24]);
     
-    uint8_t getLoraAddress(uint8_t addr[8]);
-  
   private:
     void init(uint8_t src[8], uint8_t dest[8], const char dat[240]);
+    uint8_t getLoraAddress(uint8_t addr[8]);
+    
     uint8_t parseByte(char c);
     char reparseChar(uint8_t b);
 };
@@ -247,12 +247,17 @@ class packet {
 class LoRa {
   public:
     LoRa(int nss = 7, uint8_t bw = SX1278_BW_9, uint8_t cr = SX1278_CR_4_5, uint8_t sf = SX1278_SF_12);
-    uint8_t init();
+    
+    //TODO: add functions to read current bw, sf and cr from SX1278
+    
+    uint8_t init(uint16_t addrEeprom = 0, uint16_t addrFlag = 8);
     
     uint8_t tx(packet& pack);
     uint8_t rx(packet& pack, uint8_t mode = SX1278_RXSINGLE); //TODO: explain implicit header mode in documentation
     
     void setMode(uint8_t mode);
+    void config(uint8_t bw, uint8_t cr, uint8_t sf);
+    void getLoraAddress(uint8_t addr[8]);
     
     #ifdef VERBOSE
       void regDump(void);
@@ -263,9 +268,11 @@ class LoRa {
     #endif
     
   private:
-    uint8_t _LoRaAddress[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-    int _nss;
+    uint8_t _address[8] = {0, 0, 0, 0, 0, 0, 0, 0};
     uint8_t _bw, _cr, _sf;
+    uint16_t _addrEeprom, _addrFlag;
+    
+    int _nss;
     int _dio0 = 2;
     int _dio1 = 3;
     
@@ -281,7 +288,6 @@ class LoRa {
       #error "Unsupported board selected, please select Arduino UNO or Mega"
     #endif
     
-    void config(uint8_t bw, uint8_t cr, uint8_t sf);
     uint8_t setRegValue(uint8_t reg, uint8_t value, uint8_t msb = 7, uint8_t lsb = 0);
     uint8_t getRegValue(uint8_t reg, uint8_t msb = 7, uint8_t lsb = 0);
     void clearIRQFlags(void);

@@ -143,18 +143,20 @@ LoRa::LoRa(int nss, uint8_t bw, uint8_t cr, uint8_t sf) {
   SPI.begin();
 }
 
-uint8_t LoRa::init() {
+uint8_t LoRa::init(uint16_t addrEeprom, uint16_t addrFlag) {
   #ifdef DEBUG
     Serial.begin(9600);
     Serial.println();
   #endif
   
+  _addrEeprom = addrEeprom;
+  _addrFlag = addrFlag;
+  
   // check if this node has an address
-  if(EEPROM.read(8) == 255) {
+  if(EEPROM.read(_addrEeprom) == 255) {
     // if not, generate new random address
     randomSeed(analogRead(5));
     generateLoRaAdress();
-    EEPROM.write(8, 0);
     delay(100);
   }
   
@@ -163,9 +165,9 @@ uint8_t LoRa::init() {
   #endif
   // read node address from Arduino EEPROM
   for(uint8_t i = 0; i < 8; i++) {
-    _LoRaAddress[i] = EEPROM.read(i);
+    _address[i] = EEPROM.read(i);
     #ifdef DEBUG
-      Serial.print(_LoRaAddress[i], HEX);
+      Serial.print(_address[i], HEX);
       if(i < 7) {
         Serial.print(":");
       } else {
@@ -214,6 +216,8 @@ uint8_t LoRa::init() {
   
   // configure SX1278
   config(_bw, _cr, _sf);
+  
+  return(0);
 }
 
 uint8_t LoRa::tx(packet& pack) {
@@ -256,6 +260,7 @@ uint8_t LoRa::tx(packet& pack) {
   return(0);
 }
 
+//TODO: add packet filtering based on address
 uint8_t LoRa::rx(packet& pack, uint8_t mode) {
   // set mode to STANDBY
   setMode(SX1278_STANDBY);
@@ -318,13 +323,14 @@ uint8_t LoRa::rx(packet& pack, uint8_t mode) {
     // TODO: implement RXCONTINUOUS MODE
   }
   
-  return(1);
+  return(3);
 }
 
 void LoRa::setMode(uint8_t mode) {
   setRegValue(SX1278_REG_OP_MODE, mode, 2, 0);
 }
 
+//TODO: add BW, CR and SF value check
 void LoRa::config(uint8_t bw, uint8_t cr, uint8_t sf) {
   // set mode to SLEEP
   setMode(SX1278_SLEEP);
@@ -354,15 +360,16 @@ void LoRa::config(uint8_t bw, uint8_t cr, uint8_t sf) {
     setRegValue(SX1278_REG_DETECTION_THRESHOLD, SX1278_DETECTION_THRESHOLD_SF_7_12);
   }
   
-  //set rx timeout length
+  // set rx timeout length
   /*uint16_t timeoutRx = 1023;
   setRegValue(SX1278_REG_MODEM_CONFIG_2, (uint8_t)(timeoutRx >> 8), 1, 0);
   setRegValue(SX1278_REG_SYMB_TIMEOUT_LSB, (uint8_t)timeoutRx);*/
   
-  //set default preamble length
+  // set default preamble length
   setRegValue(SX1278_REG_PREAMBLE_MSB, SX1278_PREAMBLE_LENGTH_MSB);
   setRegValue(SX1278_REG_PREAMBLE_LSB, SX1278_PREAMBLE_LENGTH_LSB);
   
+  // set mode to STANDBY
   setMode(SX1278_STANDBY);
 }
 
@@ -370,6 +377,7 @@ uint8_t LoRa::setRegValue(uint8_t reg, uint8_t value, uint8_t msb, uint8_t lsb) 
   if((msb > 7) || (lsb > 7) || (lsb > msb)) {
     return 0xFF;
   }
+  
   uint8_t currentValue = readRegister(reg);
   uint8_t newValue = currentValue & ((0b11111111 << (msb + 1)) & (0b11111111 >> (8 - lsb)));
   writeRegister(reg, newValue | value);
@@ -379,6 +387,7 @@ uint8_t LoRa::getRegValue(uint8_t reg, uint8_t msb, uint8_t lsb) {
   if((msb > 7) || (lsb > 7) || (lsb > msb)) {
     return 0xFF;
   }
+  
   uint8_t rawValue = readRegister(reg);
   uint8_t maskedValue = rawValue & ((0b11111111 << lsb) & (0b11111111 >> (7 - msb)));
   return(maskedValue);
@@ -447,9 +456,10 @@ void LoRa::writeRegister(uint8_t reg, uint8_t data) {
 }
 
 void LoRa::generateLoRaAdress(void) {
-  for(uint8_t i = 0; i < 8; i++) {
+  for(uint8_t i = _addrEeprom; i < (_addrEeprom + 8); i++) {
     EEPROM.write(i, (uint8_t)random(0, 256));
   }
+  EEPROM.write(_addrFlag, 0);
 }
 
 #ifdef VERBOSE
