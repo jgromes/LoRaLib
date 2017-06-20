@@ -16,15 +16,23 @@ If you're looking for the shield to use with this library, it has its own reposi
 
 DISCLAIMER: This library is provided 'AS IS'. See `license.txt` for details.
 
-This library enables easy long range communaction with SX1278-based LoRa modules. It was designed to be used with LoRenz Rev.B shields or modules. However, they are not required and this library can be used with any LoRa module, as long as it is based on the SX1278 chip.
+This library enables easy long range communaction with SX1278-based LoRa modules. It was designed to be used with LoRenz Rev.B shields. However, they are not required and this library can be used with any LoRa module, as long as it is based on the SX1278 chip.
 
 ## Library reference
-The following is a list of currently implemented features and their description, see `/examples/` for examples of their usage.
+
+The following is a list of currently implemented public member functions and variables, as well as their description. See `/examples/` for examples of their usage.
+
+### LoRa class
+
+#### Public member variables
+
+Currently, there are no public member variables in the LoRa class.
+
+#### Public member functions
 
 * `LoRa(int nss, uint8_t bw, uint8_t cr, uint8_t sf)`
 
-  Default constructor, used to create the LoRa object.  
-  Usage:
+  Default constructor, used to create the LoRa object.
   
   * Single LoRa module connected:
   
@@ -32,7 +40,7 @@ The following is a list of currently implemented features and their description,
     LoRa lora;
     ```
     
-    This will create a `lora` instance of the `LoRa` class with default values of bandwidth, coding rate and spreading factor. See Table 1. for their recommended values.
+    This will create a `lora` instance of the `LoRa` class with default values of bandwidth, coding rate and spreading factor.
   
   * Multiple LoRa modules connected simultaneously:
     
@@ -43,78 +51,82 @@ The following is a list of currently implemented features and their description,
     LoRa lora3(4);
     ```
     
-    Multiple LoRenz Rev.B shields/modules can be connected to a single Arduino, however, on each of them, a different position on the NSS pin header has to be shorted out. Since there are 4 positions on the NSS pin header, the maximum of simultaneously connected LoRenz Rev.B shields/modules is 4. Any number of other LoRa modules can be connected and used with this library as long as their SPI NSS connection is not the same as the ones already used for LoRenz Rev.B shield(s)/module(s)
+    Multiple LoRenz Rev.B shields can be connected to a single Arduino, however, on each of them, a different position on the NSS pin header has to be shorted out. Since there are 4 positions on the NSS pin header, the maximum of simultaneously connected LoRenz Rev.B shields is 4. Any number of other LoRa modules can be connected and used with this library as long as their SPI NSS connection is not the same as the ones already used for LoRenz Rev.B shield(s).
 
+* `uint8_t init(uint16_t addrEeprom, uint16_t addrFlag)` 
 
-* `int init()` 
+  This method has to be called inside Arduino `setup()` function before any calls to other methods from this library. Much like in other libraries, this method handles the initial setup of the SX1278 chip. This method also handles creating the node address and writing it into Arduino EEPROM.
 
-  This method has to be called inside Arduino `setup()` function before any calls to other methods from this library. Much like in other libraries, this method handles the initial setup of the SX1278 chip.
+* `uint8_t tx(packet& pack)`
 
-* `int tx(packet* pack)`
+  This function will attempt to transmit the `packet pack` in LoRa mode. For information on the packet class, second part of this reference. In case the supplied packet is larger than 256 bytes, the function will return 1. In case of a successful transmission, the function will return 0.
 
-  This function will attempt to transmit the `packet pack` in LoRa mode. For information on the packet structure, see the third part of this document. In case the supplied packet is larger than 256 bytes, the function will return -1. In case of a successful transmission, the function will return 0.
+* `uint8_t rx(packet& pack, uint8_t mode)`
 
-* `packet* rx(uint8_t mode)`
+  This function will attempt to receive incoming data in LoRa mode. For information on the packet class, second part of this reference The default mode for this function is `RXSINGLE` mode: the function will be terminated after successful reception of a single packet, this is the recommended RX mode. In `RXCONTINUOUS` mode, the function will keep on going until terminated externally. This function will return 0 on sucessful packet reception, 1 if there was a timeout or 2 if the received packet is malformed.
 
-  This function will attempt to receive incoming data in LoRa mode. For information on the packet structure, see the third part of this document. The default mode for this function is `RXSINGLE` mode: the function will be terminated after successful reception of a single packet, this is the recommended RX mode. In `RXCONTINUOUS` mode, the function will keep on going until terminated externally.
+* `void config(uint8_t bw, uint8_t cr, uint8_t sf);`
 
-* `void setMode(uint8_t mode)`
+  This function will reconfigure the LoRa module to the supllied bandwidth, coding rate and spreading factor. For their values, see the header file.
+  
+  * `void getLoraAddress(uint8_t addr[8]);`
 
-  This function will set the LoRa module into a specified mode. The available modes are: `SLEEP`, `STANDBY`, `FSTX`, `FSRX`, `TX`, `RXCONTINUOUS`, `RXSINGLE` and `CAD`. For details on these modes, please refer to the SX1278 datasheet.
+This function can be used to get address of the current node.
 
-# Packet structure
+To be able to create networks using this library, each node in the network should have a unique 8-byte address. The address is generated randomly and then written into Arduino EEPROM to addresses `addrEeprom` to `addrEeprom + 7`. The default value of `addrEeprom` is 0, so when using the default initialization `LoRa::init()`, the address will be written to address 0 to 7. To prevent overwrite of existing address on the next start, 0 will be written to EEPROM address `addrFlag` (EEPROM address 8 by default).
+  
+  * `uint8_t address[8]`
 
-Because of the SX1278 internal FIFO buffer limitations, the maximum size of a single packet is 256 bytes. The following packet structure is a part of this library:
+The address of the current node.
 
-```
-struct packet {
-  uint8_t source[8];
-  uint8_t destination[8];
-  const char* data;
-};
-```
+To be able to create networks using this library, each node in the network should have a unique 8-byte address. The address is generated randomly and then written into Arduino EEPROM to addresses `addrEeprom` to `addrEeprom + 7`. The default value of `addrEeprom` is 0, so when using the default initialization `LoRa::init()`, the address will be written to address 0 to 7. To prevent overwrite of existing address on the next start, 0 will be written to EEPROM address `addrFlag` (EEPROM address 8 by default).
 
-The `source` and `destination` arrays are the addresses of the source and the destination LoRa modules. These addresses are in the form of an array of 8 bytes and can be supplied in the form of an address string, e.g. "01:23:45:67:89:AB:CD:EF".  
-The `data` is a null-terminated string of up to 240 characters.
+### Packet class
 
-The values of all of the above can be set and retrieved by the following functions:
+#### Public member variables
 
-* `void setPacketSource(packet* pack, uint8_t* address)`
+* `uint8_t source[8]`
 
-  Set the packet source in the form of an array of 8 `byte` numbers.
+An array of 8 `byte` numbers representing the address of the packet's source.
 
-* `void setPacketSourceStr(packet* pack, const char* address)`
+* `uint8_t destination[8]`
 
-  Set the packet source in the form of an address string.
+An array of 8 `byte` numbers representing the address of the packet's source.
 
-* `uint8_t* getPacketSource(packet* pack)`
+* `char data[240]`
 
-  Retrieve the packet source in the form of an array of 8 `byte` numbers.
+A null-terminated string of up to 240 characters. This limit is due to the limitations of SX1278 internal FIFO buffer, which can only hold 256 bytes of data. Since 8 bytes are used for the packet source and another 8 for destination, 240 bytes are left for the actual data.
 
-* `const char* getPacketSourceStr(packet* pack)`
+* `uint8_t length = 0`
 
-  Retrieve the packet source in the form of an address string.
+The total length of the packet in bytes. This includes the source (8 bytes), destination (8 bytes) and data (including the terminating null character).
 
-* `void setPacketDestination(packet* pack, uint8_t* address)`
+#### Public member functions
 
-  Set the packet destination in the form of an array of 8 `byte` numbers.
+* `packet(void)`
 
-* `void setPacketDestinationStr(packet* pack, const char* address)`
+The default constructor. The constructed packet will have the source of the node which constructed it, destination "00:00:00:00:00:00:00:00" and empty data.
 
-  Set the packet destination in the form of an address string.
+* `packet(const char dest[24], const char dat[240])`
 
-* `uint8_t* getPacketDestination(packet* pack)`
+An overloaded constructor for creating packets with given source and destination addresses. The constructed packet will have the source of the node which constructed it, destination is in the form of null-terminated address string. The data are a null-terminated string of data to be sent in the packet.
 
-  Retrieve the packet destination in the form of an array of 8 `byte` numbers.
+* `packet(uint8_t dest[8], const char dat[240])`
 
-* `const char* getPacketDestinationStr(packet* pack)`
+An overloaded constructor for creating packets with given source and destination addresses. The constructed packet will have the source of the node which constructed it, destination is in the form of an array of 8 bytes. The data are a null-terminated string of data to be sent in the packet.
 
-  Retrieve the packet destination in the form of an address string.
+* `packet(const char src[24], const char dest[24], const char dat[240])`
 
-* `void setPacketData(packet* pack, const char* data)`
+An overloaded constructor for creating packets with given source and destination addresses. Both source and destination are in the form of null-terminated address strings. The data are a null-terminated string of data to be sent in the packet.
 
-  Set the packet data in the form of a null-terminated string of up to 240 characters.
+* `packet(uint8_t src[8], uint8_t dest[8], const char dat[240])`
 
-* `const char* getPacketData(packet* pack)`
+An overloaded constructor for creating packets with given source and destination addresses. Both source and destination are in the form of an array of 8 bytes. The data are a null-terminated string of data to be sent in the packet.
 
-  Retrieve the packet data in the form of a null-terminated string of up to 240 characters.
+* `uint8_t getSourceStr(char src[24])`
+
+This function converts the 8-byte-array source address of the packet into more human-readable null-terminated address string in the form "01:23:45:67:89:AB:CD:EF".
+
+* `uint8_t getDestinationStr(char dest[24])`
+
+This function converts the 8-byte-array destination address of the packet into more human-readable null-terminated address string in the form "01:23:45:67:89:AB:CD:EF".
