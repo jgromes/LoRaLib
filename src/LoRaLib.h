@@ -10,7 +10,7 @@
 #include <SPI.h>
 #include <EEPROM.h>
 
-//#define DEBUG
+#define DEBUG
 
 #ifdef DEBUG
   //#define VERBOSE
@@ -233,12 +233,12 @@ class packet {
     char data[240] = {'\0'};
     uint8_t length = 0;
     
-    uint8_t getSourceStr(char src[24]);
-    uint8_t getDestinationStr(char dest[24]);
+    void getSourceStr(char src[24]);
+    void getDestinationStr(char dest[24]);
     
   private:
     void init(uint8_t src[8], uint8_t dest[8], const char dat[240]);
-    uint8_t getLoraAddress(uint8_t addr[8]);
+    void getLoRaAddress(uint8_t addr[8]);
     
     uint8_t parseByte(char c);
     char reparseChar(uint8_t b);
@@ -248,16 +248,20 @@ class LoRa {
   public:
     LoRa(int nss = 7, uint8_t bw = SX1278_BW_9, uint8_t cr = SX1278_CR_4_5, uint8_t sf = SX1278_SF_12);
     
-    //TODO: add functions to read current bw, sf and cr from SX1278
-    
     uint8_t init(uint16_t addrEeprom = 0, uint16_t addrFlag = 8);
     
-    uint8_t tx(packet& pack);
-    uint8_t rx(packet& pack, uint8_t mode = SX1278_RXSINGLE); //TODO: explain implicit header mode in documentation
+    //TODO: implement header mode selection
+    uint8_t tx(packet& pack, uint16_t timeout = 0);
+    uint8_t rx(packet& pack, uint16_t timeout = 0, uint8_t mode = SX1278_RXSINGLE);
     
-    void setMode(uint8_t mode);
-    void config(uint8_t bw, uint8_t cr, uint8_t sf);
-    void getLoraAddress(uint8_t addr[8]);
+    uint8_t setMode(uint8_t mode);
+    uint8_t config(uint8_t bw, uint8_t cr, uint8_t sf);
+    
+    void getLoRaAddress(uint8_t addr[8]);
+    
+    uint8_t getBW(void);
+    uint8_t getCR(void);
+    uint8_t getSF(void);
     
     #ifdef VERBOSE
       void regDump(void);
