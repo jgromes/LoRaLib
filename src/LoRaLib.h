@@ -236,6 +236,9 @@ class packet {
     void getSourceStr(char src[24]);
     void getDestinationStr(char dest[24]);
     
+    void setSourceStr(const char src[24]);
+    void setDestinationStr(const char dest[24]);
+    
   private:
     void init(uint8_t src[8], uint8_t dest[8], const char dat[240]);
     void getLoRaAddress(uint8_t addr[8]);

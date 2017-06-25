@@ -95,6 +95,20 @@ void packet::getDestinationStr(char dest[24]) {
   dest[23] = '\0';
 }
 
+void packet::setSourceStr(const char src[24]) {
+  // parse source string into byte array
+  for(uint8_t i = 0; i < 8; i++) {
+    source[i] = (parseByte(src[3*i]) << 4) | parseByte(src[3*i + 1]);
+  }
+}
+
+void packet::setDestinationStr(const char dest[24]) {
+  // parse destination string into byte array
+  for(uint8_t i = 0; i < 8; i++) {
+    destination[i] = (parseByte(dest[3*i]) << 4) | parseByte(dest[3*i + 1]);
+  }
+}
+
 void packet::getLoRaAddress(uint8_t addr[8]) {
   for(uint8_t i = 0; i < 8; i++) {
     addr[i] = EEPROM.read(i);

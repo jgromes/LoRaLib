@@ -20,6 +20,8 @@ data	KEYWORD2
 length	KEYWORD2
 getSourceStr	KEYWORD2
 getDestinationStr	KEYWORD2
+setSourceStr	KEYWORD2
+setDestinationStr	KEYWORD2
 
 init	KEYWORD2
 tx	KEYWORD2
