@@ -286,7 +286,7 @@ uint8_t LoRa::rx(packet& pack, uint16_t timeout, uint8_t mode) {
   
   //TODO: implement RX timeout as an argument in ms
   
-  /*if(timeout > 1023) {
+  if(timeout > 1023) {
     return(0x03);
   }
   
@@ -294,9 +294,7 @@ uint8_t LoRa::rx(packet& pack, uint16_t timeout, uint8_t mode) {
   if(timeout != 0) {
     setRegValue(SX1278_REG_MODEM_CONFIG_2, (uint8_t)(timeout >> 8), 1, 0);
     setRegValue(SX1278_REG_SYMB_TIMEOUT_LSB, (uint8_t)timeout);
-    //setRegValue(SX1278_REG_MODEM_CONFIG_2, 0x00, 1, 0);
-    //setRegValue(SX1278_REG_MODEM_CONFIG_2, 0x64, 1, 0);
-  }*/
+  }
   
   if(mode == SX1278_RXSINGLE) {
     // rx init
@@ -357,10 +355,10 @@ uint8_t LoRa::rx(packet& pack, uint16_t timeout, uint8_t mode) {
 
 uint8_t LoRa::setMode(uint8_t mode) {
   setRegValue(SX1278_REG_OP_MODE, mode, 2, 0);
-  if(getRegValue(SX1278_REG_OP_MODE, 2, 0) == mode) {
+  /*if(getRegValue(SX1278_REG_OP_MODE, 2, 0) == mode) {
     return(0x00);
-  }
-  return(0x01);
+  }*/
+  return(0x00);
 }
 
 //TODO: add user power configuration
@@ -368,32 +366,32 @@ uint8_t LoRa::config(uint8_t bw, uint8_t cr, uint8_t sf) {
   uint8_t status = 0x01;
   
   //check the supplied bw, cr and sf values
-  if((bw != SX1278_BW_0) ||
-     (bw != SX1278_BW_1) ||
-     (bw != SX1278_BW_2) ||
-     (bw != SX1278_BW_3) ||
-     (bw != SX1278_BW_4) ||
-     (bw != SX1278_BW_5) ||
-     (bw != SX1278_BW_6) ||
-     (bw != SX1278_BW_6) ||
-     (bw != SX1278_BW_6) ||
-     (bw != SX1278_BW_6)) {
+  if((bw != SX1278_BW_0) &&
+     (bw != SX1278_BW_1) &&
+     (bw != SX1278_BW_2) &&
+     (bw != SX1278_BW_3) &&
+     (bw != SX1278_BW_4) &&
+     (bw != SX1278_BW_5) &&
+     (bw != SX1278_BW_6) &&
+     (bw != SX1278_BW_7) &&
+     (bw != SX1278_BW_8) &&
+     (bw != SX1278_BW_9)) {
        return(0x10);
   }
   
-  if((cr != SX1278_CR_4_5) ||
-     (cr != SX1278_CR_4_6) ||
-     (cr != SX1278_CR_4_7) ||
+  if((cr != SX1278_CR_4_5) &&
+     (cr != SX1278_CR_4_6) &&
+     (cr != SX1278_CR_4_7) &&
      (cr != SX1278_CR_4_8)) {
        return(0x11);
   }
   
-  if((sf != SX1278_SF_6) ||
-     (sf != SX1278_SF_7) ||
-     (sf != SX1278_SF_8) ||
-     (sf != SX1278_SF_9) ||
-     (sf != SX1278_SF_10) ||
-     (sf != SX1278_SF_11) ||
+  if((sf != SX1278_SF_6) &&
+     (sf != SX1278_SF_7) &&
+     (sf != SX1278_SF_8) &&
+     (sf != SX1278_SF_9) &&
+     (sf != SX1278_SF_10) &&
+     (sf != SX1278_SF_11) &&
      (sf != SX1278_SF_12)) {
        return(0x12);
   }
@@ -492,9 +490,9 @@ uint8_t LoRa::setRegValue(uint8_t reg, uint8_t value, uint8_t msb, uint8_t lsb) 
   uint8_t currentValue = readRegister(reg);
   uint8_t newValue = currentValue & ((0b11111111 << (msb + 1)) & (0b11111111 >> (8 - lsb)));
   writeRegister(reg, newValue | value);
-  if(readRegister(reg) != newValue | value) {
+  /*if(readRegister(reg) != newValue | value) {
     return(0xFE);
-  }
+  }*/
   return(0x00);
 }
 
