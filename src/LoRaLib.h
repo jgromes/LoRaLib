@@ -128,16 +128,16 @@
 #define SX1278_LNA_BOOST_HF_OFF                       0b00000000  //  1     0     default LNA current
 #define SX1278_LNA_BOOST_HF_ON                        0b00000011  //  1     0     150% LNA current
 //SX1278_REG_MODEM_CONFIG_1
-#define SX1278_BW_0                                   0b00000000  //  7     4     bandwidth:  7.80 kHz
-#define SX1278_BW_1                                   0b00010000  //  7     4                 10.40 kHz
-#define SX1278_BW_2                                   0b00100000  //  7     4                 15.60 kHz
-#define SX1278_BW_3                                   0b00110000  //  7     4                 20.80 kHz
-#define SX1278_BW_4                                   0b01000000  //  7     4                 31.25 kHz
-#define SX1278_BW_5                                   0b01010000  //  7     4                 41.70 kHz
-#define SX1278_BW_6                                   0b01100000  //  7     4                 62.50 kHz
-#define SX1278_BW_7                                   0b01110000  //  7     4                 125.00 kHz
-#define SX1278_BW_8                                   0b10000000  //  7     4                 250.00 kHz
-#define SX1278_BW_9                                   0b10010000  //  7     4                 500.00 kHz
+#define SX1278_BW_7_80_KHZ                            0b00000000  //  7     4     bandwidth:  7.80 kHz
+#define SX1278_BW_10_40_KHZ                           0b00010000  //  7     4                 10.40 kHz
+#define SX1278_BW_15_60_KHZ                           0b00100000  //  7     4                 15.60 kHz
+#define SX1278_BW_20_80_KHZ                           0b00110000  //  7     4                 20.80 kHz
+#define SX1278_BW_31_25_KHZ                           0b01000000  //  7     4                 31.25 kHz
+#define SX1278_BW_41_70_KHZ                           0b01010000  //  7     4                 41.70 kHz
+#define SX1278_BW_62_50_KHZ                           0b01100000  //  7     4                 62.50 kHz
+#define SX1278_BW_125_00_KHZ                          0b01110000  //  7     4                 125.00 kHz
+#define SX1278_BW_250_00_KHZ                          0b10000000  //  7     4                 250.00 kHz
+#define SX1278_BW_500_00_KHZ                          0b10010000  //  7     4                 500.00 kHz
 #define SX1278_CR_4_5                                 0b00000010  //  3     1     error coding rate:  4/5
 #define SX1278_CR_4_6                                 0b00000100  //  3     1                         4/6
 #define SX1278_CR_4_7                                 0b00000110  //  3     1                         4/7
@@ -145,13 +145,13 @@
 #define SX1278_HEADER_EXPL_MODE                       0b00000000  //  0     0     explicit header mode
 #define SX1278_HEADER_IMPL_MODE                       0b00000001  //  0     0     implicit header mode
 //SX1278_REG_MODEM_CONFIG_2
-#define SX1278_SF_6                                   0b01100000  //  7     4     spreading factor:   64
-#define SX1278_SF_7                                   0b01110000  //  7     4                         128
-#define SX1278_SF_8                                   0b10000000  //  7     4                         256
-#define SX1278_SF_9                                   0b10010000  //  7     4                         512
-#define SX1278_SF_10                                  0b10100000  //  7     4                         1024
-#define SX1278_SF_11                                  0b10110000  //  7     4                         2048
-#define SX1278_SF_12                                  0b11000000  //  7     4                         4096
+#define SX1278_SF_6                                   0b01100000  //  7     4     spreading factor:   64 chips/bit
+#define SX1278_SF_7                                   0b01110000  //  7     4                         128 chips/bit
+#define SX1278_SF_8                                   0b10000000  //  7     4                         256 chips/bit
+#define SX1278_SF_9                                   0b10010000  //  7     4                         512 chips/bit
+#define SX1278_SF_10                                  0b10100000  //  7     4                         1024 chips/bit
+#define SX1278_SF_11                                  0b10110000  //  7     4                         2048 chips/bit
+#define SX1278_SF_12                                  0b11000000  //  7     4                         4096 chips/bit
 #define SX1278_TX_MODE_SINGLE                         0b00000000  //  3     3     single TX
 #define SX1278_TX_MODE_CONT                           0b00001000  //  3     3     continuous TX
 #define SX1278_RX_CRC_MODE_OFF                        0b00000000  //  2     2     CRC disabled
@@ -249,7 +249,7 @@ class packet {
 
 class LoRa {
   public:
-    LoRa(int nss = 7, uint8_t bw = SX1278_BW_9, uint8_t cr = SX1278_CR_4_5, uint8_t sf = SX1278_SF_12);
+    LoRa(int nss = 7, uint8_t bw = SX1278_BW_7_80_KHZ, uint8_t cr = SX1278_CR_4_5, uint8_t sf = SX1278_SF_12);
     
     uint8_t init(uint16_t addrEeprom = 0, uint16_t addrFlag = 8);
     
@@ -271,6 +271,7 @@ class LoRa {
     #endif
     
     #ifdef DEBUG
+      int freeRAM(void);
       void printStatus(void);
     #endif
     

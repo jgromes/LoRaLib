@@ -366,16 +366,16 @@ uint8_t LoRa::config(uint8_t bw, uint8_t cr, uint8_t sf) {
   uint8_t status = 0x01;
   
   //check the supplied bw, cr and sf values
-  if((bw != SX1278_BW_0) &&
-     (bw != SX1278_BW_1) &&
-     (bw != SX1278_BW_2) &&
-     (bw != SX1278_BW_3) &&
-     (bw != SX1278_BW_4) &&
-     (bw != SX1278_BW_5) &&
-     (bw != SX1278_BW_6) &&
-     (bw != SX1278_BW_7) &&
-     (bw != SX1278_BW_8) &&
-     (bw != SX1278_BW_9)) {
+  if((bw != SX1278_BW_7_80_KHZ) &&
+     (bw != SX1278_BW_10_40_KHZ) &&
+     (bw != SX1278_BW_15_60_KHZ) &&
+     (bw != SX1278_BW_20_80_KHZ) &&
+     (bw != SX1278_BW_31_25_KHZ) &&
+     (bw != SX1278_BW_41_70_KHZ) &&
+     (bw != SX1278_BW_62_50_KHZ) &&
+     (bw != SX1278_BW_125_00_KHZ) &&
+     (bw != SX1278_BW_250_00_KHZ) &&
+     (bw != SX1278_BW_500_00_KHZ)) {
        return(0x10);
   }
   
@@ -598,6 +598,12 @@ void LoRa::generateLoRaAdress(void) {
 #endif
 
 #ifdef DEBUG
+  int LoRa::freeRAM(void) {
+    extern int __heap_start, *__brkval; 
+    int v; 
+    return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval); 
+  }
+  
   void LoRa::printStatus(void) {
     // modulation
     Serial.print("Modulation:\t\t");
@@ -646,34 +652,34 @@ void LoRa::generateLoRaAdress(void) {
     // bandwidth
     Serial.print("Bandwidth:\t\t");
     switch(getRegValue(SX1278_REG_MODEM_CONFIG_1, 7, 4)) {
-      case SX1278_BW_0:
+      case SX1278_BW_7_80_KHZ:
         Serial.println("7.80 kHz");
         break;
-      case SX1278_BW_1:
+      case SX1278_BW_10_40_KHZ:
         Serial.println("10.40 kHz");
         break;
-      case SX1278_BW_2:
+      case SX1278_BW_15_60_KHZ:
         Serial.println("15.60 kHz");
         break;
-      case SX1278_BW_3:
+      case SX1278_BW_20_80_KHZ:
         Serial.println("20.80 kHz");
         break;
-      case SX1278_BW_4:
+      case SX1278_BW_31_25_KHZ:
         Serial.println("31.25 kHz");
         break;
-      case SX1278_BW_5:
+      case SX1278_BW_41_70_KHZ:
         Serial.println("41.70 kHz");
         break;
-      case SX1278_BW_6:
+      case SX1278_BW_62_50_KHZ:
         Serial.println("62.50 kHz");
         break;
-      case SX1278_BW_7:
+      case SX1278_BW_125_00_KHZ:
         Serial.println("125.00 kHz");
         break;
-      case SX1278_BW_8:
+      case SX1278_BW_250_00_KHZ:
         Serial.println("250.00 kHz");
         break;
-      case SX1278_BW_9:
+      case SX1278_BW_500_00_KHZ:
         Serial.println("500.00 kHz");
         break;
       default:
