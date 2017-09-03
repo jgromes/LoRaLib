@@ -1,25 +1,32 @@
 // include the library
 #include <LoRaLib.h>
 
-// create instances of LoRa and packet classes with default settings
+// create instance of LoRa class with default settings
+// chip:                SX1278
+// NSS pin:             7
+// bandwidth:           125 kHz
+// spreading factor:    9
+// coding rate:         4/7
 LoRa lora;
-packet pack;
+
+// create empty instance of Packet class
+Packet pack;
 
 void setup() {
   Serial.begin(9600);
 
   // initialize the LoRa module with default settings
-  lora.init();
+  lora.begin();
 }
 
 void loop() {
   Serial.print("Waiting for incoming transmission ... ");
-  
-  // start receiving single packet
-  uint8_t state = lora.rx(pack);
 
-  if(state == 0) {
-    // if the function returned 0, a packet was suceesfully received
+  // wait for single packet
+  uint8_t state = lora.receive(pack);
+
+  if(state == ERR_NONE) {
+    // packet was suceesfully received
     Serial.println("success!");
 
     // create a string to store the packet information
@@ -27,24 +34,38 @@ void loop() {
 
     // print the source of the packet
     pack.getSourceStr(str);
+    Serial.print("Source:\t\t");
     Serial.println(str);
 
     // print the destination of the packet
     pack.getDestinationStr(str);
+    Serial.print("Destination:\t");
     Serial.println(str);
 
     // print the length of the packet
+    Serial.print("Length:\t\t");
     Serial.println(pack.length);
 
     // print the data of the packet
+    Serial.print("Data:\t\t");
     Serial.println(pack.data);
+
+    //print the measured data rate
+    Serial.print("Datarate:\t");
+    Serial.print(lora.dataRate);
+    Serial.println(" bps");
+
+    //print the RSSI (Received Signal Strength Indicator) of the last received packet
+    Serial.print("RSSI:\t\t");
+    Serial.print(lora.lastPacketRSSI);
+    Serial.println(" dBm");
     
-  } else if(state == 1) {
-    // if the function returned 1, a timeout occured while waiting for a packet
+  } else if(state == ERR_RX_TIMEOUT) {
+    // timeout occured while waiting for a packet
     Serial.println("timeout!");
     
-  } else if(state == 2) {
-    // if the function returned 2, a packet was received, but is malformed
+  } else if(state == ERR_CRC_MISMATCH) {
+    // packet was received, but is malformed
     Serial.println("CRC error!");
     
   }
