@@ -16,7 +16,9 @@ void setup() {
   Serial.begin(9600);
 
   // initialize the LoRa module with default settings
-  lora.begin();
+  if(lora.begin() == ERR_NONE) {
+    Serial.println("Initialization done.");
+  }
 }
 
 void loop() {
