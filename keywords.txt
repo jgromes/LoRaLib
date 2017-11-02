@@ -22,6 +22,7 @@ getSourceStr	KEYWORD2
 getDestinationStr	KEYWORD2
 setSourceStr	KEYWORD2
 setDestinationStr	KEYWORD2
+copyInto	KEYWORD2
 
 Chip	KEYWORD2
 Bandwidth	KEYWORD2
@@ -37,7 +38,7 @@ sleep	KEYWORD2
 standby	KEYWORD2
 
 setBandwidth	KEYWORD2
-setSpredingFactor	KEYWORD2
+setSpreadingFactor	KEYWORD2
 setCodingRate	KEYWORD2
 
 #######################################

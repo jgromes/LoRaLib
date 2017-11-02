@@ -10,6 +10,8 @@ uint8_t Module::initModule(int nss) {
   pinMode(_dio0, INPUT);
   pinMode(_dio1, INPUT);
   
+  digitalWrite(_nss, HIGH);
+  
   SPI.begin();
 }
 

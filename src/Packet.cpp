@@ -93,6 +93,14 @@ void Packet::setDestinationStr(const char dest[24]) {
   }
 }
 
+void Packet::copyInto(Packet& pack) {
+  for(uint8_t i = 0; i < 8; i++) {
+    pack.source[i] = source[i];
+    pack.destination[i] = destination[i];
+  }
+  strcpy(pack.data, data);
+}
+
 void Packet::getLoRaAddress(uint8_t addr[8]) {
   for(uint8_t i = 0; i < 8; i++) {
     addr[i] = EEPROM.read(i);
