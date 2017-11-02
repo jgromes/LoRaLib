@@ -11,8 +11,6 @@
 #include "SX1278.h"
 #include "SX1272.h"
 
-//TODO: implement SF6
-
 class LoRa {
   public:
     LoRa(Chip ch = CH_SX1278, int nss = 7, Bandwidth bw = BW_125_00_KHZ, SpreadingFactor sf = SF_9, CodingRate cr = CR_4_7);

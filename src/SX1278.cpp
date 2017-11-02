@@ -183,9 +183,6 @@ uint8_t SX1278::rxSingle(char* data, uint8_t* length) {
     *length = getRegValue(SX1278_REG_RX_NB_BYTES);
   }
   
-  uint8_t l = *length;
-  Serial.println(l);
-  
   readRegisterBurstStr(SX1278_REG_FIFO, *length, data);
   
   clearIRQFlags();

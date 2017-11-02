@@ -76,9 +76,10 @@ uint8_t LoRa::receive(Packet& pack) {
     pack.destination[i] = buffer[i+8];
   }
   
-  for(uint8_t i = 0; i < pack.length; i++) {
-    pack.data[i] = buffer[i+16];
+  for(uint8_t i = 16; i < pack.length; i++) {
+    pack.data[i-16] = buffer[i];
   }
+  pack.data[pack.length-16] = 0;
   
   uint32_t elapsedTime = millis() - startTime;
   dataRate = (pack.length*8.0)/((float)elapsedTime/1000.0);
