@@ -17,9 +17,14 @@ class Packet {
     Packet(const char src[24], const char dest[24], const char dat[240]);
     Packet(uint8_t src[8], uint8_t dest[8], const char dat[240]);
     
+    Packet(const char dest[24], uint8_t* dat, uint8_t len);
+    Packet(uint8_t dest[8], uint8_t* dat, uint8_t len);
+    Packet(const char src[24], const char dest[24], uint8_t* dat, uint8_t len);
+    Packet(uint8_t src[8], uint8_t dest[8], uint8_t* dat, uint8_t len);
+    
     uint8_t source[8] = {0, 0, 0, 0, 0, 0, 0, 0};
     uint8_t destination[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-    char data[240] = {'\0'};
+    uint8_t data[240];
     uint8_t length = 0;
     
     void getSourceStr(char src[24]);
@@ -32,6 +37,7 @@ class Packet {
     
   private:
     void init(uint8_t src[8], uint8_t dest[8], const char dat[240]);
+    void init(uint8_t src[8], uint8_t dest[8], uint8_t* dat, uint8_t len);
     void getLoRaAddress(uint8_t addr[8]);
     
     uint8_t parseByte(char c);

@@ -5,9 +5,10 @@ Packet::Packet(void) {
   getLoRaAddress(src);
   
   uint8_t dest[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-  char data[240] = {'\0'};
+  uint8_t dat[240];
+  uint8_t len = 0;
   
-  init(src, dest, data);
+  init(src, dest, dat, len);
 }
 
 Packet::Packet(const char dest[24], const char dat[240]) {
@@ -47,6 +48,43 @@ Packet::Packet(uint8_t src[8], uint8_t dest[8], const char dat[240]) {
   init(src, dest, dat);
 }
 
+Packet::Packet(const char dest[24], uint8_t* dat, uint8_t len) {
+  uint8_t src[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+  getLoRaAddress(src);
+  
+  uint8_t destTmp[8];
+  for(uint8_t i = 0; i < 8; i++) {
+    destTmp[i] = (parseByte(dest[3*i]) << 4) | parseByte(dest[3*i + 1]);
+  }
+  
+  init(src, destTmp, dat, len);
+}
+
+Packet::Packet(uint8_t dest[8], uint8_t* dat, uint8_t len) {
+  uint8_t src[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+  getLoRaAddress(src);
+  
+  init(src, dest, dat, len);
+}
+
+Packet::Packet(const char src[24], const char dest[24], uint8_t* dat, uint8_t len) {
+  uint8_t srcTmp[8];
+  for(uint8_t i = 0; i < 8; i++) {
+    srcTmp[i] = (parseByte(src[3*i]) << 4) | parseByte(src[3*i + 1]);
+  }
+  
+  uint8_t destTmp[8];
+  for(uint8_t i = 0; i < 8; i++) {
+    destTmp[i] = (parseByte(dest[3*i]) << 4) | parseByte(dest[3*i + 1]);
+  }
+  
+  init(srcTmp, destTmp, dat, len);
+}
+
+Packet::Packet(uint8_t src[8], uint8_t dest[8], uint8_t* dat, uint8_t len) {
+  init(src, dest, dat, len);
+}
+
 void Packet::init(uint8_t src[8], uint8_t dest[8], const char dat[240]) {
   for(uint8_t i = 0; i < 8; i++) {
     source[i] = src[i];
@@ -60,6 +98,18 @@ void Packet::init(uint8_t src[8], uint8_t dest[8], const char dat[240]) {
       length = i + 16;
       break;
     }
+  }
+}
+
+void Packet::init(uint8_t src[8], uint8_t dest[8], uint8_t* dat, uint8_t len) {
+  length = len + 16;
+  for(uint8_t i = 0; i < 8; i++) {
+    source[i] = src[i];
+    destination[i] = dest[i];
+  }
+
+  for(uint8_t i = 0; i < length; i++) {
+    data[i] = dat[i];
   }
 }
 
