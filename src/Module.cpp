@@ -28,7 +28,7 @@ uint8_t Module::getRegValue(uint8_t reg, uint8_t msb, uint8_t lsb) {
 uint8_t Module::readRegisterBurst(uint8_t reg, uint8_t numBytes, uint8_t* inBytes) {
   digitalWrite(_nss, LOW);
   SPI.transfer(reg | SPI_READ);
-  for(uint8_t i = 0; i< numBytes; i++) {
+  for(uint8_t i = 0; i < numBytes; i++) {
     inBytes[i] = SPI.transfer(reg);
   }
   digitalWrite(_nss, HIGH);
@@ -38,7 +38,7 @@ uint8_t Module::readRegisterBurst(uint8_t reg, uint8_t numBytes, uint8_t* inByte
 uint8_t Module::readRegisterBurstStr(uint8_t reg, uint8_t numBytes, char* inBytes) {
   digitalWrite(_nss, LOW);
   SPI.transfer(reg | SPI_READ);
-  for(uint8_t i = 0; i< numBytes; i++) {
+  for(uint8_t i = 0; i < numBytes; i++) {
     inBytes[i] = SPI.transfer(reg);
   }
   digitalWrite(_nss, HIGH);
