@@ -1,6 +1,6 @@
 # LoRaLib
 
-## Arduino library for LoRa modules based on SX1278 chip
+## Arduino library for LoRa modules based on SX1278 and SX1272 chips
 
 ---
 
@@ -16,6 +16,10 @@ If you're looking for the shield to use with this library, it has its own reposi
 
 DISCLAIMER: This library is provided 'AS IS'. See `license.txt` for details.
 
-This library enables easy long range communaction with SX1278-based LoRa modules. It was designed to be used with LoRenz Rev.B shields. However, they are not required and this library can be used with any LoRa module, as long as it is based on the SX1278 chip.
+This library enables easy long range communaction with SX127x family of LoRa modules. It was designed to be used with LoRenz Rev.B shields. However, they are not required and this library can be used with any LoRa module, as long as it is based on of the SX127x chips.
+
+Currently supported chips:
+* SX1272 and SX1273
+* SX1278, SX1276, SX1277 and SX1279
 
 ## As a part of the API changes, all documentation has been moved to the [Wiki](https://github.com/jgromes/LoRaLib/wiki)! ##
