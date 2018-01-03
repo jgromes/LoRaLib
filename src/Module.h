@@ -35,18 +35,7 @@ class Module {
     int _nss = 0;
     int _dio0 = 2;
     int _dio1 = 3;
-    
-    #if defined(__AVR_ATmega168__) || defined(__AVR_ATmega328P__)
-      int _sck = 13;
-      int _miso = 12;
-      int _mosi = 11;
-    #elif defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
-      int _sck = 52;
-      int _miso = 50;
-      int _mosi = 51;
-    #else
-      #error "Unsupported board selected, please select Arduino UNO or Mega"
-    #endif
+
 };
 
 #endif

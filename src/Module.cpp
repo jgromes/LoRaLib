@@ -4,9 +4,6 @@ uint8_t Module::initModule(int nss) {
   _nss = nss;
   
   pinMode(_nss, OUTPUT);
-  pinMode(_sck, OUTPUT);
-  pinMode(_miso, INPUT);
-  pinMode(_mosi, OUTPUT);
   pinMode(_dio0, INPUT);
   pinMode(_dio1, INPUT);
   
