@@ -203,7 +203,7 @@
 
 class SX1278: public Module {
   public:
-    SX1278(int nss, Bandwidth bw, SpreadingFactor sf, CodingRate cr);
+    SX1278(int nss, Bandwidth bw, SpreadingFactor sf, CodingRate cr, int dio0, int dio1);
     
     uint8_t begin(void);
     

@@ -1,7 +1,9 @@
 #include "SX1272.h"
 
-SX1272::SX1272(int nss, Bandwidth bw, SpreadingFactor sf, CodingRate cr) {
+SX1272::SX1272(int nss, Bandwidth bw, SpreadingFactor sf, CodingRate cr, int dio0, int dio1) {
   _nss = nss;
+  _dio0 = dio0;
+  _dio1 = dio1;
   
   switch(bw) {
     case BW_125_00_KHZ:
@@ -65,7 +67,7 @@ SX1272::SX1272(int nss, Bandwidth bw, SpreadingFactor sf, CodingRate cr) {
 }
 
 uint8_t SX1272::begin(void) {
-  initModule(_nss);
+  initModule(_nss, _dio0, _dio1);
   
   uint8_t i = 0;
   bool flagFound = false;

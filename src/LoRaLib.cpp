@@ -1,13 +1,13 @@
 #include "LoRaLib.h"
 
-LoRa::LoRa(Chip ch, int nss, Bandwidth bw, SpreadingFactor sf, CodingRate cr) {
+LoRa::LoRa(Chip ch, int nss, Bandwidth bw, SpreadingFactor sf, CodingRate cr, int dio0, int dio1) {
   dataRate = 0;
   lastPacketRSSI = 0;
   
   if((ch == CH_SX1276) || (ch == CH_SX1277) || (ch == CH_SX1278) || (ch == CH_SX1279)) {
-    _mod = new SX1278(nss, bw, sf, cr);
+    _mod = new SX1278(nss, bw, sf, cr, dio0, dio1);
   } else if((ch == CH_SX1272) ||(ch == CH_SX1273)) {
-    _mod = new SX1272(nss, bw, sf, cr);
+    _mod = new SX1272(nss, bw, sf, cr, dio0, dio1);
   }
 }
 
@@ -15,6 +15,15 @@ uint8_t LoRa::begin(uint16_t addrEeprom) {
   #ifdef DEBUG
     Serial.begin(9600);
     Serial.println();
+  #endif
+  
+  #ifdef ESP32
+    if(!EEPROM.begin(9)) {
+      #ifdef DEBUG
+        Serial.println("Unable to initialize EEPROM");
+      #endif
+      return(ERR_EEPROM_NOT_INITIALIZED);
+    }
   #endif
   
   _addrEeprom = addrEeprom;

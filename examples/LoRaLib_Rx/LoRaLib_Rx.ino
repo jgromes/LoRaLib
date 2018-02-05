@@ -7,6 +7,8 @@
 // bandwidth:           125 kHz
 // spreading factor:    9
 // coding rate:         4/7
+// DIO0 pin:            2
+// DIO1 pin:            3
 LoRa lora;
 
 // create empty instance of Packet class

@@ -19,7 +19,7 @@ class Module {
     virtual uint8_t config(uint8_t bw, uint8_t sf, uint8_t cr) = 0;
     virtual int8_t getLastPacketRSSI(void) = 0;
     
-    uint8_t initModule(int nss);
+    uint8_t initModule(int nss, int dio0, int dio1);
     
     uint8_t getRegValue(uint8_t reg, uint8_t msb = 7, uint8_t lsb = 0);
     uint8_t readRegisterBurst(uint8_t reg, uint8_t numBytes, uint8_t* inBytes);

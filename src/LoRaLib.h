@@ -13,7 +13,7 @@
 
 class LoRa {
   public:
-    LoRa(Chip ch = CH_SX1278, int nss = 7, Bandwidth bw = BW_125_00_KHZ, SpreadingFactor sf = SF_9, CodingRate cr = CR_4_7);
+    LoRa(Chip ch = CH_SX1278, int nss = 7, Bandwidth bw = BW_125_00_KHZ, SpreadingFactor sf = SF_9, CodingRate cr = CR_4_7, int dio0 = 2, int dio1 = 3);
     
     float dataRate;
     int8_t lastPacketRSSI;

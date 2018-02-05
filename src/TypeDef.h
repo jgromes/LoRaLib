@@ -24,6 +24,7 @@
 
 #define ERR_NONE                        0x00
 #define ERR_CHIP_NOT_FOUND              0x01
+#define ERR_EEPROM_NOT_INITIALIZED      0x02
 
 #define ERR_PACKET_TOO_LONG             0x10
 
