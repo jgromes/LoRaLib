@@ -3,7 +3,7 @@
 SX1278::SX1278(int nss, Bandwidth bw, SpreadingFactor sf, CodingRate cr, int dio0, int dio1) {
   _nss = nss;
   _dio0 = dio0;
-  _dio1 = _dio1;
+  _dio1 = dio1;
   
   switch(bw) {
     case BW_7_80_KHZ:
