@@ -51,7 +51,7 @@ void loop() {
   uint8_t state = lora.transmit(pack);
   
   if(state == ERR_NONE) {
-    // a packet was suceesfully transmitted
+    // the packet was successfully transmitted
     Serial.println(" success!");
     
   }else if(state == ERR_PACKET_TOO_LONG) {

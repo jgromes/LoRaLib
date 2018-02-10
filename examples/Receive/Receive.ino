@@ -30,7 +30,7 @@ void loop() {
   uint8_t state = lora.receive(pack);
 
   if(state == ERR_NONE) {
-    // packet was suceesfully received
+    // packet was successfully received
     Serial.println("success!");
 
     // create a string to store the packet information
@@ -65,7 +65,7 @@ void loop() {
     Serial.println(" dBm");
     
   } else if(state == ERR_RX_TIMEOUT) {
-    // timeout occured while waiting for a packet
+    // timeout occurred while waiting for a packet
     Serial.println("timeout!");
     
   } else if(state == ERR_CRC_MISMATCH) {
