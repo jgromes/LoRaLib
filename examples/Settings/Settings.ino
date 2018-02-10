@@ -32,7 +32,7 @@ LoRa loraMaxRange(CH_SX1276, 6, BW_7_80_KHZ, SF_12, CR_4_8, 4, 5);
 // coding rate:         4/5
 // DIO0 pin:            10
 // DIO1 pin:            11
-LoRa loraMaxRange(CH_SX1272, 4, BW_500_00_KHZ, SF_6, CR_4_5, 10, 11);
+LoRa loraMaxDataRate(CH_SX1272, 4, BW_500_00_KHZ, SF_6, CR_4_5, 10, 11);
 
 void setup() {
   Serial.begin(9600);
