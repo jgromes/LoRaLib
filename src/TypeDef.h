@@ -27,6 +27,7 @@
 #define ERR_EEPROM_NOT_INITIALIZED      0x02
 
 #define ERR_PACKET_TOO_LONG             0x10
+#define ERR_TX_TIMEOUT                  0x11
 
 #define ERR_RX_TIMEOUT                  0x20
 #define ERR_CRC_MISMATCH                0x21

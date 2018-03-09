@@ -58,6 +58,10 @@ void loop() {
     // the supplied packet was longer than 256 bytes
     Serial.println(" too long!");
     
+  } else if(state == ERR_TX_TIMEOUT) {
+    // timeout occured while transmitting packet
+    Serial.println(" timeout!");
+    
   }
 
   // wait a second before transmitting again

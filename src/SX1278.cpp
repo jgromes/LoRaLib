@@ -57,7 +57,7 @@ uint8_t SX1278::tx(char* data, uint8_t length) {
   setRegValue(SX1278_REG_DIO_MAPPING_1, SX1278_DIO0_TX_DONE, 7, 6);
   clearIRQFlags();
   
-  if(length > 256) {
+  if(length >= 256) {
     return(ERR_PACKET_TOO_LONG);
   }
 
@@ -71,9 +71,11 @@ uint8_t SX1278::tx(char* data, uint8_t length) {
   
   unsigned long start = millis();
   while(!digitalRead(_dio0)) {
-    #ifdef DEBUG
-      Serial.print('.');
-    #endif
+    //TODO: calculate timeout dynamically based on modem settings
+    if(millis() - start > (length * 1500)) {
+      clearIRQFlags();
+      return(ERR_TX_TIMEOUT);
+    }
   }
   
   clearIRQFlags();
