@@ -54,7 +54,7 @@ void loop() {
     // the packet was successfully transmitted
     Serial.println(" success!");
     
-  }else if(state == ERR_PACKET_TOO_LONG) {
+  } else if(state == ERR_PACKET_TOO_LONG) {
     // the supplied packet was longer than 256 bytes
     Serial.println(" too long!");
     

@@ -201,7 +201,7 @@ class SX1272: public Module {
     //TODO: CAD mode
     
     uint8_t setMode(uint8_t mode);
-    uint8_t config(uint8_t bw, uint8_t sf, uint8_t cr);
+    uint8_t config(Bandwidth bw, SpreadingFactor sf, CodingRate cr);
     int8_t getLastPacketRSSI(void);
   
   private:
@@ -209,7 +209,9 @@ class SX1272: public Module {
     int _dio0 = 2;
     int _dio1 = 3;
     
-    uint8_t _bw, _sf, _cr;
+    Bandwidth _bw;
+    SpreadingFactor _sf;
+    CodingRate _cr;
     
     void clearIRQFlags(void);
 };

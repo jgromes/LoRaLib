@@ -106,15 +106,27 @@ uint8_t LoRa::standby(void) {
 }
 
 uint8_t LoRa::setBandwidth(Bandwidth bw) {
-  return(_mod->config(bw, _sf, _cr));
+  uint8_t state = _mod->config(bw, _sf, _cr);
+  if(state == ERR_NONE) {
+    _bw = bw;
+  }
+  return(state);
 }
 
 uint8_t LoRa::setSpreadingFactor(SpreadingFactor sf) {
-  return(_mod->config(_bw, sf, _cr));
+  uint8_t state = _mod->config(_bw, sf, _cr);
+  if(state == ERR_NONE) {
+    _sf = sf;
+  }
+  return(state);
 }
 
 uint8_t LoRa::setCodingRate(CodingRate cr) {
-  return(_mod->config(_bw, _sf, cr));
+  uint8_t state = _mod->config(_bw, _sf, cr);
+  if(state == ERR_NONE) {
+    _cr = cr;
+  }
+  return(state);
 }
 
 void LoRa::generateLoRaAdress(void) {

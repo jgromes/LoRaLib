@@ -16,7 +16,7 @@ class Module {
     virtual uint8_t rxSingle(char* data, uint8_t* length) = 0;
     
     virtual uint8_t setMode(uint8_t mode) = 0;
-    virtual uint8_t config(uint8_t bw, uint8_t sf, uint8_t cr) = 0;
+    virtual uint8_t config(Bandwidth bw, SpreadingFactor sf, CodingRate cr) = 0;
     virtual int8_t getLastPacketRSSI(void) = 0;
     
     uint8_t initModule(int nss, int dio0, int dio1);

@@ -5,65 +5,9 @@ SX1272::SX1272(int nss, Bandwidth bw, SpreadingFactor sf, CodingRate cr, int dio
   _dio0 = dio0;
   _dio1 = dio1;
   
-  switch(bw) {
-    case BW_125_00_KHZ:
-      _bw = SX1272_BW_125_00_KHZ;
-      break;
-    case BW_250_00_KHZ:
-      _bw = SX1272_BW_250_00_KHZ;
-      break;
-    case BW_500_00_KHZ:
-      _bw = SX1272_BW_500_00_KHZ;
-      break;
-    default:
-      _bw = SX1272_BW_250_00_KHZ;
-      break;
-  }
-  
-  switch(sf) {
-    case SF_6:
-      _sf = SX1272_SF_6;
-      break;
-    case SF_7:
-      _sf = SX1272_SF_7;
-      break;
-    case SF_8:
-      _sf = SX1272_SF_8;
-      break;
-    case SF_9:
-      _sf = SX1272_SF_9;
-      break;
-    case SF_10:
-      _sf = SX1272_SF_10;
-      break;
-    case SF_11:
-      _sf = SX1272_SF_11;
-      break;
-    case SF_12:
-      _sf = SX1272_SF_12;
-      break;
-    default:
-      _sf = SX1272_SF_12;
-      break;
-  }
-  
-  switch(cr) {
-    case CR_4_5:
-      _cr = SX1272_CR_4_5;
-      break;
-    case CR_4_6:
-      _cr = SX1272_CR_4_6;
-      break;
-    case CR_4_7:
-      _cr = SX1272_CR_4_7;
-      break;
-    case CR_4_8:
-      _cr = SX1272_CR_4_8;
-      break;
-    default:
-      _cr = SX1272_CR_4_5;
-      break;
-  }
+  _bw = bw;
+  _sf = sf;
+  _cr = cr;
 }
 
 uint8_t SX1272::begin(void) {
@@ -176,42 +120,81 @@ uint8_t SX1272::setMode(uint8_t mode) {
   return(ERR_NONE);
 }
 
-uint8_t SX1272::config(uint8_t bw, uint8_t sf, uint8_t cr) {
+uint8_t SX1272::config(Bandwidth bw, SpreadingFactor sf, CodingRate cr) {
   uint8_t status = ERR_NONE;
+  uint8_t newBandwidth, newSpreadingFactor, newCodingRate;
   
-  if((bw != SX1272_BW_125_00_KHZ) &&
-     (bw != SX1272_BW_250_00_KHZ) &&
-     (bw != SX1272_BW_500_00_KHZ)) {
-       return(ERR_INVALID_BANDWIDTH);
+  //check the supplied bw, cr and sf values
+  switch(bw) {
+    case BW_125_00_KHZ:
+      newBandwidth = SX1272_BW_125_00_KHZ;
+      break;
+    case BW_250_00_KHZ:
+      newBandwidth = SX1272_BW_250_00_KHZ;
+      break;
+    case BW_500_00_KHZ:
+      newBandwidth = SX1272_BW_500_00_KHZ;
+      break;
+    default:
+      return(ERR_INVALID_BANDWIDTH);
   }
   
-  if((sf != SX1272_SF_6) &&
-     (sf != SX1272_SF_7) &&
-     (sf != SX1272_SF_8) &&
-     (sf != SX1272_SF_9) &&
-     (sf != SX1272_SF_10) &&
-     (sf != SX1272_SF_11) &&
-     (sf != SX1272_SF_12)) {
-       return(ERR_INVALID_SPREADING_FACTOR);
+  switch(sf) {
+    case SF_6:
+      newSpreadingFactor = SX1272_SF_6;
+      break;
+    case SF_7:
+      newSpreadingFactor = SX1272_SF_7;
+      break;
+    case SF_8:
+      newSpreadingFactor = SX1272_SF_8;
+      break;
+    case SF_9:
+      newSpreadingFactor = SX1272_SF_9;
+      break;
+    case SF_10:
+      newSpreadingFactor = SX1272_SF_10;
+      break;
+    case SF_11:
+      newSpreadingFactor = SX1272_SF_11;
+      break;
+    case SF_12:
+      newSpreadingFactor = SX1272_SF_12;
+      break;
+    default:
+      return(ERR_INVALID_SPREADING_FACTOR);
   }
   
-    if((cr != SX1272_CR_4_5) &&
-     (cr != SX1272_CR_4_6) &&
-     (cr != SX1272_CR_4_7) &&
-     (cr != SX1272_CR_4_8)) {
-       return(ERR_INVALID_CODING_RATE);
+  switch(cr) {
+    case CR_4_5:
+      newCodingRate = SX1272_CR_4_5;
+      break;
+    case CR_4_6:
+      newCodingRate = SX1272_CR_4_6;
+      break;
+    case CR_4_7:
+      newCodingRate = SX1272_CR_4_7;
+      break;
+    case CR_4_8:
+      newCodingRate = SX1272_CR_4_8;
+      break;
+    default:
+      return(ERR_INVALID_CODING_RATE);
   }
   
+  // set mode to SLEEP
   status = setMode(SX1272_SLEEP);
   if(status != ERR_NONE) {
     return(status);
   }
   
+  // set LoRa mode
   status = setRegValue(SX1272_REG_OP_MODE, SX1272_LORA, 7, 7);
   if(status != ERR_NONE) {
     return(status);
   }
   
+  // set carrier frequency
   status = setRegValue(SX1272_REG_FRF_MSB, SX1272_FRF_MSB);
   status = setRegValue(SX1272_REG_FRF_MID, SX1272_FRF_MID);
   status = setRegValue(SX1272_REG_FRF_LSB, SX1272_FRF_LSB);
@@ -219,6 +202,7 @@ uint8_t SX1272::config(uint8_t bw, uint8_t sf, uint8_t cr) {
     return(status);
   }
   
+  // output power configuration
   status = setRegValue(SX1272_REG_PA_CONFIG, SX1272_PA_SELECT_BOOST | SX1272_OUTPUT_POWER);
   status = setRegValue(SX1272_REG_OCP, SX1272_OCP_ON | SX1272_OCP_TRIM, 5, 0);
   status = setRegValue(SX1272_REG_LNA, SX1272_LNA_GAIN_1 | SX1272_LNA_BOOST_ON);
@@ -227,19 +211,21 @@ uint8_t SX1272::config(uint8_t bw, uint8_t sf, uint8_t cr) {
     return(status);
   }
   
+  // turn off frequency hopping
   status = setRegValue(SX1272_REG_HOP_PERIOD, SX1272_HOP_PERIOD_OFF);
   if(status != ERR_NONE) {
     return(status);
   }
   
-  if(sf == SX1272_SF_6) {
+  // basic setting (bw, cr, sf, header mode and CRC)
+  if(newSpreadingFactor == SX1272_SF_6) {
     status = setRegValue(SX1272_REG_MODEM_CONFIG_2, SX1272_SF_6 | SX1272_TX_MODE_SINGLE | SX1272_RX_CRC_MODE_OFF, 7, 2);
-    status = setRegValue(SX1272_REG_MODEM_CONFIG_1, bw | cr | SX1272_HEADER_IMPL_MODE);
+    status = setRegValue(SX1272_REG_MODEM_CONFIG_1, newBandwidth | newCodingRate | SX1272_HEADER_IMPL_MODE);
     status = setRegValue(SX1272_REG_DETECT_OPTIMIZE, SX1272_DETECT_OPTIMIZE_SF_6, 2, 0);
     status = setRegValue(SX1272_REG_DETECTION_THRESHOLD, SX1272_DETECTION_THRESHOLD_SF_6);
   } else {
-    status = setRegValue(SX1272_REG_MODEM_CONFIG_2, sf | SX1272_TX_MODE_SINGLE | SX1272_RX_CRC_MODE_ON, 7, 2);
-    status = setRegValue(SX1272_REG_MODEM_CONFIG_1, bw | cr | SX1272_HEADER_EXPL_MODE);
+    status = setRegValue(SX1272_REG_MODEM_CONFIG_2, newSpreadingFactor | SX1272_TX_MODE_SINGLE | SX1272_RX_CRC_MODE_ON, 7, 2);
+    status = setRegValue(SX1272_REG_MODEM_CONFIG_1, newBandwidth | newCodingRate | SX1272_HEADER_EXPL_MODE);
     status = setRegValue(SX1272_REG_DETECT_OPTIMIZE, SX1272_DETECT_OPTIMIZE_SF_7_12, 2, 0);
     status = setRegValue(SX1272_REG_DETECTION_THRESHOLD, SX1272_DETECTION_THRESHOLD_SF_7_12);
   }
@@ -248,16 +234,23 @@ uint8_t SX1272::config(uint8_t bw, uint8_t sf, uint8_t cr) {
     return(status);
   }
   
+  // set default preamble length
   status = setRegValue(SX1272_REG_PREAMBLE_MSB, SX1272_PREAMBLE_LENGTH_MSB);
   status = setRegValue(SX1272_REG_PREAMBLE_LSB, SX1272_PREAMBLE_LENGTH_LSB);
   if(status != ERR_NONE) {
     return(status);
   }
   
+  // set mode to STANDBY
   status = setMode(SX1272_STANDBY);
   if(status != ERR_NONE) {
     return(status);
   }
+  
+  // save the new settings
+  _bw = bw;
+  _sf = sf;
+  _cr = cr;
   
   return(ERR_NONE);
 }
