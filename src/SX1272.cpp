@@ -17,7 +17,7 @@ uint8_t SX1272::begin(void) {
   bool flagFound = false;
   while((i < 10) && !flagFound) {
     uint8_t version = readRegister(SX1272_REG_VERSION);
-    if(version == 0x12) {
+    if(version == 0x22) {
       flagFound = true;
     } else {
       #ifdef DEBUG
