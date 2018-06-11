@@ -23,6 +23,7 @@ getDestinationStr	KEYWORD2
 setSourceStr	KEYWORD2
 setDestinationStr	KEYWORD2
 copyInto	KEYWORD2
+setPacketData	KEYWORD2
 
 Chip	KEYWORD2
 Bandwidth	KEYWORD2
