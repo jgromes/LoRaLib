@@ -22,49 +22,31 @@ void setup() {
     Serial.println("Initialization done.");
   }
 
-  // create a string to store the packet information
-  char str[24];
-
-  // print the source of the packet
-  pack.getSourceStr(str);
-  Serial.print("Source:\t\t");
-  Serial.println(str);
-
-  // print the destination of the packet
-  pack.getDestinationStr(str);
-  Serial.print("Destination:\t");
-  Serial.println(str);
-
-  // print the length of the packet
-  Serial.print("Length:\t\t");
-  Serial.println(pack.length);
-
   // print the default data of the packet
   Serial.print("Data:\t\t");
   Serial.println(pack.data);
 }
 
 void loop() {
-  // create a variable with any data
-  String anyData = "lUlAlIvRe!";
-  /*  
-  Maybe int:
-       
-     int anyData = 123456789;
-       
-  Or float:
-   
-     float anyData = 5.535;
-     
-         In this case, there is an option to determine how many decimal places will be computed, which by default, is three.
-         If you want to change, simply pass the number of digits as a parameter:
-         
-              pack.setPacketData(anyData, 4);
-              
-  */
+  // change the packet data to some other string
+  pack.setPacketData("Goodbye Moon!");
+  Serial.print("Data:\t\t");
+  Serial.println(pack.data);
 
-  // Setting the packet with a any data variable
-  pack.setPacketData(anyData);
+  // packet data can be also changed to int
+  pack.setPacketData(42);
+  Serial.print("Data:\t\t");
+  Serial.println(pack.data);
+
+  // or float
+  pack.setPacketData(PI);
+  Serial.print("Data:\t\t");
+  Serial.println(pack.data);
+
+   // float precision can be set by parameter (3 digits by default)
+  pack.setPacketData(PI, 5);
+  Serial.print("Data:\t\t");
+  Serial.println(pack.data);
 
   Serial.print("Sending packet ... ");
 
