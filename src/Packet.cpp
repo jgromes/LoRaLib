@@ -157,7 +157,7 @@ void Packet::setPacketData(char charArray[240]){
 
 void Packet::setPacketData(String str){
   char charArray[240];
-  str.toCharArray(charArray, sizeof(str));
+  str.toCharArray(charArray, 240);
   setPacketData(charArray);
 }
 
