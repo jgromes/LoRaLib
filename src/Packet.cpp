@@ -151,6 +151,29 @@ void Packet::copyInto(Packet& pack) {
   strcpy(pack.data, data);
 }
 
+void Packet::setPacketData(char charArray[240]){
+  strcpy(data, charArray);
+}
+
+void Packet::setPacketData(String str){
+  char charArray[240];
+  str.toCharArray(charArray, sizeof(str));
+  setPacketData(charArray);
+}
+
+void Packet::setPacketData(float f, uint8_t decimals) {
+  int i = f;
+  float res = f - i;
+  if (res == 0) {
+    char charArray[240];
+    itoa(i, charArray, 10);
+    setPacketData(charArray);
+  } else {
+    String floatString = String(f, decimals);
+    setPacketData(floatString);
+  }
+}
+
 void Packet::getLoRaAddress(uint8_t addr[8]) {
   for(uint8_t i = 0; i < 8; i++) {
     addr[i] = EEPROM.read(i);
