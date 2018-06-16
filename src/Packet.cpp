@@ -155,37 +155,22 @@ void Packet::setPacketData(char charArray[240]){
   strcpy(data, charArray);
 }
 
-void Packet::setPacketData(String wordy){
+void Packet::setPacketData(String str){
   char charArray[240];
-  wordy.toCharArray(charArray, sizeof(wordy));
-  this->setPacketData(charArray);
-}
-
-void Packet::setPacketData(float f) {
-  uint8_t _decimals = 3;
-  int i = f;
-  float res = f - i;
-  if (res == 0) {
-    char charArray[240];
-    itoa(i, charArray, 10);
-    this->setPacketData(charArray);
-  } else {
-    String floatString = String(f, _decimals);
-    this->setPacketData(floatString);
-  }
+  str.toCharArray(charArray, sizeof(str));
+  setPacketData(charArray);
 }
 
 void Packet::setPacketData(float f, uint8_t decimals) {
-  uint8_t _decimals = decimals;
   int i = f;
   float res = f - i;
   if (res == 0) {
     char charArray[240];
     itoa(i, charArray, 10);
-    this->setPacketData(charArray);
+    setPacketData(charArray);
   } else {
-    String floatString = String(f, _decimals);
-    this->setPacketData(floatString);
+    String floatString = String(f, decimals);
+    setPacketData(floatString);
   }
 }
 

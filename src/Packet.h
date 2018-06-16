@@ -36,9 +36,8 @@ class Packet {
     void copyInto(Packet& pack);
     
     void setPacketData(char charArray[240]);
-    void setPacketData(String wordy);
-    void setPacketData(float f);
-    void setPacketData(float f, uint8_t decimals);
+    void setPacketData(String str);
+    void setPacketData(float f, uint8_t decimals = 3);
     
   private:
     void init(uint8_t src[8], uint8_t dest[8], const char dat[240]);
