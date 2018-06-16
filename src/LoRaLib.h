@@ -8,8 +8,13 @@
 
 #include "Module.h"
 
-#include "SX1278.h"
 #include "SX1272.h"
+#include "SX1273.h"
+
+#include "SX1278.h"
+#include "SX1276.h"
+#include "SX1277.h"
+#include "SX1279.h"
 
 class LoRa {
   public:
@@ -27,9 +32,9 @@ class LoRa {
     uint8_t sleep(void);
     uint8_t standby(void);
     
-    uint8_t setBandwidth(Bandwidth bw);
+    /*uint8_t setBandwidth(Bandwidth bw);
     uint8_t setSpreadingFactor(SpreadingFactor sf);
-    uint8_t setCodingRate(CodingRate cr);
+    uint8_t setCodingRate(CodingRate cr);*/
   
   private:
     Module* _mod;

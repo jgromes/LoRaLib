@@ -4,10 +4,25 @@ LoRa::LoRa(Chip ch, int nss, Bandwidth bw, SpreadingFactor sf, CodingRate cr, in
   dataRate = 0;
   lastPacketRSSI = 0;
   
-  if((ch == CH_SX1276) || (ch == CH_SX1277) || (ch == CH_SX1278) || (ch == CH_SX1279)) {
-    _mod = new SX1278(nss, bw, sf, cr, dio0, dio1);
-  } else if((ch == CH_SX1272) ||(ch == CH_SX1273)) {
-    _mod = new SX1272(nss, bw, sf, cr, dio0, dio1);
+  switch(ch) {
+    case CH_SX1272:
+      _mod = new SX1272(nss, bw, sf, cr, dio0, dio1);
+      break;
+    case CH_SX1273:
+      _mod = new SX1273(nss, bw, sf, cr, dio0, dio1);
+      break;
+    case CH_SX1276:
+      _mod = new SX1276(nss, bw, sf, cr, dio0, dio1);
+      break;
+    case CH_SX1277:
+      _mod = new SX1277(nss, bw, sf, cr, dio0, dio1);
+      break;
+    case CH_SX1278:
+      _mod = new SX1278(nss, bw, sf, cr, dio0, dio1);
+      break;
+    case CH_SX1279:
+      _mod = new SX1279(nss, bw, sf, cr, dio0, dio1);
+      break;
   }
 }
 
@@ -105,7 +120,7 @@ uint8_t LoRa::standby(void) {
   return(_mod->setMode(0b00000001));
 }
 
-uint8_t LoRa::setBandwidth(Bandwidth bw) {
+/*uint8_t LoRa::setBandwidth(Bandwidth bw) {
   uint8_t state = _mod->config(bw, _sf, _cr);
   if(state == ERR_NONE) {
     _bw = bw;
@@ -127,7 +142,7 @@ uint8_t LoRa::setCodingRate(CodingRate cr) {
     _cr = cr;
   }
   return(state);
-}
+}*/
 
 void LoRa::generateLoRaAdress(void) {
   for(uint8_t i = _addrEeprom; i < (_addrEeprom + 8); i++) {

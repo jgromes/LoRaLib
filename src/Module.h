@@ -16,7 +16,7 @@ class Module {
     virtual uint8_t rxSingle(char* data, uint8_t* length) = 0;
     
     virtual uint8_t setMode(uint8_t mode) = 0;
-    virtual uint8_t config(Bandwidth bw, SpreadingFactor sf, CodingRate cr) = 0;
+    virtual uint8_t config(Bandwidth bw, SpreadingFactor sf, CodingRate cr, float freq) = 0;
     virtual int8_t getLastPacketRSSI(void) = 0;
     
     uint8_t initModule(int nss, int dio0, int dio1);
@@ -32,9 +32,9 @@ class Module {
     void writeRegister(uint8_t reg, uint8_t data);
   
   private:
-    int _nss = 0;
-    int _dio0 = 2;
-    int _dio1 = 3;
+    int _nss;
+    int _dio0;
+    int _dio1;
 
 };
 
