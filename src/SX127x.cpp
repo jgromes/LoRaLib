@@ -186,11 +186,7 @@ uint8_t SX127x::config(Bandwidth bw, SpreadingFactor sf, CodingRate cr, float fr
   
   // set mode to STANDBY
   status = setMode(SX127X_STANDBY);
-  if(status != ERR_NONE) {
-    return(status);
-  }
-  
-  return(ERR_NONE);
+  return(status);
 }
 
 int8_t SX127x::getLastPacketRSSI(void) {

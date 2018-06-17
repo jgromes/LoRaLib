@@ -141,7 +141,7 @@ uint8_t SX1272::configCommon(uint8_t bw, uint8_t sf, uint8_t cr, float freq) {
   }
   
   // set low datarate optimizations for SF11/SF12 with 125 kHz bandwidth
-  if((bw == SX1272_BW_125_00_KHZ) && ((sf == SX127X_SF_11) || (sf == SX127X_SF_11))) {
+  if((bw == SX1272_BW_125_00_KHZ) && ((sf == SX127X_SF_11) || (sf == SX127X_SF_12))) {
     status = setRegValue(SX127X_REG_MODEM_CONFIG_1, SX1272_LOW_DATA_RATE_OPT_ON,  0, 0);
   } else {
     status = setRegValue(SX127X_REG_MODEM_CONFIG_1, SX1272_LOW_DATA_RATE_OPT_OFF,  0, 0);
