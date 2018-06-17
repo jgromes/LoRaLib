@@ -40,6 +40,7 @@ standby	KEYWORD2
 setBandwidth	KEYWORD2
 setSpreadingFactor	KEYWORD2
 setCodingRate	KEYWORD2
+setFrequency	KEYWORD2
 
 #######################################
 # Constants (LITERAL1)
