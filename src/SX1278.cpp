@@ -178,9 +178,7 @@ uint8_t SX1278::configCommon(uint8_t bw, uint8_t sf, uint8_t cr, float freq) {
   }
   
   // output power configuration
-  //TODO: the next line overwrites the whole register, there's probably a bug in setRegValue
-  //status = setRegValue(SX127X_REG_PA_CONFIG, SX1278_MAX_POWER, 6, 4);
-  status = setRegValue(SX127X_REG_PA_CONFIG, SX127X_PA_SELECT_BOOST | SX1278_MAX_POWER | SX127X_OUTPUT_POWER);
+  status = setRegValue(SX127X_REG_PA_CONFIG, SX1278_MAX_POWER, 6, 4);
   status = setRegValue(SX1278_REG_PA_DAC, SX127X_PA_BOOST_ON, 2, 0);
   if(status != ERR_NONE) {
     return(status);
@@ -199,13 +197,10 @@ uint8_t SX1278::configCommon(uint8_t bw, uint8_t sf, uint8_t cr, float freq) {
   
   // set SF6 optimizations
   if(sf == SX127X_SF_6) {
-    // TODO: see line 143
-    //status = setRegValue(SX127X_REG_MODEM_CONFIG_2, SX1278_RX_CRC_MODE_OFF, 2, 2);
-    status = setRegValue(SX127X_REG_MODEM_CONFIG_2, SX127X_SF_6 | SX127X_TX_MODE_SINGLE | SX1278_RX_CRC_MODE_OFF, 7, 2);
+    status = setRegValue(SX127X_REG_MODEM_CONFIG_2, SX1278_RX_CRC_MODE_OFF, 2, 2);
     status = setRegValue(SX127X_REG_MODEM_CONFIG_1, bw | cr | SX1278_HEADER_IMPL_MODE);
   } else {
-    //status = setRegValue(SX127X_REG_MODEM_CONFIG_2, SX1278_RX_CRC_MODE_ON, 2, 2);
-    status = setRegValue(SX127X_REG_MODEM_CONFIG_2, sf | SX127X_TX_MODE_SINGLE | SX1278_RX_CRC_MODE_ON, 7, 2);
+    status = setRegValue(SX127X_REG_MODEM_CONFIG_2, SX1278_RX_CRC_MODE_ON, 2, 2);
     status = setRegValue(SX127X_REG_MODEM_CONFIG_1, bw | cr | SX1278_HEADER_EXPL_MODE);
   }
   
