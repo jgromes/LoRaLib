@@ -4,12 +4,13 @@
 // create instance of LoRa class with default settings
 // chip:                SX1278
 // NSS pin:             7
+// carrier frequency:   434.0 MHz
 // bandwidth:           125 kHz
 // spreading factor:    9
 // coding rate:         4/7
 // DIO0 pin:            2
 // DIO1 pin:            3
-LoRa lora;
+LoRa lora(CH_SX1278, 7, 434.0);
 
 // create instance of Packet class with destination "01:23:45:67:89:AB:CD:EF" and data "Hello World !"
 Packet pack("01:23:45:67:89:AB:CD:EF", "Hello World!");
@@ -18,8 +19,11 @@ void setup() {
   Serial.begin(9600);
 
   // initialize the LoRa module with default settings
-  if(lora.begin() == ERR_NONE) {
-    Serial.println("Initialization done.");
+  uint8_t state = lora.begin();
+  if(state != ERR_NONE) {
+    Serial.print("Initialization failed, code 0x");
+    Serial.println(state, HEX);
+    while(true);
   }
 
   // create a string to store the packet information

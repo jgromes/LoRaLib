@@ -1,13 +1,9 @@
 #include "SX1278.h"
 
-SX1278::SX1278(int nss, Bandwidth bw, SpreadingFactor sf, CodingRate cr, int dio0, int dio1) : SX127x(CH_SX1278, dio0, dio1) {
+SX1278::SX1278(int nss, float freq, Bandwidth bw, SpreadingFactor sf, CodingRate cr, int dio0, int dio1) : SX127x(CH_SX1272, dio0, dio1, bw, sf, cr, freq) {
   _nss = nss;
   _dio0 = dio0;
   _dio1 = dio1;
-  
-  _bw = bw;
-  _sf = sf;
-  _cr = cr;
 }
 
 uint8_t SX1278::begin(void) {
@@ -21,7 +17,7 @@ uint8_t SX1278::begin(void) {
   }
   
   // start configuration
-  return(config(_bw, _sf, _cr, 434.0));
+  return(config(_bw, _sf, _cr, _freq));
 }
 
 uint8_t SX1278::rxSingle(char* data, uint8_t* length) {

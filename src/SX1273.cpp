@@ -1,6 +1,6 @@
 #include "SX1273.h"
 
-SX1273::SX1273(int nss, Bandwidth bw, SpreadingFactor sf, CodingRate cr, int dio0, int dio1) : SX1272(nss, bw, sf, cr, dio0, dio1) {
+SX1273::SX1273(int nss, float freq, Bandwidth bw, SpreadingFactor sf, CodingRate cr, int dio0, int dio1) : SX1272(nss, freq, bw, sf, cr, dio0, dio1) {
   
 }
 

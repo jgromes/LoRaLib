@@ -1,9 +1,14 @@
 #include "SX127x.h"
 
-SX127x::SX127x(Chip ch, int dio0, int dio1) {
+SX127x::SX127x(Chip ch, int dio0, int dio1, Bandwidth bw, SpreadingFactor sf, CodingRate cr, float freq) {
   _ch = ch;
   _dio0 = dio0;
   _dio1 = dio1;
+  
+  _bw = bw;
+  _sf = sf;
+  _cr = cr;
+  _freq = freq;
 }
 
 uint8_t SX127x::begin(void) {
@@ -44,6 +49,8 @@ uint8_t SX127x::begin(void) {
       Serial.println(" found! (match by REG_VERSION == 0x12)");
     }
   #endif
+  
+  return(ERR_NONE);
 }
 
 uint8_t SX127x::tx(char* data, uint8_t length) {
@@ -132,7 +139,8 @@ uint8_t SX127x::config(Bandwidth bw, SpreadingFactor sf, CodingRate cr, float fr
   }
   
   // set carrier frequency
-  int FRF = (freq * (2 << 19)) / 32.0;
+  uint32_t base = 2;
+  uint32_t FRF = (freq * (base << 18)) / 32.0;
   status = setRegValue(SX127X_REG_FRF_MSB, (FRF & 0xFF0000) >> 16);
   status = setRegValue(SX127X_REG_FRF_MID, (FRF & 0x00FF00) >> 8);
   status = setRegValue(SX127X_REG_FRF_LSB, FRF & 0x0000FF);

@@ -62,17 +62,13 @@
 
 class SX1278: public SX127x {
   public:
-    SX1278(int nss, Bandwidth bw, SpreadingFactor sf, CodingRate cr, int dio0, int dio1);
+    SX1278(int nss, float freq, Bandwidth bw, SpreadingFactor sf, CodingRate cr, int dio0, int dio1);
     
     uint8_t begin(void);
     uint8_t rxSingle(char* data, uint8_t* length);
     uint8_t config(Bandwidth bw, SpreadingFactor sf, CodingRate cr, float freq);
   
   protected:
-    Bandwidth _bw;
-    SpreadingFactor _sf;
-    CodingRate _cr;
-    
     uint8_t configCommon(uint8_t bw, uint8_t sf, uint8_t cr, float freq);
   
   private:
