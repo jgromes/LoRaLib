@@ -15,6 +15,11 @@ class Module {
     virtual uint8_t tx(char* data, uint8_t length) = 0;
     virtual uint8_t rxSingle(char* data, uint8_t* length) = 0;
     
+    virtual uint8_t setBandwidth(Bandwidth bw) = 0;
+    virtual uint8_t setSpreadingFactor(SpreadingFactor sf) = 0;
+    virtual uint8_t setCodingRate(CodingRate cr) = 0;
+    virtual uint8_t setFrequency(float freq) = 0;
+    
     virtual uint8_t setMode(uint8_t mode) = 0;
     virtual uint8_t config(Bandwidth bw, SpreadingFactor sf, CodingRate cr, float freq) = 0;
     virtual int8_t getLastPacketRSSI(void) = 0;

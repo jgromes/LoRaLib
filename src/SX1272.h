@@ -49,8 +49,18 @@ class SX1272: public SX127x {
     uint8_t begin(void);
     uint8_t rxSingle(char* data, uint8_t* length);
     uint8_t config(Bandwidth bw, SpreadingFactor sf, CodingRate cr, float freq);
+    
+    uint8_t setBandwidth(Bandwidth bw);
+    uint8_t setSpreadingFactor(SpreadingFactor sf);
+    uint8_t setCodingRate(CodingRate cr);
+    uint8_t setFrequency(float freq);
   
   protected:
+    Bandwidth _bw;
+    SpreadingFactor _sf;
+    CodingRate _cr;
+    float _freq;
+    
     uint8_t configCommon(uint8_t bw, uint8_t sf, uint8_t cr, float freq);
   
   private:

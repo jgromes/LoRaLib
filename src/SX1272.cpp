@@ -1,9 +1,14 @@
 #include "SX1272.h"
 
-SX1272::SX1272(int nss, float freq, Bandwidth bw, SpreadingFactor sf, CodingRate cr, int dio0, int dio1) : SX127x(CH_SX1272, dio0, dio1, bw, sf, cr, freq) {
+SX1272::SX1272(int nss, float freq, Bandwidth bw, SpreadingFactor sf, CodingRate cr, int dio0, int dio1) : SX127x(CH_SX1272, dio0, dio1) {
   _nss = nss;
   _dio0 = dio0;
   _dio1 = dio1;
+  
+  _bw = bw;
+  _sf = sf;
+  _cr = cr;
+  _freq = freq;
 }
 
 uint8_t SX1272::begin(void) {
@@ -29,6 +34,38 @@ uint8_t SX1272::rxSingle(char* data, uint8_t* length) {
   
   // execute common part
   return SX127x::rxSingle(data, length, headerExplMode);
+}
+
+uint8_t SX1272::setBandwidth(Bandwidth bw) {
+  uint8_t state = config(bw, _sf, _cr, _freq);
+  if(state == ERR_NONE) {
+    _bw = bw;
+  }
+  return(state);
+}
+
+uint8_t SX1272::setSpreadingFactor(SpreadingFactor sf) {
+  uint8_t state = config(_bw, sf, _cr, _freq);
+  if(state == ERR_NONE) {
+    _sf = sf;
+  }
+  return(state);
+}
+
+uint8_t SX1272::setCodingRate(CodingRate cr) {
+  uint8_t state = config(_bw, _sf, cr, _freq);
+  if(state == ERR_NONE) {
+    _cr = cr;
+  }
+  return(state);
+}
+
+uint8_t SX1272::setFrequency(float freq) {
+  uint8_t state = config(_bw, _sf, _cr, freq);
+  if(state == ERR_NONE) {
+    _freq = freq;
+  }
+  return(state);
 }
 
 uint8_t SX1272::config(Bandwidth bw, SpreadingFactor sf, CodingRate cr, float freq) {
@@ -107,6 +144,7 @@ uint8_t SX1272::config(Bandwidth bw, SpreadingFactor sf, CodingRate cr, float fr
   _bw = bw;
   _sf = sf;
   _cr = cr;
+  _freq = freq;
   
   return(ERR_NONE);
 }

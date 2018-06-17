@@ -1,9 +1,14 @@
 #include "SX1278.h"
 
-SX1278::SX1278(int nss, float freq, Bandwidth bw, SpreadingFactor sf, CodingRate cr, int dio0, int dio1) : SX127x(CH_SX1272, dio0, dio1, bw, sf, cr, freq) {
+SX1278::SX1278(int nss, float freq, Bandwidth bw, SpreadingFactor sf, CodingRate cr, int dio0, int dio1) : SX127x(CH_SX1272, dio0, dio1) {
   _nss = nss;
   _dio0 = dio0;
   _dio1 = dio1;
+  
+  _bw = bw;
+  _sf = sf;
+  _cr = cr;
+  _freq = freq;
 }
 
 uint8_t SX1278::begin(void) {
@@ -29,6 +34,38 @@ uint8_t SX1278::rxSingle(char* data, uint8_t* length) {
   
   // execute common part
   return SX127x::rxSingle(data, length, headerExplMode);
+}
+
+uint8_t SX1278::setBandwidth(Bandwidth bw) {
+  uint8_t state = config(bw, _sf, _cr, _freq);
+  if(state == ERR_NONE) {
+    _bw = bw;
+  }
+  return(state);
+}
+
+uint8_t SX1278::setSpreadingFactor(SpreadingFactor sf) {
+  uint8_t state = config(_bw, sf, _cr, _freq);
+  if(state == ERR_NONE) {
+    _sf = sf;
+  }
+  return(state);
+}
+
+uint8_t SX1278::setCodingRate(CodingRate cr) {
+  uint8_t state = config(_bw, _sf, cr, _freq);
+  if(state == ERR_NONE) {
+    _cr = cr;
+  }
+  return(state);
+}
+
+uint8_t SX1278::setFrequency(float freq) {
+  uint8_t state = config(_bw, _sf, _cr, freq);
+  if(state == ERR_NONE) {
+    _freq = freq;
+  }
+  return(state);
 }
 
 uint8_t SX1278::config(Bandwidth bw, SpreadingFactor sf, CodingRate cr, float freq) {
@@ -128,6 +165,7 @@ uint8_t SX1278::config(Bandwidth bw, SpreadingFactor sf, CodingRate cr, float fr
   _bw = bw;
   _sf = sf;
   _cr = cr;
+  _freq = freq;
   
   return(ERR_NONE);
 }
@@ -140,7 +178,9 @@ uint8_t SX1278::configCommon(uint8_t bw, uint8_t sf, uint8_t cr, float freq) {
   }
   
   // output power configuration
-  status = setRegValue(SX127X_REG_PA_CONFIG, SX1278_MAX_POWER, 6, 4);
+  //TODO: the next line overwrites the whole register, there's probably a bug in setRegValue
+  //status = setRegValue(SX127X_REG_PA_CONFIG, SX1278_MAX_POWER, 6, 4);
+  status = setRegValue(SX127X_REG_PA_CONFIG, SX127X_PA_SELECT_BOOST | SX1278_MAX_POWER | SX127X_OUTPUT_POWER);
   status = setRegValue(SX1278_REG_PA_DAC, SX127X_PA_BOOST_ON, 2, 0);
   if(status != ERR_NONE) {
     return(status);
@@ -159,10 +199,13 @@ uint8_t SX1278::configCommon(uint8_t bw, uint8_t sf, uint8_t cr, float freq) {
   
   // set SF6 optimizations
   if(sf == SX127X_SF_6) {
-    status = setRegValue(SX127X_REG_MODEM_CONFIG_2, SX1278_RX_CRC_MODE_OFF, 2, 2);
+    // TODO: see line 143
+    //status = setRegValue(SX127X_REG_MODEM_CONFIG_2, SX1278_RX_CRC_MODE_OFF, 2, 2);
+    status = setRegValue(SX127X_REG_MODEM_CONFIG_2, SX127X_SF_6 | SX127X_TX_MODE_SINGLE | SX1278_RX_CRC_MODE_OFF, 7, 2);
     status = setRegValue(SX127X_REG_MODEM_CONFIG_1, bw | cr | SX1278_HEADER_IMPL_MODE);
   } else {
-    status = setRegValue(SX127X_REG_MODEM_CONFIG_2, SX1278_RX_CRC_MODE_ON, 2, 2);
+    //status = setRegValue(SX127X_REG_MODEM_CONFIG_2, SX1278_RX_CRC_MODE_ON, 2, 2);
+    status = setRegValue(SX127X_REG_MODEM_CONFIG_2, sf | SX127X_TX_MODE_SINGLE | SX1278_RX_CRC_MODE_ON, 7, 2);
     status = setRegValue(SX127X_REG_MODEM_CONFIG_1, bw | cr | SX1278_HEADER_EXPL_MODE);
   }
   

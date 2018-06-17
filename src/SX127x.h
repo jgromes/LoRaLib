@@ -159,7 +159,7 @@
 
 class SX127x: public Module {
   public:
-    SX127x(Chip ch, int dio0, int dio1, Bandwidth bw, SpreadingFactor sf, CodingRate cr, float freq);
+    SX127x(Chip ch, int dio0, int dio1);
     
     uint8_t begin(void);
     
@@ -167,14 +167,8 @@ class SX127x: public Module {
     uint8_t rxSingle(char* data, uint8_t* length, bool headerExplMode);
     
     uint8_t setMode(uint8_t mode);
-    uint8_t config(Bandwidth bw, SpreadingFactor sf, CodingRate cr, float freq);
+    uint8_t config(uint8_t bw, uint8_t sf, uint8_t cr, float freq);
     int8_t getLastPacketRSSI(void);
-  
-  protected:
-    Bandwidth _bw;
-    SpreadingFactor _sf;
-    CodingRate _cr;
-    float _freq;
   
   private:
     Chip _ch;

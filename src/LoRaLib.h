@@ -40,11 +40,6 @@ class LoRa {
   private:
     Module* _mod;
     
-    Bandwidth _bw;
-    SpreadingFactor _sf;
-    CodingRate _cr;
-    float _freq;
-    
     uint8_t _address[8] = {0, 0, 0, 0, 0, 0, 0, 0};
     uint16_t _addrEeprom;
     

@@ -1,14 +1,10 @@
 #include "SX127x.h"
 
-SX127x::SX127x(Chip ch, int dio0, int dio1, Bandwidth bw, SpreadingFactor sf, CodingRate cr, float freq) {
+SX127x::SX127x(Chip ch, int dio0, int dio1) {
   _ch = ch;
   _dio0 = dio0;
   _dio1 = dio1;
-  
-  _bw = bw;
-  _sf = sf;
-  _cr = cr;
-  _freq = freq;
+
 }
 
 uint8_t SX127x::begin(void) {
@@ -123,7 +119,7 @@ uint8_t SX127x::setMode(uint8_t mode) {
   return(ERR_NONE);
 }
 
-uint8_t SX127x::config(Bandwidth bw, SpreadingFactor sf, CodingRate cr, float freq) {
+uint8_t SX127x::config(uint8_t bw, uint8_t sf, uint8_t cr, float freq) {
   uint8_t status = ERR_NONE;
   
   // set mode to SLEEP
