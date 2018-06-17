@@ -10,7 +10,7 @@
 // coding rate:         4/7
 // DIO0 pin:            2
 // DIO1 pin:            3
-LoRa lora(CH_SX1278, 7, 434.0);
+LoRa lora;
 
 // create instance of Packet class with destination "01:23:45:67:89:AB:CD:EF" and data "Hello World !"
 Packet pack("01:23:45:67:89:AB:CD:EF", "Hello World!");
