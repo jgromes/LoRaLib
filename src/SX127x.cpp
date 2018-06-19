@@ -190,7 +190,7 @@ int8_t SX127x::getLastPacketRSSI() {
 }
 
 float SX127x::getLastPacketSNR() {
-  int8_t rawSNR = (int8_t)getRegValue(SX127X_REG_PKT_SNR);
+  int8_t rawSNR = (int8_t)getRegValue(SX127X_REG_PKT_SNR_VALUE);
   return(rawSNR / 4.0);
 }
 

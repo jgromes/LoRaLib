@@ -11,7 +11,7 @@ SX1272::SX1272(int nss, float freq, Bandwidth bw, SpreadingFactor sf, CodingRate
   _freq = freq;
 }
 
-uint8_t SX1272::begin(void) {
+uint8_t SX1272::begin() {
   // initialize low-level drivers
   initModule(_nss, _dio0, _dio1);
   

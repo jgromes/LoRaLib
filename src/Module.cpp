@@ -1,6 +1,6 @@
 #include "Module.h"
 
-uint8_t Module::initModule(int nss, int dio0, int dio1) {
+void Module::initModule(int nss, int dio0, int dio1) {
   _nss = nss;
   _dio0 = dio0;
   _dio1 = dio1;

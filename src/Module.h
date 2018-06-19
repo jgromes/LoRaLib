@@ -10,7 +10,7 @@
 
 class Module {
   public:
-    virtual uint8_t begin(void) = 0;
+    virtual uint8_t begin() = 0;
     
     virtual uint8_t tx(char* data, uint8_t length) = 0;
     virtual uint8_t rxSingle(char* data, uint8_t* length) = 0;
@@ -22,9 +22,10 @@ class Module {
     
     virtual uint8_t setMode(uint8_t mode) = 0;
     virtual uint8_t config(Bandwidth bw, SpreadingFactor sf, CodingRate cr, float freq) = 0;
-    virtual int8_t getLastPacketRSSI(void) = 0;
+    virtual int8_t getLastPacketRSSI() = 0;
+    virtual float getLastPacketSNR() = 0;
     
-    uint8_t initModule(int nss, int dio0, int dio1);
+    void initModule(int nss, int dio0, int dio1);
     
     uint8_t getRegValue(uint8_t reg, uint8_t msb = 7, uint8_t lsb = 0);
     uint8_t readRegisterBurst(uint8_t reg, uint8_t numBytes, uint8_t* inBytes);

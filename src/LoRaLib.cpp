@@ -114,11 +114,11 @@ uint8_t LoRa::receive(Packet& pack) {
   return(status);
 }
 
-uint8_t LoRa::sleep(void) {
+uint8_t LoRa::sleep() {
   return(_mod->setMode(0b00000000));
 }
 
-uint8_t LoRa::standby(void) {
+uint8_t LoRa::standby() {
   return(_mod->setMode(0b00000001));
 }
 
@@ -138,7 +138,7 @@ uint8_t LoRa::setFrequency(float freq) {
   return(_mod->setFrequency(freq));
 }
 
-void LoRa::generateLoRaAdress(void) {
+void LoRa::generateLoRaAdress() {
   for(uint8_t i = _addrEeprom; i < (_addrEeprom + 8); i++) {
     EEPROM.write(i, (uint8_t)random(0, 256));
   }

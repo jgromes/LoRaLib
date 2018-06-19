@@ -30,8 +30,8 @@ class LoRa {
     uint8_t receive(Packet& pack);
     //TODO: CAD mode
     
-    uint8_t sleep(void);
-    uint8_t standby(void);
+    uint8_t sleep();
+    uint8_t standby();
     
     uint8_t setBandwidth(Bandwidth bw);
     uint8_t setSpreadingFactor(SpreadingFactor sf);
@@ -44,7 +44,7 @@ class LoRa {
     uint8_t _address[8] = {0, 0, 0, 0, 0, 0, 0, 0};
     uint16_t _addrEeprom;
     
-    void generateLoRaAdress(void);
+    void generateLoRaAdress();
 };
 
 #endif
