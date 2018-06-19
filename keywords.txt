@@ -31,6 +31,7 @@ CodingRate	KEYWORD2
 
 dataRate	KEYWORD2
 lastPacketRSSI	KEYWORD2
+lastPacketSNR	KEYWORD2
 begin	KEYWORD2
 transmit	KEYWORD2
 receive	KEYWORD2

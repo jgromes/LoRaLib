@@ -3,6 +3,7 @@
 LoRa::LoRa(Chip ch, int nss, float freq, Bandwidth bw, SpreadingFactor sf, CodingRate cr, int dio0, int dio1) {
   dataRate = 0;
   lastPacketRSSI = 0;
+  lastPacketSNR = 0;
   
   switch(ch) {
     case CH_SX1272:
@@ -108,6 +109,7 @@ uint8_t LoRa::receive(Packet& pack) {
   uint32_t elapsedTime = millis() - startTime;
   dataRate = (pack.length*8.0)/((float)elapsedTime/1000.0);
   lastPacketRSSI = _mod->getLastPacketRSSI();
+  lastPacketSNR = _mod->getLastPacketSNR();
   
   return(status);
 }

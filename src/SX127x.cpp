@@ -7,7 +7,7 @@ SX127x::SX127x(Chip ch, int dio0, int dio1) {
 
 }
 
-uint8_t SX127x::begin(void) {
+uint8_t SX127x::begin() {
   uint8_t i = 0;
   bool flagFound = false;
   while((i < 10) && !flagFound) {
@@ -185,11 +185,16 @@ uint8_t SX127x::config(uint8_t bw, uint8_t sf, uint8_t cr, float freq) {
   return(status);
 }
 
-int8_t SX127x::getLastPacketRSSI(void) {
+int8_t SX127x::getLastPacketRSSI() {
   return(-157 + getRegValue(SX127X_REG_PKT_RSSI_VALUE));
 }
 
-void SX127x::clearIRQFlags(void) {
+float SX127x::getLastPacketSNR() {
+  int8_t rawSNR = (int8_t)getRegValue(SX127X_REG_PKT_SNR);
+  return(rawSNR / 4.0);
+}
+
+void SX127x::clearIRQFlags() {
   writeRegister(SX127X_REG_IRQ_FLAGS, 0b11111111);
 }
 

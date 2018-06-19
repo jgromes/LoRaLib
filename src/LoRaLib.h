@@ -22,6 +22,7 @@ class LoRa {
     
     float dataRate;
     int8_t lastPacketRSSI;
+    float lastPacketSNR;
     
     uint8_t begin(uint16_t addrEeprom = 0);
     

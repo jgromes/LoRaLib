@@ -161,21 +161,22 @@ class SX127x: public Module {
   public:
     SX127x(Chip ch, int dio0, int dio1);
     
-    uint8_t begin(void);
+    uint8_t begin();
     
     uint8_t tx(char* data, uint8_t length);
     uint8_t rxSingle(char* data, uint8_t* length, bool headerExplMode);
     
     uint8_t setMode(uint8_t mode);
     uint8_t config(uint8_t bw, uint8_t sf, uint8_t cr, float freq);
-    int8_t getLastPacketRSSI(void);
+    int8_t getLastPacketRSSI();
+    float getLastPacketSNR();
   
   private:
     Chip _ch;
     int _dio0;
     int _dio1;
     
-    void clearIRQFlags(void);
+    void clearIRQFlags();
     const char* getChipName();
 };
 

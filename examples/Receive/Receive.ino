@@ -64,6 +64,11 @@ void loop() {
     Serial.print("RSSI:\t\t");
     Serial.print(lora.lastPacketRSSI);
     Serial.println(" dBm");
+
+    //print the SNR (Signal-to-Noise Ratio) of the last received packet
+    Serial.print("SNR:\t\t");
+    Serial.print(lora.lastPacketSNR);
+    Serial.println(" dBm");
     
   } else if(state == ERR_RX_TIMEOUT) {
     // timeout occurred while waiting for a packet
