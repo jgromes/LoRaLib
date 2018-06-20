@@ -1,6 +1,6 @@
 #include "Module.h"
 
-uint8_t Module::initModule(int nss, int dio0, int dio1) {
+void Module::initModule(int nss, int dio0, int dio1) {
   _nss = nss;
   _dio0 = dio0;
   _dio1 = dio1;
@@ -61,8 +61,9 @@ uint8_t Module::setRegValue(uint8_t reg, uint8_t value, uint8_t msb, uint8_t lsb
   }
   
   uint8_t currentValue = readRegister(reg);
-  uint8_t newValue = currentValue & ((0b11111111 << (msb + 1)) & (0b11111111 >> (8 - lsb)));
-  writeRegister(reg, newValue | value);
+  uint8_t mask = ~((0b11111111 << (msb + 1)) | (0b11111111 >> (8 - lsb)));
+  uint8_t newValue = (currentValue & ~mask) | (value & mask);
+  writeRegister(reg, newValue);
   return(ERR_NONE);
 }
 

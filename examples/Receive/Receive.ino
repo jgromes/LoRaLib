@@ -4,6 +4,7 @@
 // create instance of LoRa class with default settings
 // chip:                SX1278
 // NSS pin:             7
+// carrier frequency:   434.0 MHz
 // bandwidth:           125 kHz
 // spreading factor:    9
 // coding rate:         4/7
@@ -18,8 +19,11 @@ void setup() {
   Serial.begin(9600);
 
   // initialize the LoRa module with default settings
-  if(lora.begin() == ERR_NONE) {
-    Serial.println("Initialization done.");
+  uint8_t state = lora.begin();
+  if(state != ERR_NONE) {
+    Serial.print("Initialization failed, code 0x");
+    Serial.println(state, HEX);
+    while(true);
   }
 }
 
@@ -62,6 +66,11 @@ void loop() {
     //print the RSSI (Received Signal Strength Indicator) of the last received packet
     Serial.print("RSSI:\t\t");
     Serial.print(lora.lastPacketRSSI);
+    Serial.println(" dBm");
+
+    //print the SNR (Signal-to-Noise Ratio) of the last received packet
+    Serial.print("SNR:\t\t");
+    Serial.print(lora.lastPacketSNR);
     Serial.println(" dBm");
     
   } else if(state == ERR_RX_TIMEOUT) {

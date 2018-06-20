@@ -35,6 +35,7 @@
 #define ERR_INVALID_BANDWIDTH           0x30
 #define ERR_INVALID_SPREADING_FACTOR    0x31
 #define ERR_INVALID_CODING_RATE         0x32
+#define ERR_INVALID_FREQUENCY           0x33
 
 #define ERR_INVALID_BIT_RANGE           0x40
 
