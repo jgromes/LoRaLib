@@ -3,6 +3,7 @@
 
 // create instance of LoRa class with default settings
 // LoRa link with this setting is a balance between range and data rate
+//
 // chip:                SX1278
 // NSS pin:             7
 // carrier frequency:   434.0 MHz
@@ -15,6 +16,7 @@ LoRa loraBalanced;
 
 // create another LoRa instance with non-default settings
 // this LoRa link will have maximum range, but very low data rate
+//
 // chip:                SX1276
 // NSS pin:             6
 // carrier frequency:   434.0 MHz
@@ -27,6 +29,11 @@ LoRa loraMaxRange(CH_SX1276, 6, 434.0, BW_7_80_KHZ, SF_12, CR_4_8, 4, 5);
 
 // create third LoRa instance with non-default settings
 // this LoRa link will have high data rate, but lower range
+// NOTE: when using spreading factor 6, the total packet length has to be known in advance!
+//       it can be set using the length variable of your Packet instance 
+//       Packet::length = x;
+//       where x is the total packet length including both addresses
+//
 // chip:                SX1272
 // NSS pin:             4
 // carrier frequency:   915.0 MHz

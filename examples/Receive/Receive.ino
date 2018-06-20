@@ -19,8 +19,11 @@ void setup() {
   Serial.begin(9600);
 
   // initialize the LoRa module with default settings
-  if(lora.begin() == ERR_NONE) {
-    Serial.println("Initialization done.");
+  uint8_t state = lora.begin();
+  if(state != ERR_NONE) {
+    Serial.print("Initialization failed, code 0x");
+    Serial.println(state, HEX);
+    while(true);
   }
 }
 
