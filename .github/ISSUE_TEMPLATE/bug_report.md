@@ -4,6 +4,9 @@ about: Create a report to help us improve
 
 ---
 
+**IMPORTANT: Check the wiki**
+Before submitting new issue, please check the [Wiki](https://github.com/jgromes/LoRaLib/wiki). You might find a solution to your issue there.
+
 **Describe the bug**
 A clear and concise description of what the bug is.
 

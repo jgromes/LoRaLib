@@ -4,6 +4,9 @@ about: Suggest an idea for this project
 
 ---
 
+**IMPORTANT: Check the wiki**
+Before submitting new issue, please check the [Wiki](https://github.com/jgromes/LoRaLib/wiki). You might find a solution to your issue there.
+
 **Is your feature request related to a problem? Please describe.**
 A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
 
