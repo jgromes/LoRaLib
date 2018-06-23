@@ -2,11 +2,7 @@
 
 ## Arduino library for LoRa modules based on SX1278 and SX1272 chips
 
----
-
 ## See the [Wiki](https://github.com/jgromes/LoRaLib/wiki) for detailed API reference and further information.
-
----
 
 ### This is not the shield you are looking for!
 If you're looking for an open-source shield to use with this library, it has its own repository: [https://github.com/jgromes/LoRenz](https://github.com/jgromes/LoRenz)
