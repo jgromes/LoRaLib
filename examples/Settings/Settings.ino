@@ -12,6 +12,7 @@
 // coding rate:         4/7
 // DIO0 pin:            2
 // DIO1 pin:            3
+// Sync word:           0x12
 LoRa loraBalanced;
 
 // create another LoRa instance with non-default settings
@@ -25,7 +26,8 @@ LoRa loraBalanced;
 // coding rate:         4/8
 // DIO0 pin:            4
 // DIO1 pin:            5
-LoRa loraMaxRange(CH_SX1276, 6, 434.0, BW_7_80_KHZ, SF_12, CR_4_8, 4, 5);
+// Sync word:           0x13
+LoRa loraMaxRange(CH_SX1276, 6, 434.0, BW_7_80_KHZ, SF_12, CR_4_8, 4, 5, 0x13);
 
 // create third LoRa instance with non-default settings
 // this LoRa link will have high data rate, but lower range
@@ -42,7 +44,8 @@ LoRa loraMaxRange(CH_SX1276, 6, 434.0, BW_7_80_KHZ, SF_12, CR_4_8, 4, 5);
 // coding rate:         4/5
 // DIO0 pin:            10
 // DIO1 pin:            11
-LoRa loraMaxDataRate(CH_SX1272, 4, 915.0, BW_500_00_KHZ, SF_6, CR_4_5, 10, 11);
+// Sync word:           0x14
+LoRa loraMaxDataRate(CH_SX1272, 4, 915.0, BW_500_00_KHZ, SF_6, CR_4_5, 10, 11, 0x14);
 
 void setup() {
   Serial.begin(9600);
@@ -55,17 +58,31 @@ void setup() {
   // you can also change the settings at runtime
   // different modules accept different parameters
   // you can check if the setting was changed successfully
+
+  // set bandwidth to 250 kHz
   if(loraBalanced.setBandwidth(BW_250_00_KHZ) == ERR_INVALID_BANDWIDTH) {
     Serial.println("Selected bandwidth is invalid for this module!");
   }
+
+  // set spreading factor to 10
   if(loraBalanced.setSpreadingFactor(SF_10) == ERR_INVALID_SPREADING_FACTOR) {
     Serial.println("Selected spreading factor is invalid for this module!");
   }
+
+  // set coding rate to 4/6
   if(loraBalanced.setCodingRate(CR_4_6) == ERR_INVALID_CODING_RATE) {
     Serial.println("Selected coding rate is invalid for this module!");
   }
+
+  // set carrier frequency to 433.5 MHz
   if(loraBalanced.setFrequency(433.5) == ERR_INVALID_FREQUENCY) {
     Serial.println("Selected frequency is invalid for this module!");
+  }
+
+  // set LoRa sync word to 0x14
+  // NOTE: value 0x34 is reserved for LoRaWAN networks and should not be used
+  if(loraBalanced.setSyncWord(0x14) != ERR_NONE) {
+    Serial.println("Unable to set sync word!");
   }
 }
 

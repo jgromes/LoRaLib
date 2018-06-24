@@ -4,7 +4,6 @@ SX127x::SX127x(Chip ch, int dio0, int dio1) {
   _ch = ch;
   _dio0 = dio0;
   _dio1 = dio1;
-
 }
 
 uint8_t SX127x::begin() {
@@ -119,7 +118,7 @@ uint8_t SX127x::setMode(uint8_t mode) {
   return(ERR_NONE);
 }
 
-uint8_t SX127x::config(uint8_t bw, uint8_t sf, uint8_t cr, float freq) {
+uint8_t SX127x::config(uint8_t bw, uint8_t sf, uint8_t cr, float freq, uint8_t syncWord) {
   uint8_t status = ERR_NONE;
   
   // set mode to SLEEP
@@ -169,6 +168,12 @@ uint8_t SX127x::config(uint8_t bw, uint8_t sf, uint8_t cr, float freq) {
     status = setRegValue(SX127X_REG_DETECTION_THRESHOLD, SX127X_DETECTION_THRESHOLD_SF_7_12);
   }
   
+  if(status != ERR_NONE) {
+    return(status);
+  }
+  
+  // set the sync word
+  status = setRegValue(SX127X_REG_SYNC_WORD, syncWord);
   if(status != ERR_NONE) {
     return(status);
   }

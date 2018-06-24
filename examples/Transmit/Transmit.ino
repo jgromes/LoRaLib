@@ -10,6 +10,7 @@
 // coding rate:         4/7
 // DIO0 pin:            2
 // DIO1 pin:            3
+// Sync word:           0x12
 LoRa lora;
 
 // create instance of Packet class with destination "01:23:45:67:89:AB:CD:EF" and data "Hello World !"

@@ -1,6 +1,6 @@
 #include "SX1278.h"
 
-SX1278::SX1278(int nss, float freq, Bandwidth bw, SpreadingFactor sf, CodingRate cr, int dio0, int dio1) : SX127x(CH_SX1272, dio0, dio1) {
+SX1278::SX1278(int nss, float freq, Bandwidth bw, SpreadingFactor sf, CodingRate cr, int dio0, int dio1, uint8_t syncWord) : SX127x(CH_SX1272, dio0, dio1) {
   _nss = nss;
   _dio0 = dio0;
   _dio1 = dio1;
@@ -9,6 +9,7 @@ SX1278::SX1278(int nss, float freq, Bandwidth bw, SpreadingFactor sf, CodingRate
   _sf = sf;
   _cr = cr;
   _freq = freq;
+  _syncWord = syncWord;
 }
 
 uint8_t SX1278::begin() {
@@ -22,7 +23,7 @@ uint8_t SX1278::begin() {
   }
   
   // start configuration
-  return(config(_bw, _sf, _cr, _freq));
+  return(config(_bw, _sf, _cr, _freq, _syncWord));
 }
 
 uint8_t SX1278::rxSingle(char* data, uint8_t* length) {
@@ -37,7 +38,7 @@ uint8_t SX1278::rxSingle(char* data, uint8_t* length) {
 }
 
 uint8_t SX1278::setBandwidth(Bandwidth bw) {
-  uint8_t state = config(bw, _sf, _cr, _freq);
+  uint8_t state = config(bw, _sf, _cr, _freq, _syncWord);
   if(state == ERR_NONE) {
     _bw = bw;
   }
@@ -45,7 +46,7 @@ uint8_t SX1278::setBandwidth(Bandwidth bw) {
 }
 
 uint8_t SX1278::setSpreadingFactor(SpreadingFactor sf) {
-  uint8_t state = config(_bw, sf, _cr, _freq);
+  uint8_t state = config(_bw, sf, _cr, _freq, _syncWord);
   if(state == ERR_NONE) {
     _sf = sf;
   }
@@ -53,7 +54,7 @@ uint8_t SX1278::setSpreadingFactor(SpreadingFactor sf) {
 }
 
 uint8_t SX1278::setCodingRate(CodingRate cr) {
-  uint8_t state = config(_bw, _sf, cr, _freq);
+  uint8_t state = config(_bw, _sf, cr, _freq, _syncWord);
   if(state == ERR_NONE) {
     _cr = cr;
   }
@@ -61,14 +62,22 @@ uint8_t SX1278::setCodingRate(CodingRate cr) {
 }
 
 uint8_t SX1278::setFrequency(float freq) {
-  uint8_t state = config(_bw, _sf, _cr, freq);
+  uint8_t state = config(_bw, _sf, _cr, freq, _syncWord);
   if(state == ERR_NONE) {
     _freq = freq;
   }
   return(state);
 }
 
-uint8_t SX1278::config(Bandwidth bw, SpreadingFactor sf, CodingRate cr, float freq) {
+uint8_t SX1278::setSyncWord(uint8_t syncWord) {
+  uint8_t state = config(_bw, _sf, _cr, _freq, syncWord);
+  if(state == ERR_NONE) {
+    _syncWord = syncWord;
+  }
+  return(state);
+}
+
+uint8_t SX1278::config(Bandwidth bw, SpreadingFactor sf, CodingRate cr, float freq, uint8_t syncWord) {
   uint8_t status = ERR_NONE;
   uint8_t newBandwidth, newSpreadingFactor, newCodingRate;
   
@@ -156,7 +165,7 @@ uint8_t SX1278::config(Bandwidth bw, SpreadingFactor sf, CodingRate cr, float fr
   }
   
   // execute common part
-  status = configCommon(newBandwidth, newSpreadingFactor, newCodingRate, freq);
+  status = configCommon(newBandwidth, newSpreadingFactor, newCodingRate, freq, syncWord);
   if(status != ERR_NONE) {
     return(status);
   }
@@ -170,9 +179,9 @@ uint8_t SX1278::config(Bandwidth bw, SpreadingFactor sf, CodingRate cr, float fr
   return(ERR_NONE);
 }
 
-uint8_t SX1278::configCommon(uint8_t bw, uint8_t sf, uint8_t cr, float freq) {
+uint8_t SX1278::configCommon(uint8_t bw, uint8_t sf, uint8_t cr, float freq, uint8_t syncWord) {
   // configure common registers
-  uint8_t status = SX127x::config(bw, sf, cr, freq);
+  uint8_t status = SX127x::config(bw, sf, cr, freq, syncWord);
   if(status != ERR_NONE) {
     return(status);
   }

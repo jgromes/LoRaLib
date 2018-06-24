@@ -6,9 +6,9 @@
 
 class SX1277: public SX1278 {
   public:
-    SX1277(int nss, float freq, Bandwidth bw, SpreadingFactor sf, CodingRate cr, int dio0, int dio1);
+    SX1277(int nss, float freq, Bandwidth bw, SpreadingFactor sf, CodingRate cr, int dio0, int dio1, uint8_t syncWord);
     
-    uint8_t config(Bandwidth bw, SpreadingFactor sf, CodingRate cr, float freq);
+    uint8_t config(Bandwidth bw, SpreadingFactor sf, CodingRate cr, float freq, uint8_t syncWord);
 };
 
 #endif

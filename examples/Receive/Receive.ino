@@ -10,6 +10,7 @@
 // coding rate:         4/7
 // DIO0 pin:            2
 // DIO1 pin:            3
+// Sync word:           0x12
 LoRa lora;
 
 // create empty instance of Packet class

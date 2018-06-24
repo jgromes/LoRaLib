@@ -1,10 +1,10 @@
 #include "SX1276.h"
 
-SX1276::SX1276(int nss, float freq, Bandwidth bw, SpreadingFactor sf, CodingRate cr, int dio0, int dio1) : SX1278(nss, freq, bw, sf, cr, dio0, dio1) {
+SX1276::SX1276(int nss, float freq, Bandwidth bw, SpreadingFactor sf, CodingRate cr, int dio0, int dio1, uint8_t syncWord) : SX1278(nss, freq, bw, sf, cr, dio0, dio1, syncWord) {
   
 }
 
-uint8_t SX1276::config(Bandwidth bw, SpreadingFactor sf, CodingRate cr, float freq) {
+uint8_t SX1276::config(Bandwidth bw, SpreadingFactor sf, CodingRate cr, float freq, uint8_t syncWord) {
   uint8_t status = ERR_NONE;
   uint8_t newBandwidth, newSpreadingFactor, newCodingRate;
   
@@ -71,7 +71,7 @@ uint8_t SX1276::config(Bandwidth bw, SpreadingFactor sf, CodingRate cr, float fr
   }
   
   // execute common part
-  status = configCommon(newBandwidth, newSpreadingFactor, newCodingRate, freq);
+  status = configCommon(newBandwidth, newSpreadingFactor, newCodingRate, freq, syncWord);
   if(status != ERR_NONE) {
     return(status);
   }

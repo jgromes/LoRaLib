@@ -1,28 +1,28 @@
 #include "LoRaLib.h"
 
-LoRa::LoRa(Chip ch, int nss, float freq, Bandwidth bw, SpreadingFactor sf, CodingRate cr, int dio0, int dio1) {
+LoRa::LoRa(Chip ch, int nss, float freq, Bandwidth bw, SpreadingFactor sf, CodingRate cr, int dio0, int dio1, uint8_t syncWord) {
   dataRate = 0;
   lastPacketRSSI = 0;
   lastPacketSNR = 0;
   
   switch(ch) {
     case CH_SX1272:
-      _mod = new SX1272(nss, freq, bw, sf, cr, dio0, dio1);
+      _mod = new SX1272(nss, freq, bw, sf, cr, dio0, dio1, syncWord);
       break;
     case CH_SX1273:
-      _mod = new SX1273(nss, freq, bw, sf, cr, dio0, dio1);
+      _mod = new SX1273(nss, freq, bw, sf, cr, dio0, dio1, syncWord);
       break;
     case CH_SX1276:
-      _mod = new SX1276(nss, freq, bw, sf, cr, dio0, dio1);
+      _mod = new SX1276(nss, freq, bw, sf, cr, dio0, dio1, syncWord);
       break;
     case CH_SX1277:
-      _mod = new SX1277(nss, freq, bw, sf, cr, dio0, dio1);
+      _mod = new SX1277(nss, freq, bw, sf, cr, dio0, dio1, syncWord);
       break;
     case CH_SX1278:
-      _mod = new SX1278(nss, freq, bw, sf, cr, dio0, dio1);
+      _mod = new SX1278(nss, freq, bw, sf, cr, dio0, dio1, syncWord);
       break;
     case CH_SX1279:
-      _mod = new SX1279(nss, freq, bw, sf, cr, dio0, dio1);
+      _mod = new SX1279(nss, freq, bw, sf, cr, dio0, dio1, syncWord);
       break;
   }
 }
@@ -136,6 +136,10 @@ uint8_t LoRa::setCodingRate(CodingRate cr) {
 
 uint8_t LoRa::setFrequency(float freq) {
   return(_mod->setFrequency(freq));
+}
+
+uint8_t LoRa::setSyncWord(uint8_t syncword) {
+  return(_mod->setSyncWord(syncword));
 }
 
 void LoRa::generateLoRaAdress() {
