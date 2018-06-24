@@ -114,6 +114,10 @@ uint8_t LoRa::receive(Packet& pack) {
   return(status);
 }
 
+uint8_t LoRa::scanChannel() {
+  return(_mod->runCAD());
+}
+
 uint8_t LoRa::sleep() {
   return(_mod->setMode(0b00000000));
 }

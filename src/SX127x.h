@@ -64,7 +64,7 @@
 #define SX127X_FSRX                                   0b00000100  //  2     0     frequency synthesis RX
 #define SX127X_RXCONTINUOUS                           0b00000101  //  2     0     receive continuous
 #define SX127X_RXSINGLE                               0b00000110  //  2     0     receive single
-#define SX127X_CAD 
+#define SX127X_CAD                                    0b00000111  //  2     0     channel activity detection
 
 // SX127X_REG_PA_CONFIG
 #define SX127X_PA_SELECT_RFO                          0b00000000  //  7     7     RFO pin output, power limited to +14 dBm
@@ -169,6 +169,7 @@ class SX127x: public Module {
     
     uint8_t tx(char* data, uint8_t length);
     uint8_t rxSingle(char* data, uint8_t* length, bool headerExplMode);
+    uint8_t runCAD();
     
     uint8_t setMode(uint8_t mode);
     uint8_t config(uint8_t bw, uint8_t sf, uint8_t cr, float freq, uint8_t syncWord);

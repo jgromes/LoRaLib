@@ -28,7 +28,7 @@ class LoRa {
     
     uint8_t transmit(Packet& pack);
     uint8_t receive(Packet& pack);
-    //TODO: CAD mode
+    uint8_t scanChannel();
     
     uint8_t sleep();
     uint8_t standby();

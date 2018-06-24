@@ -113,6 +113,25 @@ uint8_t SX127x::rxSingle(char* data, uint8_t* length, bool headerExplMode) {
   return(ERR_NONE);
 }
 
+uint8_t SX127x::runCAD() {
+  setMode(SX127X_STANDBY);
+  
+  setRegValue(SX127X_REG_DIO_MAPPING_1, SX127X_DIO0_CAD_DONE | SX127X_DIO1_CAD_DETECTED, 7, 4);
+  clearIRQFlags();
+  
+  setMode(SX127X_CAD);
+  
+  while(!digitalRead(_dio0)) {
+    if(digitalRead(_dio1)) {
+      clearIRQFlags();
+      return(PREAMBLE_DETECTED);
+    }
+  }
+  
+  clearIRQFlags();
+  return(CHANNEL_FREE);
+}
+
 uint8_t SX127x::setMode(uint8_t mode) {
   setRegValue(SX127X_REG_OP_MODE, mode, 2, 0);
   return(ERR_NONE);

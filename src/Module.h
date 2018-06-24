@@ -14,6 +14,7 @@ class Module {
     
     virtual uint8_t tx(char* data, uint8_t length) = 0;
     virtual uint8_t rxSingle(char* data, uint8_t* length) = 0;
+    virtual uint8_t runCAD() = 0;
     
     virtual uint8_t setBandwidth(Bandwidth bw) = 0;
     virtual uint8_t setSpreadingFactor(SpreadingFactor sf) = 0;
