@@ -193,9 +193,16 @@ uint8_t SX1278::configCommon(uint8_t bw, uint8_t sf, uint8_t cr, float freq, uin
     return(status);
   }
   
-  // enable LNA gain setting by register and set low datarate optimizations for SF11/SF12 with 125 kHz bandwidth
+  // enable LNA gain setting by register 
   status = setRegValue(SX1278_REG_MODEM_CONFIG_3, SX1278_AGC_AUTO_OFF, 2, 2);
-  if((bw == SX1278_BW_125_00_KHZ) && ((sf == SX127X_SF_11) || (sf == SX127X_SF_12))) {
+  if(status != ERR_NONE) {
+    return(status);
+  }
+  
+  // calculate symbol length and set low datarate optimization, if needed
+  uint16_t base = 1;
+  float symbolLength = (float)(base << (sf >> 4)) / (float)_bwReal;
+  if(symbolLength >= 0.016) {
     status = setRegValue(SX1278_REG_MODEM_CONFIG_3, SX1278_LOW_DATA_RATE_OPT_ON,  0, 0);
   } else {
     status = setRegValue(SX1278_REG_MODEM_CONFIG_3, SX1278_LOW_DATA_RATE_OPT_OFF,  0, 0);
