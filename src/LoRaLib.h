@@ -38,6 +38,7 @@ class LoRa {
     uint8_t setCodingRate(uint8_t cr);
     uint8_t setFrequency(float freq);
     uint8_t setSyncWord(uint8_t syncword);
+    uint8_t setOutputPower(int8_t power);
   
   private:
     Module* _mod;

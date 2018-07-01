@@ -21,6 +21,7 @@ class Module {
     virtual uint8_t setCodingRate(uint8_t cr) = 0;
     virtual uint8_t setFrequency(float freq) = 0;
     virtual uint8_t setSyncWord(uint8_t syncword) = 0;
+    virtual uint8_t setOutputPower(int8_t power) = 0;
     
     virtual uint8_t setMode(uint8_t mode) = 0;
     virtual uint8_t config(uint32_t bw, uint8_t sf, uint8_t cr, float freq, uint8_t syncWord) = 0;

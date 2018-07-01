@@ -146,6 +146,10 @@ uint8_t LoRa::setSyncWord(uint8_t syncword) {
   return(_mod->setSyncWord(syncword));
 }
 
+uint8_t LoRa::setOutputPower(int8_t power) {
+  return(_mod->setOutputPower(power));
+}
+
 void LoRa::generateLoRaAdress() {
   for(uint8_t i = _addrEeprom; i < (_addrEeprom + 8); i++) {
     EEPROM.write(i, (uint8_t)random(0, 256));

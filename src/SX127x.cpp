@@ -131,6 +131,16 @@ uint8_t SX127x::runCAD() {
   return(CHANNEL_FREE);
 }
 
+uint8_t SX127x::setOutputPower(int8_t power) {
+  setMode(SX127X_STANDBY);
+
+  if((power < 2) || (power > 17)) {
+    return(ERR_INVALID_OUTPUT_POWER);
+  }
+  
+  return(setRegValue(SX127X_REG_PA_CONFIG, power - 2, 3, 0));
+}
+
 uint8_t SX127x::setMode(uint8_t mode) {
   setRegValue(SX127X_REG_OP_MODE, mode, 2, 0);
   return(ERR_NONE);

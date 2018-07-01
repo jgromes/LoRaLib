@@ -69,7 +69,8 @@
 // SX127X_REG_PA_CONFIG
 #define SX127X_PA_SELECT_RFO                          0b00000000  //  7     7     RFO pin output, power limited to +14 dBm
 #define SX127X_PA_SELECT_BOOST                        0b10000000  //  7     7     PA_BOOST pin output, power limited to +20 dBm
-#define SX127X_OUTPUT_POWER                           0b00001111  //  3     0     output power: P_out = 17 - (15 - OUTPUT_POWER) [dBm] for PA_SELECT_BOOST
+#define SX127X_OUTPUT_POWER                           0b00001111  //  3     0     output power: P_out = 2 + OUTPUT_POWER [dBm] for PA_SELECT_BOOST
+                                                                  //                            P_out = -1 + OUTPUT_POWER [dBm] for PA_SELECT_RFO
 
 // SX127X_REG_OCP
 #define SX127X_OCP_OFF                                0b00000000  //  5     5     PA overload current protection disabled
@@ -170,6 +171,8 @@ class SX127x: public Module {
     uint8_t tx(char* data, uint8_t length, uint32_t timeout);
     uint8_t rxSingle(char* data, uint8_t* length, bool headerExplMode);
     uint8_t runCAD();
+    
+    uint8_t setOutputPower(int8_t power);
     
     uint8_t setMode(uint8_t mode);
     uint8_t config(uint8_t bw, uint8_t sf, uint8_t cr, float freq, uint8_t syncWord);

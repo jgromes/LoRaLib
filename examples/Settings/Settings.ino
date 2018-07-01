@@ -84,6 +84,11 @@ void setup() {
   if(loraBalanced.setSyncWord(0x14) != ERR_NONE) {
     Serial.println("Unable to set sync word!");
   }
+
+  // set output power to 10 dBm (accepted range is 2 - 17 dBm)
+  if(loraBalanced.setOutputPower(10) != ERR_INVALID_OUTPUT_POWER) {
+    Serial.println("Selected output power is invalid for this module!");
+  }
 }
 
 void loop() {
