@@ -1,3 +1,12 @@
+/*
+ * LoRaLib Change Packet Data Example
+ * 
+ * This example shows how to easily change data inside an existing packet.
+ * 
+ * For more detailed information, see the LoRaLib Wiki
+ * https://github.com/jgromes/LoRaLib/wiki
+ */
+
 // include the library
 #include <LoRaLib.h>
 
@@ -20,8 +29,11 @@ void setup() {
   Serial.begin(9600);
 
   // initialize the LoRa module with default settings
-  if (lora.begin() == ERR_NONE) {
-    Serial.println("Initialization done.");
+  uint8_t state = lora.begin();
+  if(state != ERR_NONE) {
+    Serial.print("Initialization failed, code 0x");
+    Serial.println(state, HEX);
+    while(true);
   }
 
   // print the default data of the packet

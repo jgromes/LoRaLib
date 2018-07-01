@@ -1,3 +1,14 @@
+/*
+ * LoRaLib Channel Activity Detection Example
+ * 
+ * This example scans the current LoRa channel and detects valid LoRa preambles.
+ * Preamble is the first part of LoRa transmission, so this can be used to
+ * check if the LoRa channel is free, or if you hsould start receiving a message.
+ * 
+ * For more detailed information, see the LoRaLib Wiki
+ * https://github.com/jgromes/LoRaLib/wiki
+ */
+
 // include the library
 #include <LoRaLib.h>
 

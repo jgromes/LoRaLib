@@ -1,3 +1,19 @@
+/*
+ * LoRaLib Receive Example
+ * 
+ * This example listens for LoRa transmissions and tries to receive them.
+ * To successfully receive packets, the following settings have to be the same
+ * on both transmitter and receiver:
+ *  - carrier frequency
+ *  - bandwidth
+ *  - spreading factor
+ *  - coding rate
+ *  - sync word
+ * 
+ * For more detailed information, see the LoRaLib Wiki
+ * https://github.com/jgromes/LoRaLib/wiki
+ */
+
 // include the library
 #include <LoRaLib.h>
 

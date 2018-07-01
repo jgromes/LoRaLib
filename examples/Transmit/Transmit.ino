@@ -1,3 +1,16 @@
+/*
+ * LoRaLib Transmit Example
+ * 
+ * This example transmits LoRa packets with one second delays between them.
+ * Packet class contains the following data:
+ *  - 8-byte destination address
+ *  - 8-byte source address
+ *  - up to 240 bytes of payload
+ * 
+ * For more detailed information, see the LoRaLib Wiki
+ * https://github.com/jgromes/LoRaLib/wiki
+ */
+
 // include the library
 #include <LoRaLib.h>
 

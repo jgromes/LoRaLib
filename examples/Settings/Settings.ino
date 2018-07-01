@@ -1,3 +1,20 @@
+/*
+ * LoRaLib Settings Example
+ * 
+ * This example shows how to change all the properties of LoRa transmission.
+ * LoRaLib currently supports the following settings:
+ *  - bandwidth
+ *  - spreading factor
+ *  - coding rate
+ *  - carrier frequency
+ *  - pins (SPI slave select, digital IO 0, digital IO 1)
+ *  - sync word
+ *  - output power during transmission
+ * 
+ * For more detailed information, see the LoRaLib Wiki
+ * https://github.com/jgromes/LoRaLib/wiki
+ */
+
 // include the library
 #include <LoRaLib.h>
 
@@ -51,8 +68,11 @@ void setup() {
   Serial.begin(9600);
 
   // initialize the LoRa instance with default settings
-  if(loraBalanced.begin() == ERR_NONE) {
-    Serial.println("Initialization done.");
+  uint8_t state = lora.begin();
+  if(state != ERR_NONE) {
+    Serial.print("Initialization failed, code 0x");
+    Serial.println(state, HEX);
+    while(true);
   }
 
   // you can also change the settings at runtime
