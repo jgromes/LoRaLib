@@ -167,7 +167,7 @@ class SX127x: public Module {
     
     uint8_t begin();
     
-    uint8_t tx(char* data, uint8_t length);
+    uint8_t tx(char* data, uint8_t length, uint32_t timeout);
     uint8_t rxSingle(char* data, uint8_t* length, bool headerExplMode);
     uint8_t runCAD();
     

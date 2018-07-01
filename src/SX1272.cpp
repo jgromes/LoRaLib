@@ -26,6 +26,25 @@ uint8_t SX1272::begin() {
   return(config(_bw, _sf, _cr, _freq, _syncWord));
 }
 
+uint8_t SX1272::tx(char* data, uint8_t length) {
+  // calculate timeout
+  uint16_t base = 1;
+  float symbolLength = (float)(base << _sf) / (float)_bw;
+  float de = 0;
+  if(symbolLength >= 0.016) {
+    de = 1;
+  }
+  float ih = (float)(getRegValue(SX127X_REG_MODEM_CONFIG_1, 2, 2) >> 2);
+  float crc = (float)(getRegValue(SX127X_REG_MODEM_CONFIG_1, 1, 1) >> 1);
+  
+  float n_pre = (float)getRegValue(SX127X_REG_PREAMBLE_LSB);
+  float n_pay = 8.0 + max(ceil((8.0 * (float)length - 4.0 * (float)_sf + 28.0 + 16.0 * crc - 20.0 * ih)/(4.0 * (float)_sf - 8.0 * de)) * (float)_cr, 0);
+  uint32_t timeout = ceil(symbolLength * (n_pre + n_pay + 4.25) * 1000.0);
+  
+  // execute common part
+  return(SX127x::tx(data, length, timeout));
+}
+
 uint8_t SX1272::rxSingle(char* data, uint8_t* length) {
   // get header mode
   bool headerExplMode = false;

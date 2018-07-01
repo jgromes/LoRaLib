@@ -48,7 +48,7 @@ uint8_t SX127x::begin() {
   return(ERR_NONE);
 }
 
-uint8_t SX127x::tx(char* data, uint8_t length) {
+uint8_t SX127x::tx(char* data, uint8_t length, uint32_t timeout) {
   setMode(SX127X_STANDBY);
   
   setRegValue(SX127X_REG_DIO_MAPPING_1, SX127X_DIO0_TX_DONE, 7, 6);
@@ -66,10 +66,9 @@ uint8_t SX127x::tx(char* data, uint8_t length) {
   
   setMode(SX127X_TX);
   
-  unsigned long start = millis();
+  uint32_t start = millis();
   while(!digitalRead(_dio0)) {
-    //TODO: calculate timeout dynamically based on modem settings
-    if(millis() - start > (length * 1500)) {
+    if(millis() - start > timeout) {
       clearIRQFlags();
       return(ERR_TX_TIMEOUT);
     }

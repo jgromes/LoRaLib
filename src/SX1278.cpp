@@ -12,6 +12,25 @@ SX1278::SX1278(int nss, float freq, uint32_t bw, uint8_t sf, uint8_t cr, int dio
   _syncWord = syncWord;
 }
 
+uint8_t SX1278::tx(char* data, uint8_t length) {
+  // calculate timeout
+  uint16_t base = 1;
+  float symbolLength = (float)(base << _sf) / (float)_bw;
+  float de = 0;
+  if(symbolLength >= 0.016) {
+    de = 1;
+  }
+  float ih = (float)getRegValue(SX127X_REG_MODEM_CONFIG_1, 0, 0);
+  float crc = (float)(getRegValue(SX127X_REG_MODEM_CONFIG_2, 2, 2) >> 2);
+  
+  float n_pre = (float)getRegValue(SX127X_REG_PREAMBLE_LSB);
+  float n_pay = 8.0 + max(ceil((8.0 * (float)length - 4.0 * (float)_sf + 28.0 + 16.0 * crc - 20.0 * ih)/(4.0 * (float)_sf - 8.0 * de)) * (float)_cr, 0);
+  uint32_t timeout = ceil(symbolLength * (n_pre + n_pay + 4.25) * 1000.0);
+  
+  // execute common part
+  return(SX127x::tx(data, length, timeout));
+}
+
 uint8_t SX1278::begin() {
   // initialize low-level drivers
   initModule(_nss, _dio0, _dio1);

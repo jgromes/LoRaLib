@@ -47,6 +47,7 @@ class SX1272: public SX127x {
     SX1272(int nss, float freq, uint32_t bw, uint8_t sf, uint8_t cr, int dio0, int dio1, uint8_t syncWord);
     
     uint8_t begin();
+    uint8_t tx(char* data, uint8_t length);
     uint8_t rxSingle(char* data, uint8_t* length);
     uint8_t config(uint32_t bw, uint8_t sf, uint8_t cr, float freq, uint8_t syncWord);
     
