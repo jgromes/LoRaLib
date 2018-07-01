@@ -7,9 +7,9 @@
 // chip:                SX1278
 // NSS pin:             7
 // carrier frequency:   434.0 MHz
-// bandwidth:           125 kHz
+// bandwidth:           125000 Hz
 // spreading factor:    9
-// coding rate:         4/7
+// coding rate:         7
 // DIO0 pin:            2
 // DIO1 pin:            3
 // Sync word:           0x12
@@ -21,13 +21,13 @@ LoRa loraBalanced;
 // chip:                SX1276
 // NSS pin:             6
 // carrier frequency:   434.0 MHz
-// bandwidth:           7.8 kHz
+// bandwidth:           7800 Hz
 // spreading factor:    12
-// coding rate:         4/8
+// coding rate:         8
 // DIO0 pin:            4
 // DIO1 pin:            5
 // Sync word:           0x13
-LoRa loraMaxRange(CH_SX1276, 6, 434.0, BW_7_80_KHZ, SF_12, CR_4_8, 4, 5, 0x13);
+LoRa loraMaxRange(CH_SX1276, 6, 434.0, 7800, 12, 8, 4, 5, 0x13);
 
 // create third LoRa instance with non-default settings
 // this LoRa link will have high data rate, but lower range
@@ -39,13 +39,13 @@ LoRa loraMaxRange(CH_SX1276, 6, 434.0, BW_7_80_KHZ, SF_12, CR_4_8, 4, 5, 0x13);
 // chip:                SX1272
 // NSS pin:             4
 // carrier frequency:   915.0 MHz
-// bandwidth:           500 kHz
+// bandwidth:           500000 Hz
 // spreading factor:    6
-// coding rate:         4/5
+// coding rate:         5
 // DIO0 pin:            10
 // DIO1 pin:            11
 // Sync word:           0x14
-LoRa loraMaxDataRate(CH_SX1272, 4, 915.0, BW_500_00_KHZ, SF_6, CR_4_5, 10, 11, 0x14);
+LoRa loraMaxDataRate(CH_SX1272, 4, 915.0, 500000, 6, 5, 10, 11, 0x14);
 
 void setup() {
   Serial.begin(9600);
@@ -60,17 +60,17 @@ void setup() {
   // you can check if the setting was changed successfully
 
   // set bandwidth to 250 kHz
-  if(loraBalanced.setBandwidth(BW_250_00_KHZ) == ERR_INVALID_BANDWIDTH) {
+  if(loraBalanced.setBandwidth(250000) == ERR_INVALID_BANDWIDTH) {
     Serial.println("Selected bandwidth is invalid for this module!");
   }
 
   // set spreading factor to 10
-  if(loraBalanced.setSpreadingFactor(SF_10) == ERR_INVALID_SPREADING_FACTOR) {
+  if(loraBalanced.setSpreadingFactor(10) == ERR_INVALID_SPREADING_FACTOR) {
     Serial.println("Selected spreading factor is invalid for this module!");
   }
 
-  // set coding rate to 4/6
-  if(loraBalanced.setCodingRate(CR_4_6) == ERR_INVALID_CODING_RATE) {
+  // set coding rate to 6
+  if(loraBalanced.setCodingRate(6) == ERR_INVALID_CODING_RATE) {
     Serial.println("Selected coding rate is invalid for this module!");
   }
 

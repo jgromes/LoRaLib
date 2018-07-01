@@ -18,7 +18,7 @@
 
 class LoRa {
   public:
-    LoRa(Chip ch = CH_SX1278, int nss = 7, float freq = 434.0, Bandwidth bw = BW_125_00_KHZ, SpreadingFactor sf = SF_9, CodingRate cr = CR_4_7, int dio0 = 2, int dio1 = 3, uint8_t syncWord = SX127X_SYNC_WORD);
+    LoRa(Chip ch = CH_SX1278, int nss = 7, float freq = 434.0, uint32_t bw = 125000, uint8_t sf = 9, uint8_t cr = 7, int dio0 = 2, int dio1 = 3, uint8_t syncWord = SX127X_SYNC_WORD);
     
     float dataRate;
     int8_t lastPacketRSSI;
@@ -33,9 +33,9 @@ class LoRa {
     uint8_t sleep();
     uint8_t standby();
     
-    uint8_t setBandwidth(Bandwidth bw);
-    uint8_t setSpreadingFactor(SpreadingFactor sf);
-    uint8_t setCodingRate(CodingRate cr);
+    uint8_t setBandwidth(uint32_t bw);
+    uint8_t setSpreadingFactor(uint8_t sf);
+    uint8_t setCodingRate(uint8_t cr);
     uint8_t setFrequency(float freq);
     uint8_t setSyncWord(uint8_t syncword);
   

@@ -16,14 +16,14 @@ class Module {
     virtual uint8_t rxSingle(char* data, uint8_t* length) = 0;
     virtual uint8_t runCAD() = 0;
     
-    virtual uint8_t setBandwidth(Bandwidth bw) = 0;
-    virtual uint8_t setSpreadingFactor(SpreadingFactor sf) = 0;
-    virtual uint8_t setCodingRate(CodingRate cr) = 0;
+    virtual uint8_t setBandwidth(uint32_t bw) = 0;
+    virtual uint8_t setSpreadingFactor(uint8_t sf) = 0;
+    virtual uint8_t setCodingRate(uint8_t cr) = 0;
     virtual uint8_t setFrequency(float freq) = 0;
     virtual uint8_t setSyncWord(uint8_t syncword) = 0;
     
     virtual uint8_t setMode(uint8_t mode) = 0;
-    virtual uint8_t config(Bandwidth bw, SpreadingFactor sf, CodingRate cr, float freq, uint8_t syncWord) = 0;
+    virtual uint8_t config(uint32_t bw, uint8_t sf, uint8_t cr, float freq, uint8_t syncWord) = 0;
     virtual int8_t getLastPacketRSSI() = 0;
     virtual float getLastPacketSNR() = 0;
     

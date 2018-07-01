@@ -1,22 +1,22 @@
 #include "SX1279.h"
 
-SX1279::SX1279(int nss, float freq, Bandwidth bw, SpreadingFactor sf, CodingRate cr, int dio0, int dio1, uint8_t syncWord) : SX1278(nss, freq, bw, sf, cr, dio0, dio1, syncWord) {
+SX1279::SX1279(int nss, float freq, uint32_t bw, uint8_t sf, uint8_t cr, int dio0, int dio1, uint8_t syncWord) : SX1278(nss, freq, bw, sf, cr, dio0, dio1, syncWord) {
   
 }
 
-uint8_t SX1279::config(Bandwidth bw, SpreadingFactor sf, CodingRate cr, float freq, uint8_t syncWord) {
+uint8_t SX1279::config(uint32_t bw, uint8_t sf, uint8_t cr, float freq, uint8_t syncWord) {
   uint8_t status = ERR_NONE;
   uint8_t newBandwidth, newSpreadingFactor, newCodingRate;
   
   // check the supplied BW, CR and SF values
   switch(bw) {
-    case BW_125_00_KHZ:
+    case 125000:
       newBandwidth = SX1278_BW_125_00_KHZ;
       break;
-    case BW_250_00_KHZ:
+    case 250000:
       newBandwidth = SX1278_BW_250_00_KHZ;
       break;
-    case BW_500_00_KHZ:
+    case 500000:
       newBandwidth = SX1278_BW_500_00_KHZ;
       break;
     default:
@@ -24,16 +24,16 @@ uint8_t SX1279::config(Bandwidth bw, SpreadingFactor sf, CodingRate cr, float fr
   }
   
   switch(sf) {
-    case SF_6:
+    case 6:
       newSpreadingFactor = SX127X_SF_6;
       break;
-    case SF_7:
+    case 7:
       newSpreadingFactor = SX127X_SF_7;
       break;
-    case SF_8:
+    case 8:
       newSpreadingFactor = SX127X_SF_8;
       break;
-    case SF_9:
+    case 9:
       newSpreadingFactor = SX127X_SF_9;
       break;
     default:
@@ -41,16 +41,16 @@ uint8_t SX1279::config(Bandwidth bw, SpreadingFactor sf, CodingRate cr, float fr
   }
   
   switch(cr) {
-    case CR_4_5:
+    case 5:
       newCodingRate = SX1278_CR_4_5;
       break;
-    case CR_4_6:
+    case 6:
       newCodingRate = SX1278_CR_4_6;
       break;
-    case CR_4_7:
+    case 7:
       newCodingRate = SX1278_CR_4_7;
       break;
-    case CR_4_8:
+    case 8:
       newCodingRate = SX1278_CR_4_8;
       break;
     default:

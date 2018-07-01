@@ -1,6 +1,6 @@
 #include "LoRaLib.h"
 
-LoRa::LoRa(Chip ch, int nss, float freq, Bandwidth bw, SpreadingFactor sf, CodingRate cr, int dio0, int dio1, uint8_t syncWord) {
+LoRa::LoRa(Chip ch, int nss, float freq, uint32_t bw, uint8_t sf, uint8_t cr, int dio0, int dio1, uint8_t syncWord) {
   dataRate = 0;
   lastPacketRSSI = 0;
   lastPacketSNR = 0;
@@ -126,15 +126,15 @@ uint8_t LoRa::standby() {
   return(_mod->setMode(0b00000001));
 }
 
-uint8_t LoRa::setBandwidth(Bandwidth bw) {
+uint8_t LoRa::setBandwidth(uint32_t bw) {
   return(_mod->setBandwidth(bw));
 }
 
-uint8_t LoRa::setSpreadingFactor(SpreadingFactor sf) {
+uint8_t LoRa::setSpreadingFactor(uint8_t sf) {
   return(_mod->setSpreadingFactor(sf));
 }
 
-uint8_t LoRa::setCodingRate(CodingRate cr) {
+uint8_t LoRa::setCodingRate(uint8_t cr) {
   return(_mod->setCodingRate(cr));
 }
 

@@ -1,6 +1,6 @@
 #include "SX1278.h"
 
-SX1278::SX1278(int nss, float freq, Bandwidth bw, SpreadingFactor sf, CodingRate cr, int dio0, int dio1, uint8_t syncWord) : SX127x(CH_SX1272, dio0, dio1) {
+SX1278::SX1278(int nss, float freq, uint32_t bw, uint8_t sf, uint8_t cr, int dio0, int dio1, uint8_t syncWord) : SX127x(CH_SX1272, dio0, dio1) {
   _nss = nss;
   _dio0 = dio0;
   _dio1 = dio1;
@@ -37,7 +37,7 @@ uint8_t SX1278::rxSingle(char* data, uint8_t* length) {
   return SX127x::rxSingle(data, length, headerExplMode);
 }
 
-uint8_t SX1278::setBandwidth(Bandwidth bw) {
+uint8_t SX1278::setBandwidth(uint32_t bw) {
   uint8_t state = config(bw, _sf, _cr, _freq, _syncWord);
   if(state == ERR_NONE) {
     _bw = bw;
@@ -45,7 +45,7 @@ uint8_t SX1278::setBandwidth(Bandwidth bw) {
   return(state);
 }
 
-uint8_t SX1278::setSpreadingFactor(SpreadingFactor sf) {
+uint8_t SX1278::setSpreadingFactor(uint8_t sf) {
   uint8_t state = config(_bw, sf, _cr, _freq, _syncWord);
   if(state == ERR_NONE) {
     _sf = sf;
@@ -53,7 +53,7 @@ uint8_t SX1278::setSpreadingFactor(SpreadingFactor sf) {
   return(state);
 }
 
-uint8_t SX1278::setCodingRate(CodingRate cr) {
+uint8_t SX1278::setCodingRate(uint8_t cr) {
   uint8_t state = config(_bw, _sf, cr, _freq, _syncWord);
   if(state == ERR_NONE) {
     _cr = cr;
@@ -77,40 +77,40 @@ uint8_t SX1278::setSyncWord(uint8_t syncWord) {
   return(state);
 }
 
-uint8_t SX1278::config(Bandwidth bw, SpreadingFactor sf, CodingRate cr, float freq, uint8_t syncWord) {
+uint8_t SX1278::config(uint32_t bw, uint8_t sf, uint8_t cr, float freq, uint8_t syncWord) {
   uint8_t status = ERR_NONE;
   uint8_t newBandwidth, newSpreadingFactor, newCodingRate;
   
   // check the supplied BW, CR and SF values
   switch(bw) {
-    case BW_7_80_KHZ:
+    case 7800:
       newBandwidth = SX1278_BW_7_80_KHZ;
       break;
-    case BW_10_40_KHZ:
+    case 10400:
       newBandwidth = SX1278_BW_10_40_KHZ;
       break;
-    case BW_15_60_KHZ:
+    case 15600:
       newBandwidth = SX1278_BW_15_60_KHZ;
       break;
-    case BW_20_80_KHZ:
+    case 20800:
       newBandwidth = SX1278_BW_20_80_KHZ;
       break;
-    case BW_31_25_KHZ:
+    case 31250:
       newBandwidth = SX1278_BW_31_25_KHZ;
       break;
-    case BW_41_70_KHZ:
+    case 41700:
       newBandwidth = SX1278_BW_41_70_KHZ;
       break;
-    case BW_62_50_KHZ:
+    case 62500:
       newBandwidth = SX1278_BW_62_50_KHZ;
       break;
-    case BW_125_00_KHZ:
+    case 125000:
       newBandwidth = SX1278_BW_125_00_KHZ;
       break;
-    case BW_250_00_KHZ:
+    case 250000:
       newBandwidth = SX1278_BW_250_00_KHZ;
       break;
-    case BW_500_00_KHZ:
+    case 500000:
       newBandwidth = SX1278_BW_500_00_KHZ;
       break;
     default:
@@ -118,25 +118,25 @@ uint8_t SX1278::config(Bandwidth bw, SpreadingFactor sf, CodingRate cr, float fr
   }
   
   switch(sf) {
-    case SF_6:
+    case 6:
       newSpreadingFactor = SX127X_SF_6;
       break;
-    case SF_7:
+    case 7:
       newSpreadingFactor = SX127X_SF_7;
       break;
-    case SF_8:
+    case 8:
       newSpreadingFactor = SX127X_SF_8;
       break;
-    case SF_9:
+    case 9:
       newSpreadingFactor = SX127X_SF_9;
       break;
-    case SF_10:
+    case 10:
       newSpreadingFactor = SX127X_SF_10;
       break;
-    case SF_11:
+    case 11:
       newSpreadingFactor = SX127X_SF_11;
       break;
-    case SF_12:
+    case 12:
       newSpreadingFactor = SX127X_SF_12;
       break;
     default:
@@ -144,16 +144,16 @@ uint8_t SX1278::config(Bandwidth bw, SpreadingFactor sf, CodingRate cr, float fr
   }
   
   switch(cr) {
-    case CR_4_5:
+    case 5:
       newCodingRate = SX1278_CR_4_5;
       break;
-    case CR_4_6:
+    case 6:
       newCodingRate = SX1278_CR_4_6;
       break;
-    case CR_4_7:
+    case 7:
       newCodingRate = SX1278_CR_4_7;
       break;
-    case CR_4_8:
+    case 8:
       newCodingRate = SX1278_CR_4_8;
       break;
     default:
@@ -201,7 +201,7 @@ uint8_t SX1278::configCommon(uint8_t bw, uint8_t sf, uint8_t cr, float freq, uin
   
   // calculate symbol length and set low datarate optimization, if needed
   uint16_t base = 1;
-  float symbolLength = (float)(base << (sf >> 4)) / (float)_bwReal;
+  float symbolLength = (float)(base << _sf) / (float)_bw;
   if(symbolLength >= 0.016) {
     status = setRegValue(SX1278_REG_MODEM_CONFIG_3, SX1278_LOW_DATA_RATE_OPT_ON,  0, 0);
   } else {

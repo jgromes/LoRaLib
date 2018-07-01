@@ -4,9 +4,10 @@
 // create instance of LoRa class with default settings
 // chip:                SX1278
 // NSS pin:             7
-// bandwidth:           125 kHz
+// carrier frequency:   434.0 MHz
+// bandwidth:           125000 Hz
 // spreading factor:    9
-// coding rate:         4/7
+// coding rate:         7
 // DIO0 pin:            2
 // DIO1 pin:            3
 // Sync word:           0x12
