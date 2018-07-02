@@ -78,14 +78,9 @@ uint8_t LoRa::begin(uint16_t addrEeprom) {
 uint8_t LoRa::transmit(Packet& pack) {
   char buffer[256];
   
-  for(uint8_t i = 0; i < 8; i++) {
-    buffer[i] = pack.source[i];
-    buffer[i+8] = pack.destination[i];
-  }
-  
-  for(uint8_t i = 0; i < pack.length; i++) {
-    buffer[i+16] = pack.data[i];
-  }
+  memcpy(buffer, pack.source, 8);
+  memcpy(buffer + 8, pack.destination, 8);
+  memcpy(buffer + 16, pack.data, pack.length - 16);
   
   return(_mod->tx(buffer, pack.length));
 }
@@ -95,15 +90,16 @@ uint8_t LoRa::receive(Packet& pack) {
   uint32_t startTime = millis();
   
   uint8_t status = _mod->rxSingle(buffer, &pack.length);
-  
-  for(uint8_t i = 0; i < 8; i++) {
-    pack.source[i] = buffer[i];
-    pack.destination[i] = buffer[i+8];
+  if(status != ERR_NONE) {
+    return(status);
   }
   
-  for(uint8_t i = 16; i < pack.length; i++) {
-    pack.data[i-16] = buffer[i];
-  }
+  memcpy(pack.source, buffer, 8);
+  memcpy(pack.destination, buffer + 8, 8);
+  
+  delete[] pack.data;
+  pack.data = new char[pack.length - 15];
+  memcpy(pack.data, buffer + 16, pack.length - 16);
   pack.data[pack.length-16] = 0;
   
   uint32_t elapsedTime = millis() - startTime;

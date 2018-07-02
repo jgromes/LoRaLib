@@ -54,18 +54,13 @@ void loop() {
     // packet was successfully received
     Serial.println("success!");
 
-    // create a string to store the packet information
-    char str[24];
-
     // print the source of the packet
-    pack.getSourceStr(str);
     Serial.print("Source:\t\t");
-    Serial.println(str);
+    Serial.println(pack.getSourceStr());
 
     // print the destination of the packet
-    pack.getDestinationStr(str);
     Serial.print("Destination:\t");
-    Serial.println(str);
+    Serial.println(pack.getDestinationStr());
 
     // print the length of the packet
     Serial.print("Length:\t\t");
