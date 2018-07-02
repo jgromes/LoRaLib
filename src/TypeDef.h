@@ -7,10 +7,10 @@
   #include "WProgram.h"
 #endif
 
-//#define DEBUG
+//#define LORALIB_DEBUG
 
-#ifdef DEBUG
-  //#define VERBOSE
+#ifdef LORALIB_DEBUG
+  //#define LORALIB_VERBOSE
   #define BYTE_TO_BINARY(byte)  \
     ((byte & 0x80) ? '1' : '0'), \
     ((byte & 0x40) ? '1' : '0'), \
@@ -20,6 +20,22 @@
     ((byte & 0x04) ? '1' : '0'), \
     ((byte & 0x02) ? '1' : '0'), \
     ((byte & 0x01) ? '1' : '0') 
+  #define DEBUG_BEGIN(x)                Serial.begin (x)
+  #define DEBUG_PRINT(x)                Serial.print (x)
+  #define DEBUG_PRINT_DEC(x)            Serial.print (x, DEC)
+  #define DEBUG_PRINT_HEX(x)            Serial.print (x, HEX)
+  #define DEBUG_PRINTLN(x)              Serial.println (x)
+  #define DEBUG_PRINT_STR(x)            Serial.print (F(x))
+  #define DEBUG_PRINTLN_STR(x)          Serial.println (F(x))
+#else
+  #define BYTE_TO_BINARY(byte)
+  #define DEBUG_BEGIN(x)
+  #define DEBUG_PRINT(x)
+  #define DEBUG_PRINT_DEC(x)
+  #define DEBUG_PRINT_HEX(x)
+  #define DEBUG_PRINTLN(x)
+  #define DEBUG_PRINT_STR(x)
+  #define DEBUG_PRINTLN_STR(x)
 #endif
 
 #define ERR_NONE                        0x00
@@ -43,6 +59,6 @@
 #define CHANNEL_FREE                    0x50
 #define PREAMBLE_DETECTED               0x51
 
-enum Chip {CH_SX1272, CH_SX1273, CH_SX1276, CH_SX1277, CH_SX1278, CH_SX1279};
+enum Chip {CH_SX1272 = 0, CH_SX1273, CH_SX1276, CH_SX1277, CH_SX1278, CH_SX1279};
 
 #endif

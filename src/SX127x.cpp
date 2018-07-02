@@ -14,7 +14,7 @@ uint8_t SX127x::begin() {
     if(version == 0x12) {
       flagFound = true;
     } else {
-      #ifdef DEBUG
+      #ifdef LORALIB_DEBUG
         Serial.print(getChipName());
         Serial.print(" not found! (");
         Serial.print(i + 1);
@@ -31,14 +31,14 @@ uint8_t SX127x::begin() {
   }
   
   if(!flagFound) {
-    #ifdef DEBUG
+    #ifdef LORALIB_DEBUG
       Serial.print(getChipName());
       Serial.println(" not found!");
     #endif
     SPI.end();
     return(ERR_CHIP_NOT_FOUND);
   }
-  #ifdef DEBUG
+  #ifdef LORALIB_DEBUG
     else {
       Serial.print(getChipName());
       Serial.println(" found! (match by REG_VERSION == 0x12)");

@@ -28,16 +28,12 @@ LoRa::LoRa(Chip ch, int nss, float freq, uint32_t bw, uint8_t sf, uint8_t cr, in
 }
 
 uint8_t LoRa::begin(uint16_t addrEeprom) {
-  #ifdef DEBUG
-    Serial.begin(9600);
-    Serial.println();
-  #endif
+  DEBUG_BEGIN(9600);
+  DEBUG_PRINTLN();
   
   #ifdef ESP32
     if(!EEPROM.begin(9)) {
-      #ifdef DEBUG
-        Serial.println("Unable to initialize EEPROM");
-      #endif
+      DEBUG_PRINTLN("Unable to initialize EEPROM");
       return(ERR_EEPROM_NOT_INITIALIZED);
     }
   #endif
@@ -57,12 +53,10 @@ uint8_t LoRa::begin(uint16_t addrEeprom) {
     generateLoRaAdress();
   }
   
-  #ifdef DEBUG
-    Serial.print("LoRa node address string: ");
-  #endif
+  DEBUG_PRINTLN("LoRa node address string: ");
   for(uint8_t i = 0; i < 8; i++) {
     _address[i] = EEPROM.read(i);
-    #ifdef DEBUG
+    #ifdef LORALIB_DEBUG
       Serial.print(_address[i], HEX);
       if(i < 7) {
         Serial.print(":");
