@@ -38,7 +38,7 @@ uint8_t SX1272::tx(char* data, uint8_t length) {
   float crc = (float)(getRegValue(SX127X_REG_MODEM_CONFIG_1, 1, 1) >> 1);
   
   float n_pre = (float)getRegValue(SX127X_REG_PREAMBLE_LSB);
-  float n_pay = 8.0 + max(ceil((8.0 * (float)length - 4.0 * (float)_sf + 28.0 + 16.0 * crc - 20.0 * ih)/(4.0 * (float)_sf - 8.0 * de)) * (float)_cr, 0);
+  float n_pay = 8.0 + max(ceil((8.0 * (float)length - 4.0 * (float)_sf + 28.0 + 16.0 * crc - 20.0 * ih)/(4.0 * (float)_sf - 8.0 * de)) * (float)_cr, 0.0);
   uint32_t timeout = ceil(symbolLength * (n_pre + n_pay + 4.25) * 1000.0);
   
   // execute common part
