@@ -68,7 +68,7 @@ void setup() {
   Serial.begin(9600);
 
   // initialize the LoRa instance with default settings
-  uint8_t state = lora.begin();
+  uint8_t state = loraBalanced.begin();
   if(state != ERR_NONE) {
     Serial.print("Initialization failed, code 0x");
     Serial.println(state, HEX);
@@ -82,33 +82,41 @@ void setup() {
   // set bandwidth to 250 kHz
   if(loraBalanced.setBandwidth(250000) == ERR_INVALID_BANDWIDTH) {
     Serial.println("Selected bandwidth is invalid for this module!");
+    while(true);
   }
 
   // set spreading factor to 10
   if(loraBalanced.setSpreadingFactor(10) == ERR_INVALID_SPREADING_FACTOR) {
     Serial.println("Selected spreading factor is invalid for this module!");
+    while(true);
   }
 
   // set coding rate to 6
   if(loraBalanced.setCodingRate(6) == ERR_INVALID_CODING_RATE) {
     Serial.println("Selected coding rate is invalid for this module!");
+    while(true);
   }
 
   // set carrier frequency to 433.5 MHz
   if(loraBalanced.setFrequency(433.5) == ERR_INVALID_FREQUENCY) {
     Serial.println("Selected frequency is invalid for this module!");
+    while(true);
   }
 
   // set LoRa sync word to 0x14
   // NOTE: value 0x34 is reserved for LoRaWAN networks and should not be used
   if(loraBalanced.setSyncWord(0x14) != ERR_NONE) {
     Serial.println("Unable to set sync word!");
+    while(true);
   }
 
   // set output power to 10 dBm (accepted range is 2 - 17 dBm)
-  if(loraBalanced.setOutputPower(10) != ERR_INVALID_OUTPUT_POWER) {
+  if(loraBalanced.setOutputPower(10) == ERR_INVALID_OUTPUT_POWER) {
     Serial.println("Selected output power is invalid for this module!");
+    while(true);
   }
+
+  Serial.println("All settings succesfully changed!");
 }
 
 void loop() {
