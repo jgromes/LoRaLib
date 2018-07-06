@@ -4,9 +4,9 @@ SX1272::SX1272(Module* mod) : SX127x(mod) {
   
 }
 
-uint8_t SX1272::begin(float freq, float bw, uint8_t sf, uint8_t cr, uint8_t syncWord, uint16_t addrEeprom) {
+uint8_t SX1272::begin(float freq, float bw, uint8_t sf, uint8_t cr, uint8_t syncWord, int8_t power, uint16_t addrEeprom) {
   // execute common part
-  uint8_t state = SX127x::begin(syncWord, addrEeprom);
+  uint8_t state = SX127x::begin(syncWord, power, addrEeprom);
   if(state != ERR_NONE) {
     return(state);
   }

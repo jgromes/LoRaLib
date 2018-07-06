@@ -4,7 +4,7 @@ SX127x::SX127x(Module* mod) {
   _mod = mod;
 }
 
-uint8_t SX127x::begin(uint8_t syncWord, uint16_t addrEeprom) {
+uint8_t SX127x::begin(uint8_t syncWord, int8_t power, uint16_t addrEeprom) {
   // ESP32-only: initialize  EEPROM
   #ifdef ESP32
     if(!EEPROM.begin(9)) {
@@ -83,6 +83,13 @@ uint8_t SX127x::begin(uint8_t syncWord, uint16_t addrEeprom) {
   if(state != ERR_NONE) {
     return(state);
   }
+  
+  // set output power
+  state = SX127x::setOutputPower(power);
+  if(state != ERR_NONE) {
+    return(state);
+  }
+  
   
   return(ERR_NONE);
 }
@@ -249,7 +256,12 @@ uint8_t SX127x::setOutputPower(int8_t power) {
     return(ERR_INVALID_OUTPUT_POWER);
   }
   
-  return(_mod->SPIsetRegValue(SX127X_REG_PA_CONFIG, power - 2, 3, 0));
+  uint8_t state = _mod->SPIsetRegValue(SX127X_REG_PA_CONFIG, power - 2, 3, 0);
+  if(state == ERR_NONE) {
+    _power = power;
+  }
+  
+  return(state);
 }
 
 uint8_t SX127x::setFrequencyRaw(float newFreq) {
