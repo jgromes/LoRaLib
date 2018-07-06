@@ -64,9 +64,9 @@ void setup() {
   // spreading factor:    12
   // coding rate:         8
   // Sync word:           0x13
-  state = loraSX1272.begin(434.0, 7.8, 12, 8, 0x13);
+  state = loraSX1276.begin(434.0, 7.8, 12, 8, 0x13);
   if(state != ERR_NONE) {
-    Serial.print("SX1272 initialization failed, code 0x");
+    Serial.print("SX1276 initialization failed, code 0x");
     Serial.println(state, HEX);
     while(true);
   }
@@ -83,15 +83,18 @@ void setup() {
   // spreading factor:    6
   // coding rate:         5
   // Sync word:           0x14
-  state = loraSX1276.begin(915.0, 500.0, 6, 5, 0x14);
+  state = loraSX1272.begin(915.0, 500.0, 6, 5, 0x14);
   if(state != ERR_NONE) {
-    Serial.print("SX1276 initialization failed, code 0x");
+    Serial.print("SX1272 initialization failed, code 0x");
     Serial.println(state, HEX);
     while(true);
   }
 
   // you can also change the settings at runtime
+  
   // different modules accept different parameters
+  // see https://github.com/jgromes/LoRaLib/wiki/Supported-LoRa-modules
+  
   // you can check if the setting was changed successfully
 
   // set bandwidth to 250 kHz

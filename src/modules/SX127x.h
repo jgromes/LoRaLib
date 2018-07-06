@@ -173,7 +173,7 @@ class SX127x {
     int8_t lastPacketRSSI;
     float lastPacketSNR;
     
-    uint8_t begin(float freq, float bw, uint8_t sf, uint8_t cr, uint8_t syncWord, uint16_t addrEeprom);
+    uint8_t begin(uint8_t syncWord, uint16_t addrEeprom);
     uint8_t transmit(Packet& pack);
     uint8_t receive(Packet& pack);
     uint8_t scanChannel();
@@ -183,20 +183,22 @@ class SX127x {
     
     uint8_t setSyncWord(uint8_t syncWord);
     uint8_t setOutputPower(int8_t power);
+    
+    uint8_t setFrequencyRaw(float newFreq);
   
   protected:
     Module* _mod;
     
+    float _freq;
     float _bw;
     uint8_t _sf;
     uint8_t _cr;
-    float _freq;
     uint8_t _syncWord;
     
     uint8_t tx(char* data, uint8_t length);
     uint8_t rxSingle(char* data, uint8_t* length);
     
-    uint8_t config(float freq, uint8_t bw, uint8_t sf, uint8_t cr, uint8_t syncWord);
+    uint8_t config();
   
   private:
     uint8_t _address[8] = {0, 0, 0, 0, 0, 0, 0, 0};
