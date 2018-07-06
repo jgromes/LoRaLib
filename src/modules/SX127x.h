@@ -183,8 +183,6 @@ class SX127x {
     
     uint8_t setSyncWord(uint8_t syncWord);
     uint8_t setOutputPower(int8_t power);
-    
-    uint8_t setFrequencyRaw(float newFreq);
   
   protected:
     Module* _mod;
@@ -198,6 +196,8 @@ class SX127x {
     
     uint8_t tx(char* data, uint8_t length);
     uint8_t rxSingle(char* data, uint8_t* length);
+    
+    uint8_t setFrequencyRaw(float newFreq);
     
     uint8_t config();
   
