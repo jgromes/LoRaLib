@@ -41,14 +41,14 @@ SX1276 loraSX1276 = new LoRa(A0, A1, A2);
 void setup() {
   Serial.begin(9600);
 
-  // initialize the first LoRa instance with default settings
-  // LoRa link with this setting is a balance between range and data rate
-  //
-  // carrier frequency:   434.0 MHz
-  // bandwidth:           125.0 kHz
-  // spreading factor:    9
-  // coding rate:         7
-  // Sync word:           0x12
+  // initialize the LoRa module with default settings
+  // carrier frequency:                   434.0 MHz
+  // bandwidth:                           125.0 kHz
+  // spreading factor:                    9
+  // coding rate:                         7
+  // sync word:                           0x12
+  // output power:                        17 dBm
+  // node address in EEPROM starts at:    0
   uint8_t state = loraSX1278.begin();
   if(state != ERR_NONE) {
     Serial.print("SX1278 initialization failed, code 0x");
@@ -59,11 +59,13 @@ void setup() {
   // initialize the second LoRa instance with non-default settings
   // this LoRa link will have maximum range, but very low data rate
   //
-  // carrier frequency:   434.0 MHz
-  // bandwidth:           7.8 kHz
-  // spreading factor:    12
-  // coding rate:         8
-  // Sync word:           0x13
+  // carrier frequency:                   434.0 MHz
+  // bandwidth:                           7.8 kHz
+  // spreading factor:                    12
+  // coding rate:                         8
+  // sync word:                           0x13
+  // output power:                        17 dBm
+  // node address in EEPROM starts at:    0
   state = loraSX1276.begin(434.0, 7.8, 12, 8, 0x13);
   if(state != ERR_NONE) {
     Serial.print("SX1276 initialization failed, code 0x");
@@ -78,12 +80,14 @@ void setup() {
   //       Packet::length = x;
   //       where x is the total packet length including both addresses
   //
-  // carrier frequency:   915.0 MHz
-  // bandwidth:           500.0 kHz
-  // spreading factor:    6
-  // coding rate:         5
-  // Sync word:           0x14
-  state = loraSX1272.begin(915.0, 500.0, 6, 5, 0x14);
+  // carrier frequency:                   915.0 MHz
+  // bandwidth:                           500.0 kHz
+  // spreading factor:                    6
+  // coding rate:                         5
+  // sync word:                           0x14
+  // output power:                        2 dBm
+  // node address in EEPROM starts at:    0
+  state = loraSX1272.begin(915.0, 500.0, 6, 5, 0x14, 2);
   if(state != ERR_NONE) {
     Serial.print("SX1272 initialization failed, code 0x");
     Serial.println(state, HEX);
