@@ -10,6 +10,13 @@ LoRaLib	KEYWORD1
 Packet	KEYWORD1
 LoRa	KEYWORD1
 
+SX1272	KEYWORD1
+SX1273	KEYWORD1
+SX1276	KEYWORD1
+SX1277	KEYWORD1
+SX1278	KEYWORD1
+SX1279	KEYWORD1
+
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
