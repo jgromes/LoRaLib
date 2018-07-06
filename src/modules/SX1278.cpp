@@ -4,7 +4,7 @@ SX1278::SX1278(Module* mod) : SX127x(mod) {
   
 }
 
-uint8_t SX1278::begin(float freq, uint32_t bw, uint8_t sf, uint8_t cr, uint8_t syncWord, uint16_t addrEeprom) {
+uint8_t SX1278::begin(float freq, float bw, uint8_t sf, uint8_t cr, uint8_t syncWord, uint16_t addrEeprom) {
   uint8_t state = SX127x::begin(freq, bw, sf, cr, syncWord, addrEeprom);
   if(state != ERR_NONE) {
     return(state);
@@ -13,7 +13,7 @@ uint8_t SX1278::begin(float freq, uint32_t bw, uint8_t sf, uint8_t cr, uint8_t s
   return(config(freq, bw, sf, cr, syncWord));
 }
 
-uint8_t SX1278::setBandwidth(uint32_t bw) {
+uint8_t SX1278::setBandwidth(float bw) {
   uint8_t state = SX1278::config(_freq, bw, _sf, _cr, _syncWord);
   if(state == ERR_NONE) {
     _bw = bw;
@@ -45,45 +45,32 @@ uint8_t SX1278::setFrequency(float freq) {
   return(state);
 }
 
-uint8_t SX1278::config(float freq, uint32_t bw, uint8_t sf, uint8_t cr, uint8_t syncWord) {
+uint8_t SX1278::config(float freq, float bw, uint8_t sf, uint8_t cr, uint8_t syncWord) {
   
   uint8_t status = ERR_NONE;
   uint8_t newBandwidth, newSpreadingFactor, newCodingRate;
   
   // check the supplied BW, CR and SF values
-  switch(bw) {
-    case 7800:
-      newBandwidth = SX1278_BW_7_80_KHZ;
-      break;
-    case 10400:
-      newBandwidth = SX1278_BW_10_40_KHZ;
-      break;
-    case 15600:
-      newBandwidth = SX1278_BW_15_60_KHZ;
-      break;
-    case 20800:
-      newBandwidth = SX1278_BW_20_80_KHZ;
-      break;
-    case 31250:
-      newBandwidth = SX1278_BW_31_25_KHZ;
-      break;
-    case 41700:
-      newBandwidth = SX1278_BW_41_70_KHZ;
-      break;
-    case 62500:
-      newBandwidth = SX1278_BW_62_50_KHZ;
-      break;
-    case 125000:
-      newBandwidth = SX1278_BW_125_00_KHZ;
-      break;
-    case 250000:
-      newBandwidth = SX1278_BW_250_00_KHZ;
-      break;
-    case 500000:
-      newBandwidth = SX1278_BW_500_00_KHZ;
-      break;
-    default:
-      return(ERR_INVALID_BANDWIDTH);
+  if(bw == 7.8) {
+    newBandwidth = SX1278_BW_7_80_KHZ;
+  } else if(bw == 10.4) {
+    newBandwidth = SX1278_BW_10_40_KHZ;
+  } else if(bw == 15.6) {
+    newBandwidth = SX1278_BW_15_60_KHZ;
+  } else if(bw == 20.8) {
+    newBandwidth = SX1278_BW_20_80_KHZ;
+  } else if(bw == 31.25) {
+    newBandwidth = SX1278_BW_31_25_KHZ;
+  } else if(bw == 62.5) {
+    newBandwidth = SX1278_BW_62_50_KHZ;
+  } else if(bw == 125.0) {
+    newBandwidth = SX1278_BW_125_00_KHZ;
+  } else if(bw == 250.0) {
+    newBandwidth = SX1278_BW_250_00_KHZ;
+  } else if(bw == 500.0) {
+    newBandwidth = SX1278_BW_500_00_KHZ;
+  } else {
+    return(ERR_INVALID_BANDWIDTH);
   }
   
   switch(sf) {
@@ -148,7 +135,7 @@ uint8_t SX1278::config(float freq, uint32_t bw, uint8_t sf, uint8_t cr, uint8_t 
   return(ERR_NONE);
 }
 
-uint8_t SX1278::configCommon(uint8_t bw, uint8_t sf, uint8_t cr, float freq, uint8_t syncWord) {
+uint8_t SX1278::configCommon(float freq, uint8_t bw, uint8_t sf, uint8_t cr, uint8_t syncWord) {
   // configure common registers
   uint8_t status = SX127x::config(bw, sf, cr, freq, syncWord);
   if(status != ERR_NONE) {

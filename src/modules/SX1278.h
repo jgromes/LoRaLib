@@ -64,18 +64,18 @@ class SX1278: public SX127x {
   public:
     SX1278(Module* mod);
     
-    uint8_t begin(float freq = 434.0, uint32_t bw = 125000, uint8_t sf = 9, uint8_t cr = 7, uint8_t syncWord = SX127X_SYNC_WORD, uint16_t addrEeprom = 0);
+    uint8_t begin(float freq = 434.0, float bw = 125.0, uint8_t sf = 9, uint8_t cr = 7, uint8_t syncWord = SX127X_SYNC_WORD, uint16_t addrEeprom = 0);
     
-    uint8_t setBandwidth(uint32_t bw);
+    uint8_t setBandwidth(float bw);
     uint8_t setSpreadingFactor(uint8_t sf);
     uint8_t setCodingRate(uint8_t cr);
     uint8_t setFrequency(float freq);
   
   protected: 
-    uint8_t configCommon(uint8_t bw, uint8_t sf, uint8_t cr, float freq, uint8_t syncWord);   // common for SX1276/77/78/79
+    uint8_t configCommon(float freq, uint8_t bw, uint8_t sf, uint8_t cr, uint8_t syncWord);   // common for SX1276/77/78/79
     
   private:
-    uint8_t config(float freq, uint32_t bw, uint8_t sf, uint8_t cr, uint8_t syncWord);        // specific to SX1278
+    uint8_t config(float freq, float bw, uint8_t sf, uint8_t cr, uint8_t syncWord);           // specific to SX1278
 };
 
 #endif

@@ -32,7 +32,7 @@ void setup() {
 
   // initialize the LoRa module with default settings
   // carrier frequency:   434.0 MHz
-  // bandwidth:           125000 Hz
+  // bandwidth:           125.0 kHz
   // spreading factor:    9
   // coding rate:         7
   // Sync word:           0x12

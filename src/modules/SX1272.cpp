@@ -4,7 +4,7 @@ SX1272::SX1272(Module* mod) : SX127x(mod) {
   
 }
 
-uint8_t SX1272::begin(float freq, uint32_t bw, uint8_t sf, uint8_t cr, uint8_t syncWord, uint16_t addrEeprom) {
+uint8_t SX1272::begin(float freq, float bw, uint8_t sf, uint8_t cr, uint8_t syncWord, uint16_t addrEeprom) {
   uint8_t state = SX127x::begin(freq, bw, sf, cr, syncWord, addrEeprom);
   if(state != ERR_NONE) {
     return(state);
@@ -13,7 +13,7 @@ uint8_t SX1272::begin(float freq, uint32_t bw, uint8_t sf, uint8_t cr, uint8_t s
   return(config(freq, bw, sf, cr, syncWord));
 }
 
-uint8_t SX1272::setBandwidth(uint32_t bw) {
+uint8_t SX1272::setBandwidth(float bw) {
   uint8_t state = SX1272::config(_freq, bw, _sf, _cr, _syncWord);
   if(state == ERR_NONE) {
     _bw = bw;
@@ -45,23 +45,19 @@ uint8_t SX1272::setFrequency(float freq) {
   return(state);
 }
 
-uint8_t SX1272::config(float freq, uint32_t bw, uint8_t sf, uint8_t cr, uint8_t syncWord) {
+uint8_t SX1272::config(float freq, float bw, uint8_t sf, uint8_t cr, uint8_t syncWord) {
   uint8_t status = ERR_NONE;
   uint8_t newBandwidth, newSpreadingFactor, newCodingRate;
   
   // check the supplied BW, CR and SF values
-  switch(bw) {
-    case 125000:
-      newBandwidth = SX1272_BW_125_00_KHZ;
-      break;
-    case 250000:
-      newBandwidth = SX1272_BW_250_00_KHZ;
-      break;
-    case 500000:
-      newBandwidth = SX1272_BW_500_00_KHZ;
-      break;
-    default:
-      return(ERR_INVALID_BANDWIDTH);
+  if(bw == 125.0) {
+    newBandwidth = SX1272_BW_125_00_KHZ;
+  } else if(bw == 250.0) {
+    newBandwidth = SX1272_BW_250_00_KHZ;
+  } else if(bw == 500.0) {
+    newBandwidth = SX1272_BW_500_00_KHZ;
+  } else {
+    return(ERR_INVALID_BANDWIDTH);
   }
   
   switch(sf) {
@@ -126,7 +122,7 @@ uint8_t SX1272::config(float freq, uint32_t bw, uint8_t sf, uint8_t cr, uint8_t 
   return(ERR_NONE);
 }
 
-uint8_t SX1272::configCommon(uint8_t bw, uint8_t sf, uint8_t cr, float freq, uint8_t syncWord) {
+uint8_t SX1272::configCommon(float freq,uint8_t bw, uint8_t sf, uint8_t cr, uint8_t syncWord) {
   // configure common registers
   uint8_t status = SX127x::config(bw, sf, cr, freq, syncWord);
   if(status != ERR_NONE) {

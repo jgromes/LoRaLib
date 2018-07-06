@@ -4,23 +4,19 @@ SX1277::SX1277(Module* mod) : SX1278(mod) {
   
 }
 
-uint8_t SX1277::config(uint32_t bw, uint8_t sf, uint8_t cr, float freq, uint8_t syncWord) {
+uint8_t SX1277::config(float freq, uint32_t bw, uint8_t sf, uint8_t cr, uint8_t syncWord) {
   uint8_t status = ERR_NONE;
   uint8_t newBandwidth, newSpreadingFactor, newCodingRate;
   
   // check the supplied BW, CR and SF values
-  switch(bw) {
-    case 125000:
-      newBandwidth = SX1278_BW_125_00_KHZ;
-      break;
-    case 250000:
-      newBandwidth = SX1278_BW_250_00_KHZ;
-      break;
-    case 500000:
-      newBandwidth = SX1278_BW_500_00_KHZ;
-      break;
-    default:
-      return(ERR_INVALID_BANDWIDTH);
+  if(bw == 125.0) {
+    newBandwidth = SX1278_BW_125_00_KHZ;
+  } else if(bw == 250.0) {
+    newBandwidth = SX1278_BW_250_00_KHZ;
+  } else if(bw == 500.0) {
+    newBandwidth = SX1278_BW_500_00_KHZ;
+  } else {
+    return(ERR_INVALID_BANDWIDTH);
   }
   
   switch(sf) {

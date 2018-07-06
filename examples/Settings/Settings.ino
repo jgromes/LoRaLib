@@ -45,7 +45,7 @@ void setup() {
   // LoRa link with this setting is a balance between range and data rate
   //
   // carrier frequency:   434.0 MHz
-  // bandwidth:           125000 Hz
+  // bandwidth:           125.0 kHz
   // spreading factor:    9
   // coding rate:         7
   // Sync word:           0x12
@@ -60,11 +60,11 @@ void setup() {
   // this LoRa link will have maximum range, but very low data rate
   //
   // carrier frequency:   434.0 MHz
-  // bandwidth:           7800 Hz
+  // bandwidth:           7.8 kHz
   // spreading factor:    12
   // coding rate:         8
   // Sync word:           0x13
-  state = loraSX1272.begin(434.0, 7800, 12, 8, 0x13);
+  state = loraSX1272.begin(434.0, 7.8, 12, 8, 0x13);
   if(state != ERR_NONE) {
     Serial.print("SX1272 initialization failed, code 0x");
     Serial.println(state, HEX);
@@ -79,11 +79,11 @@ void setup() {
   //       where x is the total packet length including both addresses
   //
   // carrier frequency:   915.0 MHz
-  // bandwidth:           500000 Hz
+  // bandwidth:           500.0 kHz
   // spreading factor:    6
   // coding rate:         5
   // Sync word:           0x14
-  state = loraSX1276.begin(915.0, 500000, 6, 5, 0x14);
+  state = loraSX1276.begin(915.0, 500.0, 6, 5, 0x14);
   if(state != ERR_NONE) {
     Serial.print("SX1276 initialization failed, code 0x");
     Serial.println(state, HEX);
@@ -95,7 +95,7 @@ void setup() {
   // you can check if the setting was changed successfully
 
   // set bandwidth to 250 kHz
-  if(loraSX1278.setBandwidth(250000) == ERR_INVALID_BANDWIDTH) {
+  if(loraSX1278.setBandwidth(250.0) == ERR_INVALID_BANDWIDTH) {
     Serial.println("Selected bandwidth is invalid for this module!");
     while(true);
   }

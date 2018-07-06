@@ -4,7 +4,7 @@ SX127x::SX127x(Module* mod) {
   _mod = mod;
 }
 
-uint8_t SX127x::begin(float freq, uint32_t bw, uint8_t sf, uint8_t cr, uint8_t syncWord, uint16_t addrEeprom) {
+uint8_t SX127x::begin(float freq, float bw, uint8_t sf, uint8_t cr, uint8_t syncWord, uint16_t addrEeprom) {
   // copy LoRa modem settings
   _freq = freq;
   _bw = bw;
@@ -250,7 +250,7 @@ uint8_t SX127x::setOutputPower(int8_t power) {
   return(_mod->SPIsetRegValue(SX127X_REG_PA_CONFIG, power - 2, 3, 0));
 }
 
-uint8_t SX127x::config(uint8_t bw, uint8_t sf, uint8_t cr, float freq, uint8_t syncWord) {
+uint8_t SX127x::config(float freq, uint8_t bw, uint8_t sf, uint8_t cr, uint8_t syncWord) {
   uint8_t status = ERR_NONE;
   // set mode to SLEEP
   status = setMode(SX127X_SLEEP);
