@@ -10,40 +10,27 @@
 
 class Module {
   public:
-    virtual uint8_t begin() = 0;
+    Module(int cs = 7, int int0 = 2, int int1 = 3);
     
-    virtual uint8_t tx(char* data, uint8_t length) = 0;
-    virtual uint8_t rxSingle(char* data, uint8_t* length) = 0;
-    virtual uint8_t runCAD() = 0;
+    uint8_t init(uint8_t interface, uint8_t gpio);
     
-    virtual uint8_t setBandwidth(uint32_t bw) = 0;
-    virtual uint8_t setSpreadingFactor(uint8_t sf) = 0;
-    virtual uint8_t setCodingRate(uint8_t cr) = 0;
-    virtual uint8_t setFrequency(float freq) = 0;
-    virtual uint8_t setSyncWord(uint8_t syncword) = 0;
-    virtual uint8_t setOutputPower(int8_t power) = 0;
+    uint8_t SPIgetRegValue(uint8_t reg, uint8_t msb = 7, uint8_t lsb = 0);
+    uint8_t SPIreadRegisterBurst(uint8_t reg, uint8_t numBytes, uint8_t* inBytes);
+    uint8_t SPIreadRegisterBurstStr(uint8_t reg, uint8_t numBytes, char* str);
+    uint8_t SPIreadRegister(uint8_t reg);
     
-    virtual uint8_t setMode(uint8_t mode) = 0;
-    virtual uint8_t config(uint32_t bw, uint8_t sf, uint8_t cr, float freq, uint8_t syncWord) = 0;
-    virtual int8_t getLastPacketRSSI() = 0;
-    virtual float getLastPacketSNR() = 0;
+    uint8_t SPIsetRegValue(uint8_t reg, uint8_t value, uint8_t msb = 7, uint8_t lsb = 0);
+    void SPIwriteRegisterBurst(uint8_t reg, uint8_t* data, uint8_t numBytes);
+    void SPIwriteRegisterBurstStr(uint8_t reg, const char* data, uint8_t numBytes);
+    void SPIwriteRegister(uint8_t reg, uint8_t data);
     
-    void initModule(int nss, int dio0, int dio1);
-    
-    uint8_t getRegValue(uint8_t reg, uint8_t msb = 7, uint8_t lsb = 0);
-    uint8_t readRegisterBurst(uint8_t reg, uint8_t numBytes, uint8_t* inBytes);
-    uint8_t readRegisterBurstStr(uint8_t reg, uint8_t numBytes, char* str);
-    uint8_t readRegister(uint8_t reg);
-    
-    uint8_t setRegValue(uint8_t reg, uint8_t value, uint8_t msb = 7, uint8_t lsb = 0);
-    void writeRegisterBurst(uint8_t reg, uint8_t* data, uint8_t numBytes);
-    void writeRegisterBurstStr(uint8_t reg, const char* data, uint8_t numBytes);
-    void writeRegister(uint8_t reg, uint8_t data);
+    bool getInt0State();
+    bool getInt1State();
   
   private:
-    int _nss;
-    int _dio0;
-    int _dio1;
+    int _cs;
+    int _int0;
+    int _int1;
 
 };
 

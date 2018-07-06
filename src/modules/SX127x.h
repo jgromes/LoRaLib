@@ -1,8 +1,11 @@
-#ifndef _LORALIB_SX127X_H
-#define _LORALIB_SX127X_H
+#ifndef _KITELIB_SX127X_H
+#define _KITELIB_SX127X_H
+
+#include <EEPROM.h>
 
 #include "TypeDef.h"
 #include "Module.h"
+#include "Packet.h"
 
 // SX127x series common registers
 #define SX127X_REG_FIFO                               0x00
@@ -162,30 +165,49 @@
 #define SX127X_SYNC_WORD                              0x12        //  7     0     default LoRa sync word
 #define SX127X_SYNC_WORD_LORAWAN                      0x34        //  7     0     sync word reserved for LoRaWAN networks
 
-class SX127x: public Module {
+class SX127x {
   public:
-    SX127x(Chip ch, int dio0, int dio1);
+    SX127x(Module* mod);
     
-    uint8_t begin();
+    float dataRate;
+    int8_t lastPacketRSSI;
+    float lastPacketSNR;
     
-    uint8_t tx(char* data, uint8_t length, uint32_t timeout);
-    uint8_t rxSingle(char* data, uint8_t* length, bool headerExplMode);
-    uint8_t runCAD();
+    uint8_t begin(uint8_t syncWord, int8_t power, uint16_t addrEeprom);
+    uint8_t transmit(Packet& pack);
+    uint8_t receive(Packet& pack);
+    uint8_t scanChannel();
     
+    uint8_t sleep();
+    uint8_t standby();
+    
+    uint8_t setSyncWord(uint8_t syncWord);
     uint8_t setOutputPower(int8_t power);
+  
+  protected:
+    Module* _mod;
     
-    uint8_t setMode(uint8_t mode);
-    uint8_t config(uint8_t bw, uint8_t sf, uint8_t cr, float freq, uint8_t syncWord);
-    int8_t getLastPacketRSSI();
-    float getLastPacketSNR();
+    float _freq;
+    float _bw;
+    uint8_t _sf;
+    uint8_t _cr;
+    uint8_t _syncWord;
+    int8_t _power;
+    
+    uint8_t tx(char* data, uint8_t length);
+    uint8_t rxSingle(char* data, uint8_t* length);
+    
+    uint8_t setFrequencyRaw(float newFreq);
+    
+    uint8_t config();
   
   private:
-    Chip _ch;
-    int _dio0;
-    int _dio1;
+    uint8_t _address[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+    uint16_t _addrEeprom;
     
+    void generateNodeAdress();
+    uint8_t setMode(uint8_t mode);
     void clearIRQFlags();
-    const char* getChipName();
 };
 
 #endif
