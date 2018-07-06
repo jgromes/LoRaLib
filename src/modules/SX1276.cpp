@@ -1,10 +1,10 @@
-#include "SX1279.h"
+#include "SX1276.h"
 
-SX1279::SX1279(int nss, float freq, uint32_t bw, uint8_t sf, uint8_t cr, int dio0, int dio1, uint8_t syncWord) : SX1278(nss, freq, bw, sf, cr, dio0, dio1, syncWord) {
+SX1276::SX1276(Module* mod) : SX1278(mod) {
   
 }
 
-uint8_t SX1279::config(uint32_t bw, uint8_t sf, uint8_t cr, float freq, uint8_t syncWord) {
+uint8_t SX1276::config(uint32_t bw, uint8_t sf, uint8_t cr, float freq, uint8_t syncWord) {
   uint8_t status = ERR_NONE;
   uint8_t newBandwidth, newSpreadingFactor, newCodingRate;
   
@@ -36,6 +36,15 @@ uint8_t SX1279::config(uint32_t bw, uint8_t sf, uint8_t cr, float freq, uint8_t 
     case 9:
       newSpreadingFactor = SX127X_SF_9;
       break;
+    case 10:
+      newSpreadingFactor = SX127X_SF_10;
+      break;
+    case 11:
+      newSpreadingFactor = SX127X_SF_11;
+      break;
+    case 12:
+      newSpreadingFactor = SX127X_SF_12;
+      break;
     default:
       return(ERR_INVALID_SPREADING_FACTOR);
   }
@@ -57,7 +66,7 @@ uint8_t SX1279::config(uint32_t bw, uint8_t sf, uint8_t cr, float freq, uint8_t 
       return(ERR_INVALID_CODING_RATE);
   }
   
-  if((freq < 137.0) || (freq > 960.0)) {
+  if((freq < 137.0) || (freq > 1020.0)) {
     return(ERR_INVALID_FREQUENCY);
   }
   

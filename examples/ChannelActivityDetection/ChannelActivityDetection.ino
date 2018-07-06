@@ -12,17 +12,12 @@
 // include the library
 #include <LoRaLib.h>
 
-// create instance of LoRa class with default settings
-// chip:                SX1278
-// NSS pin:             7
-// carrier frequency:   434.0 MHz
-// bandwidth:           125000 Hz
-// spreading factor:    9
-// coding rate:         7
-// DIO0 pin:            2
-// DIO1 pin:            3
-// Sync word:           0x12
-LoRa lora;
+// create instance of LoRa class using SX1278 module 
+// this pinout corresponds to LoRenz shield: https://github.com/jgromes/LoRenz
+// NSS pin:   7
+// DIO0 pin:  2
+// DIO1 pin:  3
+SX1278 lora = new LoRa;
 
 void setup() {
   Serial.begin(9600);

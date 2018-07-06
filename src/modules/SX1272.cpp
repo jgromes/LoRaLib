@@ -1,63 +1,20 @@
 #include "SX1272.h"
 
-SX1272::SX1272(int nss, float freq, uint32_t bw, uint8_t sf, uint8_t cr, int dio0, int dio1, uint8_t syncWord) : SX127x(CH_SX1272, dio0, dio1) {
-  _nss = nss;
-  _dio0 = dio0;
-  _dio1 = dio1;
+SX1272::SX1272(Module* mod) : SX127x(mod) {
   
-  _bw = bw;
-  _sf = sf;
-  _cr = cr;
-  _freq = freq;
-  _syncWord = syncWord;
 }
 
-uint8_t SX1272::begin() {
-  // initialize low-level drivers
-  initModule(_nss, _dio0, _dio1);
-  
-  // execute common part
-  uint8_t status = SX127x::begin();
-  if(status != ERR_NONE) {
-    return(status);
+uint8_t SX1272::begin(float freq, uint32_t bw, uint8_t sf, uint8_t cr, uint8_t syncWord, uint16_t addrEeprom) {
+  uint8_t state = SX127x::begin(freq, bw, sf, cr, syncWord, addrEeprom);
+  if(state != ERR_NONE) {
+    return(state);
   }
   
-  // start configuration
-  return(config(_bw, _sf, _cr, _freq, _syncWord));
-}
-
-uint8_t SX1272::tx(char* data, uint8_t length) {
-  // calculate timeout
-  uint16_t base = 1;
-  float symbolLength = (float)(base << _sf) / (float)_bw;
-  float de = 0;
-  if(symbolLength >= 0.016) {
-    de = 1;
-  }
-  float ih = (float)(getRegValue(SX127X_REG_MODEM_CONFIG_1, 2, 2) >> 2);
-  float crc = (float)(getRegValue(SX127X_REG_MODEM_CONFIG_1, 1, 1) >> 1);
-  
-  float n_pre = (float)getRegValue(SX127X_REG_PREAMBLE_LSB);
-  float n_pay = 8.0 + max(ceil((8.0 * (float)length - 4.0 * (float)_sf + 28.0 + 16.0 * crc - 20.0 * ih)/(4.0 * (float)_sf - 8.0 * de)) * (float)_cr, 0.0);
-  uint32_t timeout = ceil(symbolLength * (n_pre + n_pay + 4.25) * 1000.0);
-  
-  // execute common part
-  return(SX127x::tx(data, length, timeout));
-}
-
-uint8_t SX1272::rxSingle(char* data, uint8_t* length) {
-  // get header mode
-  bool headerExplMode = false;
-  if(getRegValue(SX127X_REG_MODEM_CONFIG_1, 0, 0) == SX1272_HEADER_EXPL_MODE) {
-    headerExplMode = true;
-  }
-  
-  // execute common part
-  return SX127x::rxSingle(data, length, headerExplMode);
+  return(config(freq, bw, sf, cr, syncWord));
 }
 
 uint8_t SX1272::setBandwidth(uint32_t bw) {
-  uint8_t state = config(bw, _sf, _cr, _freq, _syncWord);
+  uint8_t state = SX1272::config(_freq, bw, _sf, _cr, _syncWord);
   if(state == ERR_NONE) {
     _bw = bw;
   }
@@ -65,7 +22,7 @@ uint8_t SX1272::setBandwidth(uint32_t bw) {
 }
 
 uint8_t SX1272::setSpreadingFactor(uint8_t sf) {
-  uint8_t state = config(_bw, sf, _cr, _freq, _syncWord);
+  uint8_t state = SX1272::config(_freq, _bw, sf, _cr, _syncWord);
   if(state == ERR_NONE) {
     _sf = sf;
   }
@@ -73,7 +30,7 @@ uint8_t SX1272::setSpreadingFactor(uint8_t sf) {
 }
 
 uint8_t SX1272::setCodingRate(uint8_t cr) {
-  uint8_t state = config(_bw, _sf, cr, _freq, _syncWord);
+  uint8_t state = SX1272::config(_freq, _bw, _sf, cr, _syncWord);
   if(state == ERR_NONE) {
     _cr = cr;
   }
@@ -81,22 +38,14 @@ uint8_t SX1272::setCodingRate(uint8_t cr) {
 }
 
 uint8_t SX1272::setFrequency(float freq) {
-  uint8_t state = config(_bw, _sf, _cr, freq, _syncWord);
+  uint8_t state = SX1272::config(freq, _bw, _sf, _cr, _syncWord);
   if(state == ERR_NONE) {
     _freq = freq;
   }
   return(state);
 }
 
-uint8_t SX1272::setSyncWord(uint8_t syncWord) {
-  uint8_t state = config(_bw, _sf, _cr, _freq, syncWord);
-  if(state == ERR_NONE) {
-    _syncWord = syncWord;
-  }
-  return(state);
-}
-
-uint8_t SX1272::config(uint32_t bw, uint8_t sf, uint8_t cr, float freq, uint8_t syncWord) {
+uint8_t SX1272::config(float freq, uint32_t bw, uint8_t sf, uint8_t cr, uint8_t syncWord) {
   uint8_t status = ERR_NONE;
   uint8_t newBandwidth, newSpreadingFactor, newCodingRate;
   
@@ -158,12 +107,12 @@ uint8_t SX1272::config(uint32_t bw, uint8_t sf, uint8_t cr, float freq, uint8_t 
       return(ERR_INVALID_CODING_RATE);
   }
   
-  if((freq < 860.0) || (freq > 1020.0)) {
+  if((freq < 137.0) || (freq > 525.0)) {
     return(ERR_INVALID_FREQUENCY);
   }
   
   // execute common part
-  status = configCommon(newBandwidth, newSpreadingFactor, newCodingRate, freq, syncWord);
+  status = SX1272::configCommon(newBandwidth, newSpreadingFactor, newCodingRate, freq, syncWord);
   if(status != ERR_NONE) {
     return(status);
   }
@@ -185,22 +134,22 @@ uint8_t SX1272::configCommon(uint8_t bw, uint8_t sf, uint8_t cr, float freq, uin
   }
   
   // output power configuration
-  status = setRegValue(SX1272_REG_PA_DAC, SX127X_PA_BOOST_ON, 2, 0);
+  status = _mod->SPIsetRegValue(SX1272_REG_PA_DAC, SX127X_PA_BOOST_ON, 2, 0);
   if(status != ERR_NONE) {
     return(status);
   }
   
   // enable LNA gain setting by register
-  status = setRegValue(SX127X_REG_MODEM_CONFIG_2, SX1272_AGC_AUTO_OFF, 2, 2);
+  status = _mod->SPIsetRegValue(SX127X_REG_MODEM_CONFIG_2, SX1272_AGC_AUTO_OFF, 2, 2);
   if(status != ERR_NONE) {
     return(status);
   }
   
   // set SF6 optimizations
   if(sf == SX127X_SF_6) {
-    status = setRegValue(SX127X_REG_MODEM_CONFIG_1, bw | cr | SX1272_HEADER_IMPL_MODE | SX1272_RX_CRC_MODE_OFF, 7, 1);
+    status = _mod->SPIsetRegValue(SX127X_REG_MODEM_CONFIG_1, bw | cr | SX1272_HEADER_IMPL_MODE | SX1272_RX_CRC_MODE_OFF, 7, 1);
   } else {
-    status = setRegValue(SX127X_REG_MODEM_CONFIG_1, bw | cr | SX1272_HEADER_EXPL_MODE | SX1272_RX_CRC_MODE_ON,  7, 1);
+    status = _mod->SPIsetRegValue(SX127X_REG_MODEM_CONFIG_1, bw | cr | SX1272_HEADER_EXPL_MODE | SX1272_RX_CRC_MODE_ON,  7, 1);
   }
   if(status != ERR_NONE) {
     return(status);
@@ -210,9 +159,9 @@ uint8_t SX1272::configCommon(uint8_t bw, uint8_t sf, uint8_t cr, float freq, uin
   uint16_t base = 1;
   float symbolLength = (float)(base << _sf) / (float)_bw;
   if(symbolLength >= 0.016) {
-    status = setRegValue(SX127X_REG_MODEM_CONFIG_1, SX1272_LOW_DATA_RATE_OPT_ON,  0, 0);
+    status = _mod->SPIsetRegValue(SX127X_REG_MODEM_CONFIG_1, SX1272_LOW_DATA_RATE_OPT_ON,  0, 0);
   } else {
-    status = setRegValue(SX127X_REG_MODEM_CONFIG_1, SX1272_LOW_DATA_RATE_OPT_OFF,  0, 0);
+    status = _mod->SPIsetRegValue(SX127X_REG_MODEM_CONFIG_1, SX1272_LOW_DATA_RATE_OPT_OFF,  0, 0);
   }
   if(status != ERR_NONE) {
     return(status);

@@ -1,7 +1,8 @@
-#ifndef _LORALIB_SX1272_H
-#define _LORALIB_SX1272_H
+#ifndef _KITELIB_SX1272_H
+#define _KITELIB_SX1272_H
 
 #include "TypeDef.h"
+#include "Module.h"
 #include "SX127x.h"
 
 //SX1272 specific register map
@@ -44,32 +45,21 @@
 
 class SX1272: public SX127x {
   public:
-    SX1272(int nss, float freq, uint32_t bw, uint8_t sf, uint8_t cr, int dio0, int dio1, uint8_t syncWord);
+    SX1272(Module* mod);
     
-    uint8_t begin();
-    uint8_t tx(char* data, uint8_t length);
-    uint8_t rxSingle(char* data, uint8_t* length);
-    uint8_t config(uint32_t bw, uint8_t sf, uint8_t cr, float freq, uint8_t syncWord);
+    uint8_t begin(float freq = 434.0, uint32_t bw = 125000, uint8_t sf = 9, uint8_t cr = 7, uint8_t syncWord = SX127X_SYNC_WORD, uint16_t addrEeprom = 0);
     
     uint8_t setBandwidth(uint32_t bw);
     uint8_t setSpreadingFactor(uint8_t sf);
     uint8_t setCodingRate(uint8_t cr);
     uint8_t setFrequency(float freq);
-    uint8_t setSyncWord(uint8_t syncWord);
   
   protected:
-    uint32_t _bw;
-    uint8_t _sf;
-    uint8_t _cr;
-    float _freq;
-    uint8_t _syncWord;
+    uint8_t configCommon(uint8_t bw, uint8_t sf, uint8_t cr, float freq, uint8_t syncWord);   // common for SX1272/73
     
-    uint8_t configCommon(uint8_t bw, uint8_t sf, uint8_t cr, float freq, uint8_t syncWord);
-  
   private:
-    int _nss;
-    int _dio0;
-    int _dio1;
+    uint8_t config(float freq, uint32_t bw, uint8_t sf, uint8_t cr, uint8_t syncWord);        // specific to SX1272
+    
 };
 
 #endif

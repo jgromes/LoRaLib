@@ -1,23 +1,23 @@
-#include "SX1277.h"
+#include "SX1273.h"
 
-SX1277::SX1277(int nss, float freq, uint32_t bw, uint8_t sf, uint8_t cr, int dio0, int dio1, uint8_t syncWord) : SX1278(nss, freq, bw, sf, cr, dio0, dio1, syncWord) {
+SX1273::SX1273(Module* mod) : SX1272(mod) {
   
 }
 
-uint8_t SX1277::config(uint32_t bw, uint8_t sf, uint8_t cr, float freq, uint8_t syncWord) {
+uint8_t SX1273::config(uint32_t bw, uint8_t sf, uint8_t cr, float freq, uint8_t syncWord) {
   uint8_t status = ERR_NONE;
   uint8_t newBandwidth, newSpreadingFactor, newCodingRate;
   
   // check the supplied BW, CR and SF values
   switch(bw) {
     case 125000:
-      newBandwidth = SX1278_BW_125_00_KHZ;
+      newBandwidth = SX1272_BW_125_00_KHZ;
       break;
     case 250000:
-      newBandwidth = SX1278_BW_250_00_KHZ;
+      newBandwidth = SX1272_BW_250_00_KHZ;
       break;
     case 500000:
-      newBandwidth = SX1278_BW_500_00_KHZ;
+      newBandwidth = SX1272_BW_500_00_KHZ;
       break;
     default:
       return(ERR_INVALID_BANDWIDTH);
@@ -42,22 +42,22 @@ uint8_t SX1277::config(uint32_t bw, uint8_t sf, uint8_t cr, float freq, uint8_t 
   
   switch(cr) {
     case 5:
-      newCodingRate = SX1278_CR_4_5;
+      newCodingRate = SX1272_CR_4_5;
       break;
     case 6:
-      newCodingRate = SX1278_CR_4_6;
+      newCodingRate = SX1272_CR_4_6;
       break;
     case 7:
-      newCodingRate = SX1278_CR_4_7;
+      newCodingRate = SX1272_CR_4_7;
       break;
     case 8:
-      newCodingRate = SX1278_CR_4_8;
+      newCodingRate = SX1272_CR_4_8;
       break;
     default:
       return(ERR_INVALID_CODING_RATE);
   }
   
-  if((freq < 137.0) || (freq > 1020.0)) {
+  if((freq < 860.0) || (freq > 1020.0)) {
     return(ERR_INVALID_FREQUENCY);
   }
   
