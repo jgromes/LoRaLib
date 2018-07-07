@@ -4,7 +4,7 @@ SX127x::SX127x(Module* mod) {
   _mod = mod;
 }
 
-uint8_t SX127x::begin(uint8_t syncWord, int8_t power, uint16_t addrEeprom) {
+uint8_t SX127x::begin(uint8_t syncWord, uint16_t addrEeprom) {
   // ESP32-only: initialize  EEPROM
   #ifdef ESP32
     if(!EEPROM.begin(9)) {
@@ -83,13 +83,6 @@ uint8_t SX127x::begin(uint8_t syncWord, int8_t power, uint16_t addrEeprom) {
   if(state != ERR_NONE) {
     return(state);
   }
-  
-  // set output power
-  state = SX127x::setOutputPower(power);
-  if(state != ERR_NONE) {
-    return(state);
-  }
-  
   
   return(ERR_NONE);
 }
@@ -249,21 +242,6 @@ uint8_t SX127x::setSyncWord(uint8_t syncWord) {
   return(state);
 }
 
-uint8_t SX127x::setOutputPower(int8_t power) {
-  setMode(SX127X_STANDBY);
-
-  if((power < 2) || (power > 17)) {
-    return(ERR_INVALID_OUTPUT_POWER);
-  }
-  
-  uint8_t state = _mod->SPIsetRegValue(SX127X_REG_PA_CONFIG, power - 2, 3, 0);
-  if(state == ERR_NONE) {
-    _power = power;
-  }
-  
-  return(state);
-}
-
 uint8_t SX127x::setFrequencyRaw(float newFreq) {
   // set mode to standby
   setMode(SX127X_STANDBY);
@@ -293,9 +271,8 @@ uint8_t SX127x::config() {
     return(state);
   }
   
-  // output power configuration
-  state = _mod->SPIsetRegValue(SX127X_REG_PA_CONFIG, SX127X_PA_SELECT_BOOST | SX127X_OUTPUT_POWER);
-  state |= _mod->SPIsetRegValue(SX127X_REG_OCP, SX127X_OCP_ON | SX127X_OCP_TRIM, 5, 0);
+  // set overcurrent protection and LNA gain
+  state = _mod->SPIsetRegValue(SX127X_REG_OCP, SX127X_OCP_ON | SX127X_OCP_TRIM, 5, 0);
   state |= _mod->SPIsetRegValue(SX127X_REG_LNA, SX127X_LNA_GAIN_1 | SX127X_LNA_BOOST_ON);
   if(state != ERR_NONE) {
     return(state);
