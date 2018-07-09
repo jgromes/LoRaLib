@@ -38,27 +38,29 @@
   #define DEBUG_PRINTLN_STR(x)
 #endif
 
-#define ERR_NONE                        0x00
-#define ERR_CHIP_NOT_FOUND              0x01
-#define ERR_EEPROM_NOT_INITIALIZED      0x02
+// Shield configuration
+#define USE_SPI                               0x00
+#define USE_UART                              0x01
+#define USE_I2C                               0x02
+#define INT_NONE                              0x00
+#define INT_0                                 0x01
+#define INT_1                                 0x02
+#define INT_BOTH                              0x03
 
-#define ERR_PACKET_TOO_LONG             0x10
-#define ERR_TX_TIMEOUT                  0x11
-
-#define ERR_RX_TIMEOUT                  0x20
-#define ERR_CRC_MISMATCH                0x21
-
-#define ERR_INVALID_BANDWIDTH           0x30
-#define ERR_INVALID_SPREADING_FACTOR    0x31
-#define ERR_INVALID_CODING_RATE         0x32
-#define ERR_INVALID_FREQUENCY           0x33
-#define ERR_INVALID_OUTPUT_POWER        0x34
-
-#define ERR_INVALID_BIT_RANGE           0x40
-
-#define CHANNEL_FREE                    0x50
-#define PREAMBLE_DETECTED               0x51
-
-enum Chip {CH_SX1272 = 0, CH_SX1273, CH_SX1276, CH_SX1277, CH_SX1278, CH_SX1279};
+#define ERR_NONE                              0x00
+#define ERR_CHIP_NOT_FOUND                    0x01
+#define ERR_EEPROM_NOT_INITIALIZED            0x02
+#define ERR_PACKET_TOO_LONG                   0x03
+#define ERR_TX_TIMEOUT                        0x04
+#define ERR_RX_TIMEOUT                        0x05
+#define ERR_CRC_MISMATCH                      0x06
+#define ERR_INVALID_BANDWIDTH                 0x07
+#define ERR_INVALID_SPREADING_FACTOR          0x08
+#define ERR_INVALID_CODING_RATE               0x09
+#define ERR_INVALID_BIT_RANGE                 0x0A
+#define ERR_INVALID_FREQUENCY                 0x0B
+#define ERR_INVALID_OUTPUT_POWER              0x0C
+#define PREAMBLE_DETECTED                     0x0D
+#define CHANNEL_FREE                          0x0E
 
 #endif
