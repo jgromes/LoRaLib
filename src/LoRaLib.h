@@ -1,11 +1,7 @@
 #ifndef _LORALIB_H
 #define _LORALIB_H
 
-#include <EEPROM.h>
-
 #include "TypeDef.h"
-#include "Packet.h"
-
 #include "Module.h"
 
 #include "modules/SX1272.h"

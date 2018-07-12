@@ -7,7 +7,6 @@
 #######################################
 
 LoRaLib	KEYWORD1
-Packet	KEYWORD1
 LoRa	KEYWORD1
 
 SX1272	KEYWORD1
@@ -20,17 +19,6 @@ SX1279	KEYWORD1
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
-
-source	KEYWORD2
-destination	KEYWORD2
-data	KEYWORD2
-length	KEYWORD2
-getSourceStr	KEYWORD2
-getDestinationStr	KEYWORD2
-setSourceStr	KEYWORD2
-setDestinationStr	KEYWORD2
-copyInto	KEYWORD2
-setPacketData	KEYWORD2
 
 dataRate	KEYWORD2
 lastPacketRSSI	KEYWORD2
