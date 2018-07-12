@@ -21,13 +21,11 @@
 // DIO1 pin:  3
 SX1278 lora = new LoRa;
 
-// create instance of Packet class with destination "01:23:45:67:89:AB:CD:EF" and data "Hello World !"
-Packet pack("01:23:45:67:89:AB:CD:EF", "Hello World!");
-
 void setup() {
   Serial.begin(9600);
 
-  // initialize the LoRa module with default settings
+  // initialize SX1278 with default settings
+  Serial.print(F("Initializing ... "));
   // carrier frequency:                   434.0 MHz
   // bandwidth:                           125.0 kHz
   // spreading factor:                    9
@@ -35,35 +33,21 @@ void setup() {
   // sync word:                           0x12
   // output power:                        17 dBm
   // node address in EEPROM starts at:    0
-  uint8_t state = lora.begin();
-  if(state != ERR_NONE) {
-    Serial.print("Initialization failed, code 0x");
+  byte state = lora.begin();
+  if(state == ERR_NONE) {
+    Serial.println(F("success!"));
+  } else {
+    Serial.print(F("failed, code 0x"));
     Serial.println(state, HEX);
     while(true);
   }
-
-  // print the source of the packet
-  Serial.print("Source:\t\t");
-  Serial.println(pack.getSourceStr());
-
-  // print the destination of the packet
-  Serial.print("Destination:\t");
-  Serial.println(pack.getDestinationStr());
-
-  // print the length of the packet
-  Serial.print("Length:\t\t");
-  Serial.println(pack.length);
-  
-  // print the data of the packet
-  Serial.print("Data:\t\t");
-  Serial.println(pack.data);
 }
 
 void loop() {
   Serial.print("Sending packet ... ");
 
   // start transmitting the packet
-  uint8_t state = lora.transmit(pack);
+  uint8_t state = lora.transmit("Hello World!");
   
   if(state == ERR_NONE) {
     // the packet was successfully transmitted
