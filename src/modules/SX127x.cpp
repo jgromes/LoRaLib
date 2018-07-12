@@ -111,7 +111,7 @@ uint8_t SX127x::transmit(String& str) {
   return(SX127x::transmit(str.c_str()));
 }
 
-/*uint8_t SX127x::receive(uint8_t* data, size_t len) {
+uint8_t SX127x::receive(uint8_t* data, size_t len) {
   // set mode to standby
   setMode(SX127X_STANDBY);
   
@@ -149,10 +149,11 @@ uint8_t SX127x::transmit(String& str) {
     length = _mod->SPIgetRegValue(SX127X_REG_RX_NB_BYTES);
   }
   
+  // read packet data
   _mod->SPIreadRegisterBurst(SX127X_REG_FIFO, length, data);
   
   // update data rate, RSSI and SNR
-  dataRate = (pack.length*8.0)/((float)elapsed/1000.0);
+  dataRate = (length*8.0)/((float)elapsed/1000.0);
   lastPacketRSSI = -157 + _mod->SPIgetRegValue(SX127X_REG_PKT_RSSI_VALUE);
   int8_t rawSNR = (int8_t)_mod->SPIgetRegValue(SX127X_REG_PKT_SNR_VALUE);
   lastPacketSNR = rawSNR / 4.0;
@@ -161,7 +162,22 @@ uint8_t SX127x::transmit(String& str) {
   clearIRQFlags();
   
   return(ERR_NONE);
-}*/
+}
+
+uint8_t SX127x::receive(String& str, size_t len) {
+  // create temporary array to store received data
+  char* data = new char[0];
+  uint8_t state = SX127x::receive((uint8_t*)data, len);
+  
+  // if packet was received successfully, copy data into String
+  if(state == ERR_NONE) {
+    data[strlen(data) - 1] = 0;
+    str = String(data);
+  }
+  
+  delete[] data;
+  return(state);
+}
 
 uint8_t SX127x::scanChannel() {
   // set mode to standby

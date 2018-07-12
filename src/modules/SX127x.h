@@ -175,9 +175,10 @@ class SX127x {
     // basic methods
     uint8_t begin(uint8_t syncWord);
     uint8_t transmit(uint8_t* data, size_t len);
-    uint8_t transmit(const char* data);
+    uint8_t transmit(const char* str);
     uint8_t transmit(String& str);
-    //uint8_t receive(uint8_t* data, size_t len);
+    uint8_t receive(uint8_t* data, size_t len);
+    uint8_t receive(String& str, size_t len = 0);
     uint8_t scanChannel();
     uint8_t sleep();
     uint8_t standby();
