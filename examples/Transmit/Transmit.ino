@@ -2,11 +2,11 @@
  * LoRaLib Transmit Example
  * 
  * This example transmits LoRa packets with one second delays between them.
- * Each packet contains the following data:
- *  - 8-byte destination address
- *  - 8-byte source address
- *  - up to 240 bytes of payload
- * 
+ * Each packet contains up to 256 bytes of data, in the form of:
+ *  - Arduino String
+ *  - null-terminated char array (C-string)
+ *  - arbitrary binary data (byte array)
+ *  
  * For more detailed information, see the LoRaLib Wiki
  * https://github.com/jgromes/LoRaLib/wiki
  */
@@ -21,13 +21,11 @@
 // DIO1 pin:  3
 SX1278 lora = new LoRa;
 
-// create instance of Packet class with destination "01:23:45:67:89:AB:CD:EF" and data "Hello World !"
-Packet pack("01:23:45:67:89:AB:CD:EF", "Hello World!");
-
 void setup() {
   Serial.begin(9600);
 
-  // initialize the LoRa module with default settings
+  // initialize SX1278 with default settings
+  Serial.print(F("Initializing ... "));
   // carrier frequency:                   434.0 MHz
   // bandwidth:                           125.0 kHz
   // spreading factor:                    9
@@ -35,35 +33,27 @@ void setup() {
   // sync word:                           0x12
   // output power:                        17 dBm
   // node address in EEPROM starts at:    0
-  uint8_t state = lora.begin();
-  if(state != ERR_NONE) {
-    Serial.print("Initialization failed, code 0x");
+  byte state = lora.begin();
+  if(state == ERR_NONE) {
+    Serial.println(F("success!"));
+  } else {
+    Serial.print(F("failed, code 0x"));
     Serial.println(state, HEX);
     while(true);
   }
-
-  // print the source of the packet
-  Serial.print("Source:\t\t");
-  Serial.println(pack.getSourceStr());
-
-  // print the destination of the packet
-  Serial.print("Destination:\t");
-  Serial.println(pack.getDestinationStr());
-
-  // print the length of the packet
-  Serial.print("Length:\t\t");
-  Serial.println(pack.length);
-  
-  // print the data of the packet
-  Serial.print("Data:\t\t");
-  Serial.println(pack.data);
 }
 
 void loop() {
   Serial.print("Sending packet ... ");
 
-  // start transmitting the packet
-  uint8_t state = lora.transmit(pack);
+  // you can transmit C-string or Arduino string up to 256 characters long
+  byte state = lora.transmit("Hello World!");
+
+  // you can also transmit byte array up to 256 bytes long
+  /*
+  byte byteArr[] = {0x01, 0x23, 0x45, 0x56, 0x78, 0xAB, 0xCD, 0xEF};
+  byte state = lora.transmit(byteArr, 8);
+  */
   
   if(state == ERR_NONE) {
     // the packet was successfully transmitted

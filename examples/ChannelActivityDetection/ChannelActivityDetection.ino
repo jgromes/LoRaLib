@@ -22,7 +22,8 @@ SX1278 lora = new LoRa;
 void setup() {
   Serial.begin(9600);
 
-  // initialize the LoRa module with default settings
+  // initialize SX1278 with default settings
+  Serial.print(F("Initializing ... "));
   // carrier frequency:                   434.0 MHz
   // bandwidth:                           125.0 kHz
   // spreading factor:                    9
@@ -30,9 +31,11 @@ void setup() {
   // sync word:                           0x12
   // output power:                        17 dBm
   // node address in EEPROM starts at:    0
-  uint8_t state = lora.begin();
-  if(state != ERR_NONE) {
-    Serial.print("Initialization failed, code 0x");
+  byte state = lora.begin();
+  if(state == ERR_NONE) {
+    Serial.println(F("success!"));
+  } else {
+    Serial.print(F("failed, code 0x"));
     Serial.println(state, HEX);
     while(true);
   }

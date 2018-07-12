@@ -2,7 +2,7 @@
  * LoRaLib Receive Example
  * 
  * This example listens for LoRa transmissions and tries to receive them.
- * To successfully receive packets, the following settings have to be the same
+ * To successfully receive data, the following settings have to be the same
  * on both transmitter and receiver:
  *  - carrier frequency
  *  - bandwidth
@@ -24,13 +24,11 @@
 // DIO1 pin:  3
 SX1278 lora = new LoRa;
 
-// create empty instance of Packet class
-Packet pack;
-
 void setup() {
   Serial.begin(9600);
 
-  // initialize the LoRa module with default settings
+  // initialize SX1278 with default settings
+  Serial.print(F("Initializing ... "));
   // carrier frequency:                   434.0 MHz
   // bandwidth:                           125.0 kHz
   // spreading factor:                    9
@@ -38,9 +36,11 @@ void setup() {
   // sync word:                           0x12
   // output power:                        17 dBm
   // node address in EEPROM starts at:    0
-  uint8_t state = lora.begin();
-  if(state != ERR_NONE) {
-    Serial.print("Initialization failed, code 0x");
+  byte state = lora.begin();
+  if(state == ERR_NONE) {
+    Serial.println(F("success!"));
+  } else {
+    Serial.print(F("failed, code 0x"));
     Serial.println(state, HEX);
     while(true);
   }
@@ -49,28 +49,23 @@ void setup() {
 void loop() {
   Serial.print("Waiting for incoming transmission ... ");
 
-  // wait for single packet
-  uint8_t state = lora.receive(pack);
+  // you can receive data as an Arduino String
+  String str;
+  byte state = lora.receive(str);
+
+  // you can also receive data as byte array
+  /*
+  byte byteArr[8];
+  byte state = lora.receive(byteArr, 8);
+  */
 
   if(state == ERR_NONE) {
     // packet was successfully received
     Serial.println("success!");
 
-    // print the source of the packet
-    Serial.print("Source:\t\t");
-    Serial.println(pack.getSourceStr());
-
-    // print the destination of the packet
-    Serial.print("Destination:\t");
-    Serial.println(pack.getDestinationStr());
-
-    // print the length of the packet
-    Serial.print("Length:\t\t");
-    Serial.println(pack.length);
-
     // print the data of the packet
     Serial.print("Data:\t\t");
-    Serial.println(pack.data);
+    Serial.println(str);
 
     //print the measured data rate
     Serial.print("Datarate:\t");
