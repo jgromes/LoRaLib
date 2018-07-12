@@ -2,11 +2,11 @@
  * LoRaLib Transmit Example
  * 
  * This example transmits LoRa packets with one second delays between them.
- * Each packet contains the following data:
- *  - 8-byte destination address
- *  - 8-byte source address
- *  - up to 240 bytes of payload
- * 
+ * Each packet contains up to 256 bytes of data, in the form of:
+ *  - Arduino String
+ *  - null-terminated char array (C-string)
+ *  - arbitrary binary data (byte array)
+ *  
  * For more detailed information, see the LoRaLib Wiki
  * https://github.com/jgromes/LoRaLib/wiki
  */
@@ -46,8 +46,14 @@ void setup() {
 void loop() {
   Serial.print("Sending packet ... ");
 
-  // start transmitting the packet
-  uint8_t state = lora.transmit("Hello World!");
+  // you can transmit C-string or Arduino string up to 256 characters long
+  byte state = lora.transmit("Hello World!");
+
+  // you can also transmit byte array up to 256 bytes long
+  /*
+  byte byteArr[] = {0x01, 0x23, 0x45, 0x56, 0x78, 0xAB, 0xCD, 0xEF};
+  byte state = lora.transmit(byteArr, 8);
+  */
   
   if(state == ERR_NONE) {
     // the packet was successfully transmitted
