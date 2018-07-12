@@ -42,6 +42,7 @@ void setup() {
   Serial.begin(9600);
 
   // initialize the LoRa module with default settings
+  Serial.print(F("Initializing SX1278 ... "));
   // carrier frequency:                   434.0 MHz
   // bandwidth:                           125.0 kHz
   // spreading factor:                    9
@@ -49,16 +50,18 @@ void setup() {
   // sync word:                           0x12
   // output power:                        17 dBm
   // node address in EEPROM starts at:    0
-  uint8_t state = loraSX1278.begin();
-  if(state != ERR_NONE) {
-    Serial.print("SX1278 initialization failed, code 0x");
+  byte state = loraSX1278.begin();
+  if(state == ERR_NONE) {
+    Serial.println(F("success!"));
+  } else {
+    Serial.print(F("failed, code 0x"));
     Serial.println(state, HEX);
     while(true);
   }
 
   // initialize the second LoRa instance with non-default settings
   // this LoRa link will have maximum range, but very low data rate
-  //
+  Serial.print(F("Initializing SX1276 ... "));
   // carrier frequency:                   434.0 MHz
   // bandwidth:                           7.8 kHz
   // spreading factor:                    12
@@ -67,19 +70,18 @@ void setup() {
   // output power:                        17 dBm
   // node address in EEPROM starts at:    0
   state = loraSX1276.begin(434.0, 7.8, 12, 8, 0x13);
-  if(state != ERR_NONE) {
-    Serial.print("SX1276 initialization failed, code 0x");
+  if(state == ERR_NONE) {
+    Serial.println(F("success!"));
+  } else {
+    Serial.print(F("failed, code 0x"));
     Serial.println(state, HEX);
     while(true);
   }
-
   // initialize the second LoRa instance with non-default settings
   // this LoRa link will have high data rate, but lower range
   // NOTE: when using spreading factor 6, the total packet length has to be known in advance!
-  //       it can be set using the length variable of your Packet instance 
-  //       Packet::length = x;
-  //       where x is the total packet length including both addresses
-  //
+  //       you have to pass the number of expected bytes to the receive() method
+  Serial.print(F("Initializing SX1272 ... "));
   // carrier frequency:                   915.0 MHz
   // bandwidth:                           500.0 kHz
   // spreading factor:                    6
@@ -88,8 +90,10 @@ void setup() {
   // output power:                        2 dBm
   // node address in EEPROM starts at:    0
   state = loraSX1272.begin(915.0, 500.0, 6, 5, 0x14, 2);
-  if(state != ERR_NONE) {
-    Serial.print("SX1272 initialization failed, code 0x");
+  if(state == ERR_NONE) {
+    Serial.println(F("success!"));
+  } else {
+    Serial.print(F("failed, code 0x"));
     Serial.println(state, HEX);
     while(true);
   }
