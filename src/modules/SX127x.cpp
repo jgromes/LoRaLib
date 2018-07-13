@@ -228,13 +228,8 @@ uint8_t SX127x::setSyncWord(uint8_t syncWord) {
   // set mode to standby
   setMode(SX127X_STANDBY);
   
-  // write register
-  uint8_t state = _mod->SPIsetRegValue(SX127X_REG_SYNC_WORD, syncWord);
-  if(state == ERR_NONE) {
-    _syncWord = syncWord;
-  }
-  
-  return(state);
+  // write register 
+  return(_mod->SPIsetRegValue(SX127X_REG_SYNC_WORD, syncWord));
 }
 
 uint8_t SX127x::setFrequencyRaw(float newFreq) {

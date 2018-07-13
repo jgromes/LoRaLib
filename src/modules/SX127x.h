@@ -189,12 +189,9 @@ class SX127x {
   protected:
     Module* _mod;
     
-    float _freq;
     float _bw;
     uint8_t _sf;
     uint8_t _cr;
-    uint8_t _syncWord;
-    int8_t _power;
     
     uint8_t tx(char* data, uint8_t length);
     uint8_t rxSingle(char* data, uint8_t* length);
