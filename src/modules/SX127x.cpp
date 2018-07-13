@@ -157,7 +157,11 @@ uint8_t SX127x::receive(uint8_t* data, size_t len) {
     data = new uint8_t[length];
   }
   _mod->SPIreadRegisterBurst(SX127X_REG_FIFO, length, data);
-  data[length] = 0;
+  
+  // add terminating null
+  if(len == 0) {
+    data[length] = 0;
+  }
   
   // update data rate, RSSI and SNR
   dataRate = (length*8.0)/((float)elapsed/1000.0);
