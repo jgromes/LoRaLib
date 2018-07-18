@@ -173,7 +173,7 @@ class SX127x {
     float lastPacketSNR;
     
     // basic methods
-    uint8_t begin(uint8_t syncWord);
+    uint8_t begin(uint8_t chipVersion, uint8_t syncWord);
     uint8_t transmit(uint8_t* data, size_t len);
     uint8_t transmit(const char* str);
     uint8_t transmit(String& str);
