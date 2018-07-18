@@ -1,38 +1,43 @@
 /*
- * LoRaLib Settings Example
- * 
- * This example shows how to change all the properties of LoRa transmission.
- * LoRaLib currently supports the following settings:
- *  - pins (SPI slave select, digital IO 0, digital IO 1)
- *  - carrier frequency
- *  - bandwidth
- *  - spreading factor
- *  - coding rate
- *  - sync word
- *  - output power during transmission
- * 
- * For more detailed information, see the LoRaLib Wiki
- * https://github.com/jgromes/LoRaLib/wiki
- */
+   LoRaLib Settings Example
+
+   This example shows how to change all the properties
+   of LoRa transmission. LoRaLib currently supports 
+   the following settings:
+    - pins (SPI slave select, digital IO 0, digital IO 1)
+    - carrier frequency
+    - bandwidth
+    - spreading factor
+    - coding rate
+    - sync word
+    - output power during transmission
+
+   For more detailed information, see the LoRaLib Wiki
+   https://github.com/jgromes/LoRaLib/wiki
+*/
 
 // include the library
 #include <LoRaLib.h>
 
-// create instance of LoRa class using SX1278 module 
-// this pinout corresponds to LoRenz shield: https://github.com/jgromes/LoRenz
+// create instance of LoRa class using SX1278 module
+// this pinout corresponds to LoRenz shield: 
+// https://github.com/jgromes/LoRenz
 // NSS pin:   7
 // DIO0 pin:  2
 // DIO1 pin:  3
 SX1278 loraSX1278 = new LoRa;
 
-// create another instance of LoRa class using SX1272 module and user-specified pinout
+// create another instance of LoRa class using 
+// SX1272 module and user-specified pinout
 // NSS pin:   6
 // DIO0 pin:  4
 // DIO1 pin:  5
 SX1272 loraSX1272 = new LoRa(6, 4, 5);
 
-// create third instance of LoRa class using SX1276 module and user-specified pinout
-// we ran out of Uno digital pins, so here we use analog ones
+// create third instance of LoRa class using 
+// SX1276 module and user-specified pinout
+// we ran out of Uno digital pins, so here we use 
+// analog ones
 // NSS pin:   A0
 // DIO0 pin:  A1
 // DIO1 pin:  A2
@@ -51,16 +56,18 @@ void setup() {
   // output power:                        17 dBm
   // node address in EEPROM starts at:    0
   byte state = loraSX1278.begin();
-  if(state == ERR_NONE) {
+  if (state == ERR_NONE) {
     Serial.println(F("success!"));
   } else {
     Serial.print(F("failed, code 0x"));
     Serial.println(state, HEX);
-    while(true);
+    while (true);
   }
 
-  // initialize the second LoRa instance with non-default settings
-  // this LoRa link will have maximum range, but very low data rate
+  // initialize the second LoRa instance with 
+  // non-default settings
+  // this LoRa link will have maximum range, 
+  // but very low data rate
   Serial.print(F("Initializing SX1276 ... "));
   // carrier frequency:                   434.0 MHz
   // bandwidth:                           7.8 kHz
@@ -70,17 +77,21 @@ void setup() {
   // output power:                        17 dBm
   // node address in EEPROM starts at:    0
   state = loraSX1276.begin(434.0, 7.8, 12, 8, 0x13);
-  if(state == ERR_NONE) {
+  if (state == ERR_NONE) {
     Serial.println(F("success!"));
   } else {
     Serial.print(F("failed, code 0x"));
     Serial.println(state, HEX);
-    while(true);
+    while (true);
   }
-  // initialize the second LoRa instance with non-default settings
-  // this LoRa link will have high data rate, but lower range
-  // NOTE: when using spreading factor 6, the total packet length has to be known in advance!
-  //       you have to pass the number of expected bytes to the receive() method
+  // initialize the second LoRa instance with
+  // non-default settings
+  // this LoRa link will have high data rate, 
+  // but lower range
+  // NOTE: when using spreading factor 6, the total packet
+  //       length has to be known in advance!
+  //       you have to pass the number of expected bytes
+  //       to the receive() method
   Serial.print(F("Initializing SX1272 ... "));
   // carrier frequency:                   915.0 MHz
   // bandwidth:                           500.0 kHz
@@ -90,56 +101,56 @@ void setup() {
   // output power:                        2 dBm
   // node address in EEPROM starts at:    0
   state = loraSX1272.begin(915.0, 500.0, 6, 5, 0x14, 2);
-  if(state == ERR_NONE) {
+  if (state == ERR_NONE) {
     Serial.println(F("success!"));
   } else {
     Serial.print(F("failed, code 0x"));
     Serial.println(state, HEX);
-    while(true);
+    while (true);
   }
 
   // you can also change the settings at runtime
-  
-  // different modules accept different parameters
-  // see https://github.com/jgromes/LoRaLib/wiki/Supported-LoRa-modules
-  
+
+  // different modules accept different parameters, see
+  // https://github.com/jgromes/LoRaLib/wiki/Supported-LoRa-modules
+
   // you can check if the setting was changed successfully
 
   // set bandwidth to 250 kHz
-  if(loraSX1278.setBandwidth(250.0) == ERR_INVALID_BANDWIDTH) {
+  if (loraSX1278.setBandwidth(250.0) == ERR_INVALID_BANDWIDTH) {
     Serial.println("Selected bandwidth is invalid for this module!");
-    while(true);
+    while (true);
   }
 
   // set spreading factor to 10
-  if(loraSX1278.setSpreadingFactor(10) == ERR_INVALID_SPREADING_FACTOR) {
+  if (loraSX1278.setSpreadingFactor(10) == ERR_INVALID_SPREADING_FACTOR) {
     Serial.println("Selected spreading factor is invalid for this module!");
-    while(true);
+    while (true);
   }
 
   // set coding rate to 6
-  if(loraSX1278.setCodingRate(6) == ERR_INVALID_CODING_RATE) {
+  if (loraSX1278.setCodingRate(6) == ERR_INVALID_CODING_RATE) {
     Serial.println("Selected coding rate is invalid for this module!");
-    while(true);
+    while (true);
   }
 
   // set carrier frequency to 433.5 MHz
-  if(loraSX1278.setFrequency(433.5) == ERR_INVALID_FREQUENCY) {
+  if (loraSX1278.setFrequency(433.5) == ERR_INVALID_FREQUENCY) {
     Serial.println("Selected frequency is invalid for this module!");
-    while(true);
+    while (true);
   }
 
   // set LoRa sync word to 0x14
   // NOTE: value 0x34 is reserved for LoRaWAN networks and should not be used
-  if(loraSX1278.setSyncWord(0x14) != ERR_NONE) {
+  if (loraSX1278.setSyncWord(0x14) != ERR_NONE) {
     Serial.println("Unable to set sync word!");
-    while(true);
+    while (true);
   }
 
   // set output power to 10 dBm (accepted range is 2 - 17 dBm)
-  if(loraSX1278.setOutputPower(10) == ERR_INVALID_OUTPUT_POWER) {
+  if (loraSX1278.setOutputPower(10) == ERR_INVALID_OUTPUT_POWER) {
     Serial.println("Selected output power is invalid for this module!");
-    while(true);
+    while (true);
   }
 
   Serial.println("All settings succesfully changed!");

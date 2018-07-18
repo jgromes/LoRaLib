@@ -1,9 +1,11 @@
 /*
  * LoRaLib Channel Activity Detection Example
  * 
- * This example scans the current LoRa channel and detects valid LoRa preambles.
- * Preamble is the first part of LoRa transmission, so this can be used to
- * check if the LoRa channel is free, or if you hsould start receiving a message.
+ * This example scans the current LoRa channel and detects 
+ * valid LoRa preambles. Preamble is the first part of 
+ * LoRa transmission, so this can be used to check 
+ * if the LoRa channel is free, or if you should start 
+ * receiving a message.
  * 
  * For more detailed information, see the LoRaLib Wiki
  * https://github.com/jgromes/LoRaLib/wiki
@@ -13,7 +15,8 @@
 #include <LoRaLib.h>
 
 // create instance of LoRa class using SX1278 module 
-// this pinout corresponds to LoRenz shield: https://github.com/jgromes/LoRenz
+// this pinout corresponds to LoRenz shield:
+// https://github.com/jgromes/LoRenz
 // NSS pin:   7
 // DIO0 pin:  2
 // DIO1 pin:  3

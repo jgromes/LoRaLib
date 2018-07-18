@@ -1,21 +1,23 @@
 /*
- * LoRaLib Transmit Example
- * 
- * This example transmits LoRa packets with one second delays between them.
- * Each packet contains up to 256 bytes of data, in the form of:
- *  - Arduino String
- *  - null-terminated char array (C-string)
- *  - arbitrary binary data (byte array)
- *  
- * For more detailed information, see the LoRaLib Wiki
- * https://github.com/jgromes/LoRaLib/wiki
- */
+   LoRaLib Transmit Example
+
+   This example transmits LoRa packets with one second delays
+   between them. Each packet contains up to 256 bytes
+   of data, in the form of:
+    - Arduino String
+    - null-terminated char array (C-string)
+    - arbitrary binary data (byte array)
+
+   For more detailed information, see the LoRaLib Wiki
+   https://github.com/jgromes/LoRaLib/wiki
+*/
 
 // include the library
 #include <LoRaLib.h>
 
-// create instance of LoRa class using SX1278 module 
-// this pinout corresponds to LoRenz shield: https://github.com/jgromes/LoRenz
+// create instance of LoRa class using SX1278 module
+// this pinout corresponds to LoRenz shield:
+// https://github.com/jgromes/LoRenz
 // NSS pin:   7
 // DIO0 pin:  2
 // DIO1 pin:  3
@@ -33,39 +35,41 @@ void setup() {
   // sync word:                           0x12
   // output power:                        17 dBm
   byte state = lora.begin();
-  if(state == ERR_NONE) {
+  if (state == ERR_NONE) {
     Serial.println(F("success!"));
   } else {
     Serial.print(F("failed, code 0x"));
     Serial.println(state, HEX);
-    while(true);
+    while (true);
   }
 }
 
 void loop() {
   Serial.print("Sending packet ... ");
 
-  // you can transmit C-string or Arduino string up to 256 characters long
+  // you can transmit C-string or Arduino string up to
+  // 256 characters long
   byte state = lora.transmit("Hello World!");
 
   // you can also transmit byte array up to 256 bytes long
   /*
-  byte byteArr[] = {0x01, 0x23, 0x45, 0x56, 0x78, 0xAB, 0xCD, 0xEF};
-  byte state = lora.transmit(byteArr, 8);
+    byte byteArr[] = {0x01, 0x23, 0x45, 0x56,
+                    0x78, 0xAB, 0xCD, 0xEF};
+    byte state = lora.transmit(byteArr, 8);
   */
-  
-  if(state == ERR_NONE) {
+
+  if (state == ERR_NONE) {
     // the packet was successfully transmitted
     Serial.println(" success!");
-    
-  } else if(state == ERR_PACKET_TOO_LONG) {
+
+  } else if (state == ERR_PACKET_TOO_LONG) {
     // the supplied packet was longer than 256 bytes
     Serial.println(" too long!");
-    
-  } else if(state == ERR_TX_TIMEOUT) {
+
+  } else if (state == ERR_TX_TIMEOUT) {
     // timeout occurred while transmitting packet
     Serial.println(" timeout!");
-    
+
   }
 
   // wait a second before transmitting again
