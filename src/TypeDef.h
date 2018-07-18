@@ -7,10 +7,10 @@
   #include "WProgram.h"
 #endif
 
-//#define LORALIB_DEBUG
+//#define KITELIB_DEBUG
 
-#ifdef LORALIB_DEBUG
-  //#define LORALIB_VERBOSE
+#ifdef KITELIB_DEBUG
+  //#define KITELIB_VERBOSE
   #define BYTE_TO_BINARY(byte)  \
     ((byte & 0x80) ? '1' : '0'), \
     ((byte & 0x40) ? '1' : '0'), \
