@@ -53,7 +53,7 @@ uint8_t SX1278::setFrequency(float freq) {
   }
   
   // set frequency
-  return(SX1278::setFrequencyRaw(freq));
+  return(SX127x::setFrequencyRaw(freq));
 }
 
 uint8_t SX1278::setBandwidth(float bw) {
