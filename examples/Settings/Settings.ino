@@ -55,12 +55,12 @@ void setup() {
   // sync word:                           0x12
   // output power:                        17 dBm
   // node address in EEPROM starts at:    0
-  byte state = loraSX1278.begin();
+  int state = loraSX1278.begin();
   if (state == ERR_NONE) {
     Serial.println(F("success!"));
   } else {
-    Serial.print(F("failed, code 0x"));
-    Serial.println(state, HEX);
+    Serial.print(F("failed, code "));
+    Serial.println(state);
     while (true);
   }
 
@@ -80,8 +80,8 @@ void setup() {
   if (state == ERR_NONE) {
     Serial.println(F("success!"));
   } else {
-    Serial.print(F("failed, code 0x"));
-    Serial.println(state, HEX);
+    Serial.print(F("failed, code "));
+    Serial.println(state);
     while (true);
   }
   // initialize the second LoRa instance with
@@ -104,8 +104,8 @@ void setup() {
   if (state == ERR_NONE) {
     Serial.println(F("success!"));
   } else {
-    Serial.print(F("failed, code 0x"));
-    Serial.println(state, HEX);
+    Serial.print(F("failed, code "));
+    Serial.println(state);
     while (true);
   }
 

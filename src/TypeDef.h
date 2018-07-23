@@ -47,20 +47,22 @@
 #define INT_1                                 0x02
 #define INT_BOTH                              0x03
 
-#define ERR_NONE                              0x00
-#define ERR_CHIP_NOT_FOUND                    0x01
-#define ERR_EEPROM_NOT_INITIALIZED            0x02
-#define ERR_PACKET_TOO_LONG                   0x03
-#define ERR_TX_TIMEOUT                        0x04
-#define ERR_RX_TIMEOUT                        0x05
-#define ERR_CRC_MISMATCH                      0x06
-#define ERR_INVALID_BANDWIDTH                 0x07
-#define ERR_INVALID_SPREADING_FACTOR          0x08
-#define ERR_INVALID_CODING_RATE               0x09
-#define ERR_INVALID_BIT_RANGE                 0x0A
-#define ERR_INVALID_FREQUENCY                 0x0B
-#define ERR_INVALID_OUTPUT_POWER              0x0C
-#define PREAMBLE_DETECTED                     0x0D
-#define CHANNEL_FREE                          0x0E
+#define ERR_NONE                                0
+#define ERR_UNKNOWN                            -1
+
+#define ERR_CHIP_NOT_FOUND                     -2
+#define ERR_EEPROM_NOT_INITIALIZED             -3
+#define ERR_PACKET_TOO_LONG                    -4
+#define ERR_TX_TIMEOUT                         -5
+#define ERR_RX_TIMEOUT                         -6
+#define ERR_CRC_MISMATCH                       -7
+#define ERR_INVALID_BANDWIDTH                  -8
+#define ERR_INVALID_SPREADING_FACTOR           -9
+#define ERR_INVALID_CODING_RATE                -10
+#define ERR_INVALID_BIT_RANGE                  -11
+#define ERR_INVALID_FREQUENCY                  -12
+#define ERR_INVALID_OUTPUT_POWER               -13
+#define PREAMBLE_DETECTED                      -14
+#define CHANNEL_FREE                           -15
 
 #endif

@@ -34,12 +34,12 @@ void setup() {
   // coding rate:                         7
   // sync word:                           0x12
   // output power:                        17 dBm
-  byte state = lora.begin();
+  int state = lora.begin();
   if (state == ERR_NONE) {
     Serial.println(F("success!"));
   } else {
-    Serial.print(F("failed, code 0x"));
-    Serial.println(state, HEX);
+    Serial.print(F("failed, code "));
+    Serial.println(state);
     while (true);
   }
 }
@@ -49,13 +49,13 @@ void loop() {
 
   // you can transmit C-string or Arduino string up to
   // 256 characters long
-  byte state = lora.transmit("Hello World!");
+  int state = lora.transmit("Hello World!");
 
   // you can also transmit byte array up to 256 bytes long
   /*
     byte byteArr[] = {0x01, 0x23, 0x45, 0x56,
                     0x78, 0xAB, 0xCD, 0xEF};
-    byte state = lora.transmit(byteArr, 8);
+    int state = lora.transmit(byteArr, 8);
   */
 
   if (state == ERR_NONE) {

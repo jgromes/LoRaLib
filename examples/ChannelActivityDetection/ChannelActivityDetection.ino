@@ -33,12 +33,12 @@ void setup() {
   // coding rate:                         7
   // sync word:                           0x12
   // output power:                        17 dBm
-  byte state = lora.begin();
+  int state = lora.begin();
   if(state == ERR_NONE) {
     Serial.println(F("success!"));
   } else {
-    Serial.print(F("failed, code 0x"));
-    Serial.println(state, HEX);
+    Serial.print(F("failed, code "));
+    Serial.println(state);
     while(true);
   }
 }
@@ -47,7 +47,7 @@ void loop() {
   Serial.print("Scanning channel for LoRa preamble ... ");
 
   // start scanning current channel
-  uint8_t state = lora.scanChannel();
+  int state = lora.scanChannel();
   
   if(state == PREAMBLE_DETECTED) {
     // LoRa preamble was detected

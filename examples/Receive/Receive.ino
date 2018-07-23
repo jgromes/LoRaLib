@@ -37,12 +37,12 @@ void setup() {
   // coding rate:                         7
   // sync word:                           0x12
   // output power:                        17 dBm
-  byte state = lora.begin();
+  int state = lora.begin();
   if (state == ERR_NONE) {
     Serial.println(F("success!"));
   } else {
-    Serial.print(F("failed, code 0x"));
-    Serial.println(state, HEX);
+    Serial.print(F("failed, code "));
+    Serial.println(state);
     while (true);
   }
 }
@@ -52,12 +52,12 @@ void loop() {
 
   // you can receive data as an Arduino String
   String str;
-  byte state = lora.receive(str);
+  int state = lora.receive(str);
 
   // you can also receive data as byte array
   /*
     byte byteArr[8];
-    byte state = lora.receive(byteArr, 8);
+    int state = lora.receive(byteArr, 8);
   */
 
   if (state == ERR_NONE) {
