@@ -263,6 +263,12 @@ int16_t SX127x::config() {
     return(state);
   }
   
+  // set mode to STANDBY
+  state = setMode(SX127X_STANDBY);
+  if(state != ERR_NONE) {
+    return(state);
+  }
+  
   // set overcurrent protection and LNA gain
   state = _mod->SPIsetRegValue(SX127X_REG_OCP, SX127X_OCP_ON | SX127X_OCP_TRIM, 5, 0);
   state |= _mod->SPIsetRegValue(SX127X_REG_LNA, SX127X_LNA_GAIN_1 | SX127X_LNA_BOOST_ON);
