@@ -12,18 +12,20 @@ int16_t SX127x::begin(uint8_t chipVersion, uint8_t syncWord) {
   uint8_t i = 0;
   bool flagFound = false;
   while((i < 10) && !flagFound) {
-    uint8_t version = _mod->SPIreadRegister(SX127X_REG_VERSION);
+    int16_t version = _mod->SPIreadRegister(SX127X_REG_VERSION);
     if(version == chipVersion) {
       flagFound = true;
     } else {
       #ifdef KITELIB_DEBUG
-        Serial.print("SX127x not found! (");
+        Serial.print(F("SX127x not found! ("));
         Serial.print(i + 1);
-        Serial.print(" of 10 tries) SX127X_REG_VERSION == ");
+        Serial.print(F(" of 10 tries) SX127X_REG_VERSION == "));
         
-        char buffHex[5];
-        sprintf(buffHex, "0x%02X", version);
+        char buffHex[7];
+        sprintf(buffHex, "0x%04X", version);
         Serial.print(buffHex);
+        Serial.print(F(", expected 0x00"));
+        Serial.print(chipVersion, HEX);
         Serial.println();
       #endif
       delay(1000);
@@ -178,7 +180,7 @@ int16_t SX127x::receive(uint8_t* data, size_t len) {
 int16_t SX127x::receive(String& str, size_t len) {
   // create temporary array to store received data
   char* data = new char[len];
-  uint8_t state = SX127x::receive((uint8_t*)data, len);
+  int16_t state = SX127x::receive((uint8_t*)data, len);
   
   // if packet was received successfully, copy data into String
   if(state == ERR_NONE) {
