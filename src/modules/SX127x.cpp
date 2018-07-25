@@ -49,6 +49,14 @@ int16_t SX127x::begin(uint8_t chipVersion, uint8_t syncWord) {
   return(ERR_NONE);
 }
 
+int16_t SX127x::transmit(String& str) {
+  return(SX127x::transmit(str.c_str()));
+}
+
+int16_t SX127x::transmit(const char* str) {
+  return(SX127x::transmit((uint8_t*)str, strlen(str)));
+}
+
 int16_t SX127x::transmit(uint8_t* data, size_t len) {
   // check packet length
   if(len >= 256) {
@@ -98,6 +106,10 @@ int16_t SX127x::transmit(uint8_t* data, size_t len) {
       return(ERR_TX_TIMEOUT);
     }
   }
+  uint32_t elapsed = millis() - start;
+  
+  // update data rate
+  dataRate = (length*8.0)/((float)elapsed/1000.0);
   
   // clear interrupt flags
   clearIRQFlags();
@@ -105,12 +117,18 @@ int16_t SX127x::transmit(uint8_t* data, size_t len) {
   return(ERR_NONE);
 }
 
-int16_t SX127x::transmit(const char* str) {
-  return(SX127x::transmit((uint8_t*)str, strlen(str)));
-}
-
-int16_t SX127x::transmit(String& str) {
-  return(SX127x::transmit(str.c_str()));
+int16_t SX127x::receive(String& str, size_t len) {
+  // create temporary array to store received data
+  char* data = new char[len];
+  int16_t state = SX127x::receive((uint8_t*)data, len);
+  
+  // if packet was received successfully, copy data into String
+  if(state == ERR_NONE) {
+    str = String(data);
+  }
+  
+  delete[] data;
+  return(state);
 }
 
 int16_t SX127x::receive(uint8_t* data, size_t len) {
@@ -138,7 +156,6 @@ int16_t SX127x::receive(uint8_t* data, size_t len) {
       return(ERR_RX_TIMEOUT);
     }
   }
-  uint32_t elapsed = millis() - start;
   
   // check integrity CRC
   if(_mod->SPIgetRegValue(SX127X_REG_IRQ_FLAGS, 5, 5) == SX127X_CLEAR_IRQ_FLAG_PAYLOAD_CRC_ERROR) {
@@ -165,8 +182,7 @@ int16_t SX127x::receive(uint8_t* data, size_t len) {
     data[length] = 0;
   }
   
-  // update data rate, RSSI and SNR
-  dataRate = (length*8.0)/((float)elapsed/1000.0);
+  // update RSSI and SNR
   lastPacketRSSI = -157 + _mod->SPIgetRegValue(SX127X_REG_PKT_RSSI_VALUE);
   int8_t rawSNR = (int8_t)_mod->SPIgetRegValue(SX127X_REG_PKT_SNR_VALUE);
   lastPacketSNR = rawSNR / 4.0;
@@ -175,20 +191,6 @@ int16_t SX127x::receive(uint8_t* data, size_t len) {
   clearIRQFlags();
   
   return(ERR_NONE);
-}
-
-int16_t SX127x::receive(String& str, size_t len) {
-  // create temporary array to store received data
-  char* data = new char[len];
-  int16_t state = SX127x::receive((uint8_t*)data, len);
-  
-  // if packet was received successfully, copy data into String
-  if(state == ERR_NONE) {
-    str = String(data);
-  }
-  
-  delete[] data;
-  return(state);
 }
 
 int16_t SX127x::scanChannel() {
@@ -295,8 +297,7 @@ int16_t SX127x::config() {
 }
 
 int16_t SX127x::setMode(uint8_t mode) {
-  _mod->SPIsetRegValue(SX127X_REG_OP_MODE, mode, 2, 0);
-  return(ERR_NONE);
+  return(_mod->SPIsetRegValue(SX127X_REG_OP_MODE, mode, 2, 0));
 }
 
 void SX127x::clearIRQFlags() {

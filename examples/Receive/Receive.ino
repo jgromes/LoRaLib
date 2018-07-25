@@ -68,11 +68,6 @@ void loop() {
     Serial.print("Data:\t\t");
     Serial.println(str);
 
-    // print measured data rate
-    Serial.print("Datarate:\t");
-    Serial.print(lora.dataRate);
-    Serial.println(" bps");
-
     // print RSSI (Received Signal Strength Indicator) 
     // of the last received packet
     Serial.print("RSSI:\t\t");

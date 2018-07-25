@@ -62,6 +62,11 @@ void loop() {
     // the packet was successfully transmitted
     Serial.println(" success!");
 
+    // print measured data rate
+    Serial.print("Datarate:\t");
+    Serial.print(lora.dataRate);
+    Serial.println(" bps");
+
   } else if (state == ERR_PACKET_TOO_LONG) {
     // the supplied packet was longer than 256 bytes
     Serial.println(" too long!");
