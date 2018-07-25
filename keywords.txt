@@ -29,6 +29,9 @@ receive	KEYWORD2
 sleep	KEYWORD2
 standby	KEYWORD2
 scanChannel	KEYWORD2
+listen	KEYWORD2
+onReceive	KEYWORD2
+readData	KEYWORD2
 
 setBandwidth	KEYWORD2
 setSpreadingFactor	KEYWORD2

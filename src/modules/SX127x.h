@@ -182,6 +182,12 @@ class SX127x {
     int16_t scanChannel();
     int16_t sleep();
     int16_t standby();
+    int16_t listen();
+    
+    // interrupt methods
+    int16_t readData(String& str, size_t len = 0);
+    int16_t readData(uint8_t* data, size_t len);
+    void onReceive(void (*func)(void));
     
     // configuration methods
     int16_t setSyncWord(uint8_t syncWord);
@@ -201,6 +207,7 @@ class SX127x {
   private:
     int16_t setMode(uint8_t mode);
     void clearIRQFlags();
+    static void rxISR();
 };
 
 #endif
