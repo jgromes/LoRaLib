@@ -100,7 +100,7 @@ int16_t SX127x::transmit(uint8_t* data, size_t len) {
   
   // wait for packet transmission or timeout
   uint32_t start = millis();
-  while(!_mod->getInt0State()) {
+  while(!digitalRead(_mod->int0())) {
     if(millis() - start > timeout) {
       clearIRQFlags();
       return(ERR_TX_TIMEOUT);
@@ -109,7 +109,7 @@ int16_t SX127x::transmit(uint8_t* data, size_t len) {
   uint32_t elapsed = millis() - start;
   
   // update data rate
-  dataRate = (length*8.0)/((float)elapsed/1000.0);
+  dataRate = (len*8.0)/((float)elapsed/1000.0);
   
   // clear interrupt flags
   clearIRQFlags();
@@ -150,8 +150,8 @@ int16_t SX127x::receive(uint8_t* data, size_t len) {
   
   // wait for packet reception or timeout
   uint32_t start = millis();
-  while(!_mod->getInt0State()) {
-    if(_mod->getInt1State()) {
+  while(!digitalRead(_mod->int0())) {
+    if(digitalRead(_mod->int1())) {
       clearIRQFlags();
       return(ERR_RX_TIMEOUT);
     }
@@ -205,8 +205,8 @@ int16_t SX127x::scanChannel() {
   setMode(SX127X_CAD);
   
   // wait for channel activity detected or timeout
-  while(!_mod->getInt0State()) {
-    if(_mod->getInt1State()) {
+  while(!digitalRead(_mod->int0())) {
+    if(digitalRead(_mod->int1())) {
       clearIRQFlags();
       return(PREAMBLE_DETECTED);
     }
