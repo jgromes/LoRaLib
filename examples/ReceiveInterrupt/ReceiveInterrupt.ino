@@ -25,10 +25,10 @@
 // NSS pin:   7
 // DIO0 pin:  2
 // DIO1 pin:  3
-// IMPORTANT: because this example uses external 
-//            interrupts, DIO0 MUST be connected
-//            to Arduino pin 2 or 3. DIO1 can be
-//            connected to any free pin.
+// IMPORTANT: because this example uses external interrupts,
+//            DIO0 MUST be connected to Arduino pin 2 or 3.
+//            DIO1 MAY be connected to any free pin 
+//            or left floating.
 SX1278 lora = new LoRa;
 
 void setup() {
@@ -53,7 +53,7 @@ void setup() {
 
   // set the function that will be called 
   // when new packet is received
-  lora.onReceive(handlePacket);
+  lora.onReceive(setFlag);
   
   // start listening for LoRa packets
   Serial.print(F("Starting to listen ... "));
@@ -66,56 +66,83 @@ void setup() {
     while (true);
   }
 
-  // the 'listen' mode can be disabled by calling:
+  // if needed, 'listen' mode can be disabled by calling
+  // any of the following methods:
+  //
   // lora.standby()
   // lora.sleep()
   // lora.transmit();
   // lora.receive();
+  // lora.scanChannel();
 }
+
+// flag to indicate that a packet was received
+volatile bool receivedFlag = false;
+
+// disable interrupt when it's not needed
+volatile bool enableInterrupt = true;
 
 // this function is called when a complete packet
 // is received by the module
 // IMPORTANT: this function MUST be 'void' type
 //            and MUST NOT have any arguments!
-void handlePacket(void) {
-  // you can receive data as an Arduino String
-  String str;
-  int state = lora.readData(str);
-
-  // you can also receive data as byte array
-  /*
-    byte byteArr[8];
-    int state = lora.receive(byteArr, 8);
-  */
-  
-  if (state == ERR_NONE) {
-    // packet was successfully received
-    Serial.println("Received packet!");
-
-    // print data of the packet
-    Serial.print("Data:\t\t");
-    Serial.println(str);
-
-    // print RSSI (Received Signal Strength Indicator) 
-    // of the last received packet
-    Serial.print("RSSI:\t\t");
-    Serial.print(lora.lastPacketRSSI);
-    Serial.println(" dBm");
-
-    // print SNR (Signal-to-Noise Ratio) 
-    // of the last received packet
-    Serial.print("SNR:\t\t");
-    Serial.print(lora.lastPacketSNR);
-    Serial.println(" dBm");
-
-  } else if (state == ERR_CRC_MISMATCH) {
-    // packet was received, but is malformed
-    Serial.println("CRC error!");
-
+void setFlag(void) {
+  // check if the interrupt is enabled
+  if(!enableInterrupt) {
+    return;
   }
+
+  // we got a packet, set the flag
+  receivedFlag = true;
 }
 
 void loop() {
-  // nothing here
+  // check if the flag is set
+  if(receivedFlag) {
+    // disable the interrupt service routine while
+    // processing the data
+    enableInterrupt = false;
+
+    // reset flag
+    receivedFlag = false;
+    
+    // you can read received data as an Arduino String
+    String str;
+    int state = lora.readData(str);
+  
+    // you can also read received data as byte array
+    /*
+      byte byteArr[8];
+      int state = lora.receive(byteArr, 8);
+    */
+    
+    if (state == ERR_NONE) {
+      // packet was successfully received
+      Serial.println("Received packet!");
+  
+      // print data of the packet
+      Serial.print("Data:\t\t");
+      Serial.println(str);
+  
+      // print RSSI (Received Signal Strength Indicator) 
+      Serial.print("RSSI:\t\t");
+      Serial.print(lora.lastPacketRSSI);
+      Serial.println(" dBm");
+  
+      // print SNR (Signal-to-Noise Ratio) 
+      Serial.print("SNR:\t\t");
+      Serial.print(lora.lastPacketSNR);
+      Serial.println(" dBm");
+  
+    } else if (state == ERR_CRC_MISMATCH) {
+      // packet was received, but is malformed
+      Serial.println("CRC error!");
+  
+    }
+
+    // we're ready to receive more packets,
+    // enable interrupt service routine
+    enableInterrupt = true;
+  }
 
 }
