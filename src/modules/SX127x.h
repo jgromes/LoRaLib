@@ -207,7 +207,6 @@ class SX127x {
   private:
     int16_t setMode(uint8_t mode);
     void clearIRQFlags();
-    static void rxISR();
 };
 
 #endif
