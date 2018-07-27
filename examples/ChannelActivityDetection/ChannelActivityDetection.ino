@@ -35,6 +35,7 @@ void setup() {
   // output power:                        17 dBm
   // current limit:                       100 mA
   // preamble length:                     8 symbols
+  // amplifier gain:                      0 (automatic gain control)
   int state = lora.begin();
   if(state == ERR_NONE) {
     Serial.println(F("success!"));

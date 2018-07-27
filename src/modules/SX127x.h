@@ -78,14 +78,12 @@
 #define SX127X_OCP_TRIM                               0b00001011  //  4     0     OCP current: I_max(OCP_TRIM = 0b1011) = 100 mA
 
 // SX127X_REG_LNA
-#define SX127X_LNA_GAIN_0                             0b00000000  //  7     5     LNA gain setting:   not used
-#define SX127X_LNA_GAIN_1                             0b00100000  //  7     5                         max gain
+#define SX127X_LNA_GAIN_1                             0b00100000  //  7     5     LNA gain setting:   max gain
 #define SX127X_LNA_GAIN_2                             0b01000000  //  7     5                         .
 #define SX127X_LNA_GAIN_3                             0b01100000  //  7     5                         .
 #define SX127X_LNA_GAIN_4                             0b10000000  //  7     5                         .
 #define SX127X_LNA_GAIN_5                             0b10100000  //  7     5                         .
 #define SX127X_LNA_GAIN_6                             0b11000000  //  7     5                         min gain
-#define SX127X_LNA_GAIN_7                             0b11100000  //  7     5                         not used
 #define SX127X_LNA_BOOST_OFF                          0b00000000  //  1     0     default LNA current
 #define SX127X_LNA_BOOST_ON                           0b00000011  //  1     0     150% LNA current
 

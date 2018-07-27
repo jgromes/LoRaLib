@@ -4,7 +4,7 @@ SX1272::SX1272(Module* mod) : SX127x(mod) {
   
 }
 
-int16_t SX1272::begin(float freq, float bw, uint8_t sf, uint8_t cr, uint8_t syncWord, int8_t power, uint8_t currentLimit, uint16_t preambleLength) {
+int16_t SX1272::begin(float freq, float bw, uint8_t sf, uint8_t cr, uint8_t syncWord, int8_t power, uint8_t currentLimit, uint16_t preambleLength, uint8_t gain) {
   // execute common part
   int16_t state = SX127x::begin(SX1272_CHIP_VERSION, syncWord, currentLimit, preambleLength);
   if(state != ERR_NONE) {
@@ -19,31 +19,13 @@ int16_t SX1272::begin(float freq, float bw, uint8_t sf, uint8_t cr, uint8_t sync
   
   // configure publicly accessible settings
   state = setFrequency(freq);
-  if(state != ERR_NONE) {
-    return(state);
-  }
+  state |= setBandwidth(bw);
+  state |= setSpreadingFactor(sf);
+  state |= setCodingRate(cr);
+  state |= setOutputPower(power);
+  state |= setGain(gain);
   
-  state = setBandwidth(bw);
-  if(state != ERR_NONE) {
-    return(state);
-  }
-  
-  state = setSpreadingFactor(sf);
-  if(state != ERR_NONE) {
-    return(state);
-  }
-  
-  state = setCodingRate(cr);
-  if(state != ERR_NONE) {
-    return(state);
-  }
-  
-  state = setOutputPower(power);
-  if(state != ERR_NONE) {
-    return(state);
-  }
-  
-  return(ERR_NONE);
+  return(state);
 }
 
 int16_t SX1272::setFrequency(float freq) {
@@ -178,6 +160,26 @@ int16_t SX1272::setOutputPower(int8_t power) {
   return(state);
 }
 
+int16_t SX1272::setGain(uint8_t gain) {
+  // check allowed range
+  if(gain > 6) {
+    return(ERR_INVALID_GAIN);
+  }
+  
+  // set mode to standby
+  int16_t state = SX127x::standby();
+  
+  if(gain == 0) {
+    // gain set to 0, enable AGC loop
+    state |= _mod->SPIsetRegValue(SX127X_REG_MODEM_CONFIG_2, SX1272_AGC_AUTO_ON, 2, 2);
+  } else {
+    state |= _mod->SPIsetRegValue(SX127X_REG_MODEM_CONFIG_2, SX1272_AGC_AUTO_OFF, 2, 2);
+    state |= _mod->SPIsetRegValue(SX127X_REG_LNA, (gain << 5) | SX127X_LNA_BOOST_ON);
+  }
+  
+  return(state);
+}
+
 int16_t SX1272::setBandwidthRaw(uint8_t newBandwidth) {
   // set mode to standby
   SX127x::standby();
@@ -218,12 +220,6 @@ int16_t SX1272::setCodingRateRaw(uint8_t newCodingRate) {
 int16_t SX1272::config() {
   // configure common registers
   int16_t state = SX127x::config();
-  if(state != ERR_NONE) {
-    return(state);
-  }
-  
-  // enable LNA gain setting by register
-  state = _mod->SPIsetRegValue(SX127X_REG_MODEM_CONFIG_2, SX1272_AGC_AUTO_OFF, 2, 2);
   if(state != ERR_NONE) {
     return(state);
   }

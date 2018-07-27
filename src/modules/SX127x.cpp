@@ -42,23 +42,14 @@ int16_t SX127x::begin(uint8_t chipVersion, uint8_t syncWord, uint8_t currentLimi
   
   // set LoRa sync word
   int16_t state = SX127x::setSyncWord(syncWord);
-  if(state != ERR_NONE) {
-    return(state);
-  }
   
   // set over current protection
-  state = SX127x::setCurrentLimit(currentLimit);
-  if(state != ERR_NONE) {
-    return(state);
-  }
+  state |= SX127x::setCurrentLimit(currentLimit);
   
   // set preamble length
-  state = SX127x::setPreambleLength(preambleLength);
-  if(state != ERR_NONE) {
-    return(state);
-  }
+  state |= SX127x::setPreambleLength(preambleLength);
   
-  return(ERR_NONE);
+  return(state);
 }
 
 int16_t SX127x::transmit(String& str) {
@@ -303,8 +294,11 @@ int16_t SX127x::setPreambleLength(uint16_t preambleLength) {
     return(ERR_INVALID_PREAMBLE_LENGTH);
   }
   
+  // set mode to standby
+  int16_t state = setMode(SX127X_STANDBY);
+  
   // set preamble length
-  int16_t state = _mod->SPIsetRegValue(SX127X_REG_PREAMBLE_MSB, (preambleLength & 0xFF00) >> 8);
+  state |= _mod->SPIsetRegValue(SX127X_REG_PREAMBLE_MSB, (preambleLength & 0xFF00) >> 8);
   state |= _mod->SPIsetRegValue(SX127X_REG_PREAMBLE_LSB, preambleLength & 0x00FF);
   return(state);
 }
@@ -399,20 +393,9 @@ int16_t SX127x::config() {
     return(state);
   }
   
-  // set LNA gain
-  state |= _mod->SPIsetRegValue(SX127X_REG_LNA, SX127X_LNA_GAIN_1 | SX127X_LNA_BOOST_ON);
-  if(state != ERR_NONE) {
-    return(state);
-  }
-  
   // turn off frequency hopping
   state = _mod->SPIsetRegValue(SX127X_REG_HOP_PERIOD, SX127X_HOP_PERIOD_OFF);
-  if(state != ERR_NONE) {
-    return(state);
-  }
-  
-  // set mode to STANDBY
-  return(setMode(SX127X_STANDBY));
+  return(state);
 }
 
 int16_t SX127x::setMode(uint8_t mode) {
