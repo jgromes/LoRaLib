@@ -12,6 +12,7 @@
     - sync word
     - output power during transmission
     - over current protection limit
+    - LoRa preamble length
 
    For more detailed information, see the LoRaLib Wiki
    https://github.com/jgromes/LoRaLib/wiki
@@ -56,6 +57,7 @@ void setup() {
   // sync word:                           0x12
   // output power:                        17 dBm
   // current limit:                       100 mA
+  // preamble length:                     8 symbols
   int state = loraSX1278.begin();
   if (state == ERR_NONE) {
     Serial.println(F("success!"));
@@ -77,6 +79,7 @@ void setup() {
   // sync word:                           0x13
   // output power:                        17 dBm
   // current limit:                       100 mA
+  // preamble length:                     8 symbols
   state = loraSX1276.begin(434.0, 7.8, 12, 8, 0x13);
   if (state == ERR_NONE) {
     Serial.println(F("success!"));
@@ -101,7 +104,8 @@ void setup() {
   // sync word:                           0x14
   // output power:                        2 dBm
   // current limit:                       50 mA
-  state = loraSX1272.begin(915.0, 500.0, 6, 5, 0x14, 2, 50);
+  // preamble length:                     20 symbols
+  state = loraSX1272.begin(915.0, 500.0, 6, 5, 0x14, 2, 50, 20);
   if (state == ERR_NONE) {
     Serial.println(F("success!"));
   } else {
@@ -148,7 +152,7 @@ void setup() {
     while (true);
   }
 
-  // set output power to 10 dBm (accepted range is 2 - 17 dBm)
+  // set output power to 10 dBm (accepted range is -3 - 17 dBm, or 20 dBm)
   if (loraSX1278.setOutputPower(10) == ERR_INVALID_OUTPUT_POWER) {
     Serial.println("Selected output power is invalid for this module!");
     while (true);
@@ -157,6 +161,12 @@ void setup() {
   // set over current protection limit to 80 mA (accepted range is 45 - 240 mA)
   if (loraSX1278.setCurrentLimit(80) == ERR_INVALID_CURRENT_LIMIT) {
     Serial.println("Selected current limit is invalid for this module!");
+    while (true);
+  }
+
+  // set LoRa preamble length to 15 symbols (accepted range is 6 - 65535)
+  if (loraSX1278.setPreambleLength(15) == ERR_INVALID_PREAMBLE_LENGTH) {
+    Serial.println("Selected preamble length is invalid for this module!");
     while (true);
   }
 

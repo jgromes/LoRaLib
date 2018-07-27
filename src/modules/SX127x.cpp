@@ -4,7 +4,7 @@ SX127x::SX127x(Module* mod) {
   _mod = mod;
 }
 
-int16_t SX127x::begin(uint8_t chipVersion, uint8_t syncWord, uint8_t currentLimit) {
+int16_t SX127x::begin(uint8_t chipVersion, uint8_t syncWord, uint8_t currentLimit, uint16_t preambleLength) {
   // set module properties
   _mod->init(USE_SPI, INT_BOTH);
   
@@ -48,6 +48,12 @@ int16_t SX127x::begin(uint8_t chipVersion, uint8_t syncWord, uint8_t currentLimi
   
   // set over current protection
   state = SX127x::setCurrentLimit(currentLimit);
+  if(state != ERR_NONE) {
+    return(state);
+  }
+  
+  // set preamble length
+  state = SX127x::setPreambleLength(preambleLength);
   if(state != ERR_NONE) {
     return(state);
   }
@@ -291,6 +297,18 @@ int16_t SX127x::setCurrentLimit(uint8_t currentLimit) {
   return(state);
 }
 
+int16_t SX127x::setPreambleLength(uint16_t preambleLength) {
+  // check allowed range
+  if(preambleLength < 6) {
+    return(ERR_INVALID_PREAMBLE_LENGTH);
+  }
+  
+  // set preamble length
+  int16_t state = _mod->SPIsetRegValue(SX127X_REG_PREAMBLE_MSB, (preambleLength & 0xFF00) >> 8);
+  state |= _mod->SPIsetRegValue(SX127X_REG_PREAMBLE_LSB, preambleLength & 0x00FF);
+  return(state);
+}
+
 int16_t SX127x::setFrequencyRaw(float newFreq) {
   // set mode to standby
   setMode(SX127X_STANDBY);
@@ -393,16 +411,8 @@ int16_t SX127x::config() {
     return(state);
   }
   
-  // set default preamble length
-  state = _mod->SPIsetRegValue(SX127X_REG_PREAMBLE_MSB, SX127X_PREAMBLE_LENGTH_MSB);
-  state |= _mod->SPIsetRegValue(SX127X_REG_PREAMBLE_LSB, SX127X_PREAMBLE_LENGTH_LSB);
-  if(state != ERR_NONE) {
-    return(state);
-  }
-  
   // set mode to STANDBY
-  state = setMode(SX127X_STANDBY);
-  return(state);
+  return(setMode(SX127X_STANDBY));
 }
 
 int16_t SX127x::setMode(uint8_t mode) {

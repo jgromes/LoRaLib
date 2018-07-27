@@ -63,5 +63,6 @@
 #define CHANNEL_FREE                          -15
 #define ERR_SPI_WRITE_FAILED                  -16
 #define ERR_INVALID_CURRENT_LIMIT             -17
+#define ERR_INVALID_PREAMBLE_LENGTH           -18
 
 #endif

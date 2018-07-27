@@ -11,6 +11,7 @@
     - spreading factor
     - coding rate
     - sync word
+    - preamble length
 
    For more detailed information, see the LoRaLib Wiki
    https://github.com/jgromes/LoRaLib/wiki
@@ -43,6 +44,7 @@ void setup() {
   // sync word:                           0x12
   // output power:                        17 dBm
   // current limit:                       100 mA
+  // preamble length:                     8 symbols
   int state = lora.begin();
   if (state == ERR_NONE) {
     Serial.println(F("success!"));

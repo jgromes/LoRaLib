@@ -173,7 +173,7 @@ class SX127x {
     float lastPacketSNR;
     
     // basic methods
-    int16_t begin(uint8_t chipVersion, uint8_t syncWord, uint8_t currentLimit);
+    int16_t begin(uint8_t chipVersion, uint8_t syncWord, uint8_t currentLimit, uint16_t preambleLength);
     int16_t transmit(String& str);
     int16_t transmit(const char* str);
     int16_t transmit(uint8_t* data, size_t len);
@@ -192,6 +192,7 @@ class SX127x {
     // configuration methods
     int16_t setSyncWord(uint8_t syncWord);
     int16_t setCurrentLimit(uint8_t currentLimit);
+    int16_t setPreambleLength(uint16_t preambleLength);
   
   protected:
     Module* _mod;

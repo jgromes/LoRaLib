@@ -4,9 +4,9 @@ SX1278::SX1278(Module* mod) : SX127x(mod) {
   
 }
 
-int16_t SX1278::begin(float freq, float bw, uint8_t sf, uint8_t cr, uint8_t syncWord, int8_t power, uint8_t currentLimit) {
+int16_t SX1278::begin(float freq, float bw, uint8_t sf, uint8_t cr, uint8_t syncWord, int8_t power, uint8_t currentLimit, uint16_t preambleLength) {
   // execute common part
-  int16_t state = SX127x::begin(SX1278_CHIP_VERSION, syncWord, currentLimit);
+  int16_t state = SX127x::begin(SX1278_CHIP_VERSION, syncWord, currentLimit, preambleLength);
   if(state != ERR_NONE) {
     return(state);
   }
