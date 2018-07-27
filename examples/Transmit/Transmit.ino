@@ -34,6 +34,7 @@ void setup() {
   // coding rate:                         7
   // sync word:                           0x12
   // output power:                        17 dBm
+  // current limit:                       100 mA
   int state = lora.begin();
   if (state == ERR_NONE) {
     Serial.println(F("success!"));

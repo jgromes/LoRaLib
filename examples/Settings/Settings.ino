@@ -11,6 +11,7 @@
     - coding rate
     - sync word
     - output power during transmission
+    - over current protection limit
 
    For more detailed information, see the LoRaLib Wiki
    https://github.com/jgromes/LoRaLib/wiki
@@ -54,7 +55,7 @@ void setup() {
   // coding rate:                         7
   // sync word:                           0x12
   // output power:                        17 dBm
-  // node address in EEPROM starts at:    0
+  // current limit:                       100 mA
   int state = loraSX1278.begin();
   if (state == ERR_NONE) {
     Serial.println(F("success!"));
@@ -75,7 +76,7 @@ void setup() {
   // coding rate:                         8
   // sync word:                           0x13
   // output power:                        17 dBm
-  // node address in EEPROM starts at:    0
+  // current limit:                       100 mA
   state = loraSX1276.begin(434.0, 7.8, 12, 8, 0x13);
   if (state == ERR_NONE) {
     Serial.println(F("success!"));
@@ -99,8 +100,8 @@ void setup() {
   // coding rate:                         5
   // sync word:                           0x14
   // output power:                        2 dBm
-  // node address in EEPROM starts at:    0
-  state = loraSX1272.begin(915.0, 500.0, 6, 5, 0x14, 2);
+  // current limit:                       50 mA
+  state = loraSX1272.begin(915.0, 500.0, 6, 5, 0x14, 2, 50);
   if (state == ERR_NONE) {
     Serial.println(F("success!"));
   } else {
@@ -150,6 +151,12 @@ void setup() {
   // set output power to 10 dBm (accepted range is 2 - 17 dBm)
   if (loraSX1278.setOutputPower(10) == ERR_INVALID_OUTPUT_POWER) {
     Serial.println("Selected output power is invalid for this module!");
+    while (true);
+  }
+
+  // set over current protection limit to 80 mA (accepted range is 45 - 240 mA)
+  if (loraSX1278.setCurrentLimit(80) == ERR_INVALID_CURRENT_LIMIT) {
+    Serial.println("Selected current limit is invalid for this module!");
     while (true);
   }
 

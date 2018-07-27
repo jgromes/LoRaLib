@@ -4,7 +4,7 @@ SX127x::SX127x(Module* mod) {
   _mod = mod;
 }
 
-int16_t SX127x::begin(uint8_t chipVersion, uint8_t syncWord) {
+int16_t SX127x::begin(uint8_t chipVersion, uint8_t syncWord, uint8_t currentLimit) {
   // set module properties
   _mod->init(USE_SPI, INT_BOTH);
   
@@ -42,6 +42,12 @@ int16_t SX127x::begin(uint8_t chipVersion, uint8_t syncWord) {
   
   // set LoRa sync word
   int16_t state = SX127x::setSyncWord(syncWord);
+  if(state != ERR_NONE) {
+    return(state);
+  }
+  
+  // set over current protection
+  state = SX127x::setCurrentLimit(currentLimit);
   if(state != ERR_NONE) {
     return(state);
   }
@@ -260,6 +266,31 @@ int16_t SX127x::setSyncWord(uint8_t syncWord) {
   return(_mod->SPIsetRegValue(SX127X_REG_SYNC_WORD, syncWord));
 }
 
+int16_t SX127x::setCurrentLimit(uint8_t currentLimit) {
+  // check allowed range
+  if(!(((currentLimit >= 45) && (currentLimit <= 240)) || (currentLimit == 0))) {
+    return(ERR_INVALID_CURRENT_LIMIT);
+  }
+  
+  // set mode to standby
+  int16_t state = setMode(SX127X_STANDBY);
+  
+  // set OCP limit
+  uint8_t raw;
+  if(currentLimit == 0) {
+    // limit set to 0, disable OCP
+    state |= _mod->SPIsetRegValue(SX127X_REG_OCP, SX127X_OCP_OFF, 5, 5);
+  } else if(currentLimit <= 120) {
+    raw = (currentLimit - 45) / 5;
+    state |= _mod->SPIsetRegValue(SX127X_REG_OCP, SX127X_OCP_ON | raw, 5, 0);
+  } else if(currentLimit <= 240) {
+    raw = (currentLimit + 30) / 10;
+    state |= _mod->SPIsetRegValue(SX127X_REG_OCP, SX127X_OCP_ON | raw, 5, 0);
+  }
+  
+  return(state);
+}
+
 int16_t SX127x::setFrequencyRaw(float newFreq) {
   // set mode to standby
   setMode(SX127X_STANDBY);
@@ -350,8 +381,7 @@ int16_t SX127x::config() {
     return(state);
   }
   
-  // set overcurrent protection and LNA gain
-  state = _mod->SPIsetRegValue(SX127X_REG_OCP, SX127X_OCP_ON | SX127X_OCP_TRIM, 5, 0);
+  // set LNA gain
   state |= _mod->SPIsetRegValue(SX127X_REG_LNA, SX127X_LNA_GAIN_1 | SX127X_LNA_BOOST_ON);
   if(state != ERR_NONE) {
     return(state);
