@@ -18,7 +18,7 @@ int16_t SX1278::begin(float freq, float bw, uint8_t sf, uint8_t cr, uint8_t sync
   }
   
   // configure publicly accessible settings
-  state |= setFrequency(freq);
+  state = setFrequency(freq);
   state |= setBandwidth(bw);
   state |= setSpreadingFactor(sf);
   state |= setCodingRate(cr);
@@ -130,7 +130,6 @@ int16_t SX1278::setBandwidth(float bw) {
   if(state == ERR_NONE) {
     SX127x::_bw = bw;
   }
-  
   return(state);
 }
 
@@ -169,7 +168,6 @@ int16_t SX1278::setSpreadingFactor(uint8_t sf) {
   if(state == ERR_NONE) {
     SX127x::_sf = sf;
   }
-  
   return(state);
 }
 
@@ -199,36 +197,35 @@ int16_t SX1278::setCodingRate(uint8_t cr) {
   if(state == ERR_NONE) {
     SX127x::_cr = cr;
   }
-  
   return(state);
 }
 
 int16_t SX1278::setOutputPower(int8_t power) {
+  // check allowed power range
   if(!(((power >= -3) && (power <= 17)) || (power == 20))) {
     return(ERR_INVALID_OUTPUT_POWER);
   }
   
   // set mode to standby
-  SX127x::standby();
+  int16_t state = SX127x::standby();
   
-  int16_t state;
+  // set output power
   if(power < 2) {
     // power is less than 2 dBm, enable PA on RFO
-    state = _mod->SPIsetRegValue(SX127X_REG_PA_CONFIG, SX127X_PA_SELECT_RFO, 7, 7);
+    state |= _mod->SPIsetRegValue(SX127X_REG_PA_CONFIG, SX127X_PA_SELECT_RFO, 7, 7);
     state |= _mod->SPIsetRegValue(SX127X_REG_PA_CONFIG, SX1278_LOW_POWER | (power + 3), 6, 0);
     state |= _mod->SPIsetRegValue(SX1278_REG_PA_DAC, SX127X_PA_BOOST_OFF, 2, 0);
   } else if((power >= 2) && (power <= 17)) {
     // power is 2 - 17 dBm, enable PA1 + PA2 on PA_BOOST
-    state = _mod->SPIsetRegValue(SX127X_REG_PA_CONFIG, SX127X_PA_SELECT_BOOST, 7, 7);
+    state |= _mod->SPIsetRegValue(SX127X_REG_PA_CONFIG, SX127X_PA_SELECT_BOOST, 7, 7);
     state |= _mod->SPIsetRegValue(SX127X_REG_PA_CONFIG, SX1278_MAX_POWER | (power - 2), 6, 0);
     state |= _mod->SPIsetRegValue(SX1278_REG_PA_DAC, SX127X_PA_BOOST_OFF, 2, 0);
   } else if(power == 20) {
     // power is 20 dBm, enable PA1 + PA2 on PA_BOOST and enable high power mode
-    state = _mod->SPIsetRegValue(SX127X_REG_PA_CONFIG, SX127X_PA_SELECT_BOOST, 7, 7);
+    state |= _mod->SPIsetRegValue(SX127X_REG_PA_CONFIG, SX127X_PA_SELECT_BOOST, 7, 7);
     state |= _mod->SPIsetRegValue(SX127X_REG_PA_CONFIG, SX1278_MAX_POWER | (power - 5), 6, 0);
     state |= _mod->SPIsetRegValue(SX1278_REG_PA_DAC, SX127X_PA_BOOST_ON, 2, 0);
   }
-  
   return(state);
 }
 
@@ -241,6 +238,7 @@ int16_t SX1278::setGain(uint8_t gain) {
   // set mode to standby
   int16_t state = SX127x::standby();
   
+  // set gain
   if(gain == 0) {
     // gain set to 0, enable AGC loop
     state |= _mod->SPIsetRegValue(SX1278_REG_MODEM_CONFIG_3, SX1278_AGC_AUTO_ON, 2, 2);
@@ -248,24 +246,23 @@ int16_t SX1278::setGain(uint8_t gain) {
     state |= _mod->SPIsetRegValue(SX1278_REG_MODEM_CONFIG_3, SX1278_AGC_AUTO_OFF, 2, 2);
     state |= _mod->SPIsetRegValue(SX127X_REG_LNA, (gain << 5) | SX127X_LNA_BOOST_ON);
   }
-  
   return(state);
 }
 
 int16_t SX1278::setBandwidthRaw(uint8_t newBandwidth) {
   // set mode to standby
-  SX127x::standby();
+  int16_t state = SX127x::standby();
   
   // write register
-  return(_mod->SPIsetRegValue(SX127X_REG_MODEM_CONFIG_1, newBandwidth, 7, 4));
+  state |= _mod->SPIsetRegValue(SX127X_REG_MODEM_CONFIG_1, newBandwidth, 7, 4);
+  return(state);
 }
 
 int16_t SX1278::setSpreadingFactorRaw(uint8_t newSpreadingFactor) {
   // set mode to standby
-  SX127x::standby();
+  int16_t state = SX127x::standby();
   
   // write registers
-  int16_t state = 0;
   if(newSpreadingFactor == SX127X_SF_6) {
     state |= _mod->SPIsetRegValue(SX127X_REG_MODEM_CONFIG_1, SX1278_HEADER_IMPL_MODE, 0, 0);
     state |= _mod->SPIsetRegValue(SX127X_REG_MODEM_CONFIG_2, SX127X_SF_6 | SX127X_TX_MODE_SINGLE | SX1278_RX_CRC_MODE_OFF, 7, 2);
@@ -277,16 +274,16 @@ int16_t SX1278::setSpreadingFactorRaw(uint8_t newSpreadingFactor) {
     state |= _mod->SPIsetRegValue(SX127X_REG_DETECT_OPTIMIZE, SX127X_DETECT_OPTIMIZE_SF_7_12, 2, 0);
     state |= _mod->SPIsetRegValue(SX127X_REG_DETECTION_THRESHOLD, SX127X_DETECTION_THRESHOLD_SF_7_12);
   }
-  
   return(state);
 }
 
 int16_t SX1278::setCodingRateRaw(uint8_t newCodingRate) {
   // set mode to standby
-  SX127x::standby();
+  int16_t state = SX127x::standby();
   
   // write register
-  return(_mod->SPIsetRegValue(SX127X_REG_MODEM_CONFIG_1, newCodingRate, 3, 1));
+  state |= _mod->SPIsetRegValue(SX127X_REG_MODEM_CONFIG_1, newCodingRate, 3, 1);
+  return(state);
 }
 
 int16_t SX1278::config() {
@@ -304,6 +301,5 @@ int16_t SX1278::config() {
   } else {
     state = _mod->SPIsetRegValue(SX1278_REG_MODEM_CONFIG_3, SX1278_LOW_DATA_RATE_OPT_OFF, 0, 0);
   }
-  
   return(state);
 }

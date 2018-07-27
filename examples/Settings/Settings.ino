@@ -91,7 +91,8 @@ void setup() {
     Serial.println(state);
     while (true);
   }
-  // initialize the second LoRa instance with
+  
+  // initialize the third LoRa instance with
   // non-default settings
   // this LoRa link will have high data rate, 
   // but lower range
@@ -185,7 +186,7 @@ void setup() {
     while (true);
   }
 
-  Serial.println("All settings succesfully changed!");
+  Serial.println("All settings successfully changed!");
 }
 
 void loop() {

@@ -80,7 +80,7 @@ int16_t SX127x::transmit(uint8_t* data, size_t len) {
   uint32_t timeout = ceil(symbolLength * (n_pre + n_pay + 4.25) * 1000.0);
   
   // set mode to standby
-  setMode(SX127X_STANDBY);
+  int16_t state = setMode(SX127X_STANDBY);
   
   // set DIO mapping
   _mod->SPIsetRegValue(SX127X_REG_DIO_MAPPING_1, SX127X_DIO0_TX_DONE, 7, 6);
@@ -89,17 +89,20 @@ int16_t SX127x::transmit(uint8_t* data, size_t len) {
   clearIRQFlags();
   
   // set packet length
-  _mod->SPIsetRegValue(SX127X_REG_PAYLOAD_LENGTH, len);
+  state |= _mod->SPIsetRegValue(SX127X_REG_PAYLOAD_LENGTH, len);
   
   // set FIFO pointers
-  _mod->SPIsetRegValue(SX127X_REG_FIFO_TX_BASE_ADDR, SX127X_FIFO_TX_BASE_ADDR_MAX);
-  _mod->SPIsetRegValue(SX127X_REG_FIFO_ADDR_PTR, SX127X_FIFO_TX_BASE_ADDR_MAX);
+  state |= _mod->SPIsetRegValue(SX127X_REG_FIFO_TX_BASE_ADDR, SX127X_FIFO_TX_BASE_ADDR_MAX);
+  state |= _mod->SPIsetRegValue(SX127X_REG_FIFO_ADDR_PTR, SX127X_FIFO_TX_BASE_ADDR_MAX);
   
   // write packet to FIFO
   _mod->SPIwriteRegisterBurst(SX127X_REG_FIFO, data, len);
   
   // start transmission
-  setMode(SX127X_TX);
+  state |= setMode(SX127X_TX);
+  if(state != ERR_NONE) {
+    return(state);
+  }
   
   // wait for packet transmission or timeout
   uint32_t start = millis();
@@ -136,20 +139,23 @@ int16_t SX127x::receive(String& str, size_t len) {
 
 int16_t SX127x::receive(uint8_t* data, size_t len) {
   // set mode to standby
-  setMode(SX127X_STANDBY);
+  int16_t state = setMode(SX127X_STANDBY);
   
   // set DIO pin mapping
-  _mod->SPIsetRegValue(SX127X_REG_DIO_MAPPING_1, SX127X_DIO0_RX_DONE | SX127X_DIO1_RX_TIMEOUT, 7, 4);
+  state |= _mod->SPIsetRegValue(SX127X_REG_DIO_MAPPING_1, SX127X_DIO0_RX_DONE | SX127X_DIO1_RX_TIMEOUT, 7, 4);
   
   // clear interrupt flags
   clearIRQFlags();
   
   // set FIFO pointers
-  _mod->SPIsetRegValue(SX127X_REG_FIFO_RX_BASE_ADDR, SX127X_FIFO_RX_BASE_ADDR_MAX);
-  _mod->SPIsetRegValue(SX127X_REG_FIFO_ADDR_PTR, SX127X_FIFO_RX_BASE_ADDR_MAX);
+  state |= _mod->SPIsetRegValue(SX127X_REG_FIFO_RX_BASE_ADDR, SX127X_FIFO_RX_BASE_ADDR_MAX);
+  state |= _mod->SPIsetRegValue(SX127X_REG_FIFO_ADDR_PTR, SX127X_FIFO_RX_BASE_ADDR_MAX);
   
   // set mode to receive
-  setMode(SX127X_RXSINGLE);
+  state |= setMode(SX127X_RXSINGLE);
+  if(state != ERR_NONE) {
+    return(state);
+  }
   
   // wait for packet reception or timeout
   uint32_t start = millis();
@@ -198,14 +204,19 @@ int16_t SX127x::receive(uint8_t* data, size_t len) {
 
 int16_t SX127x::scanChannel() {
   // set mode to standby
-  setMode(SX127X_STANDBY);
+  int16_t state = setMode(SX127X_STANDBY);
   
   // set DIO pin mapping
-  _mod->SPIsetRegValue(SX127X_REG_DIO_MAPPING_1, SX127X_DIO0_CAD_DONE | SX127X_DIO1_CAD_DETECTED, 7, 4);
+  state |= _mod->SPIsetRegValue(SX127X_REG_DIO_MAPPING_1, SX127X_DIO0_CAD_DONE | SX127X_DIO1_CAD_DETECTED, 7, 4);
+  
+  // clear interrupt flags
   clearIRQFlags();
   
   // set mode to CAD
-  setMode(SX127X_CAD);
+  state |= setMode(SX127X_CAD);
+  if(state != ERR_NONE) {
+    return(state);
+  }
   
   // wait for channel activity detected or timeout
   while(!digitalRead(_mod->int0())) {
@@ -237,15 +248,12 @@ int16_t SX127x::listen() {
   
   // set DIO pin mapping
   state |= _mod->SPIsetRegValue(SX127X_REG_DIO_MAPPING_1, SX127X_DIO0_RX_DONE | SX127X_DIO1_RX_TIMEOUT, 7, 4);
-  if(state != ERR_NONE) {
-    return(state);
-  }
   
   // clear interrupt flags
   clearIRQFlags();
   
   // set FIFO pointers
-  state = _mod->SPIsetRegValue(SX127X_REG_FIFO_RX_BASE_ADDR, SX127X_FIFO_RX_BASE_ADDR_MAX);
+  state |= _mod->SPIsetRegValue(SX127X_REG_FIFO_RX_BASE_ADDR, SX127X_FIFO_RX_BASE_ADDR_MAX);
   state |= _mod->SPIsetRegValue(SX127X_REG_FIFO_ADDR_PTR, SX127X_FIFO_RX_BASE_ADDR_MAX);
   if(state != ERR_NONE) {
     return(state);
@@ -284,7 +292,6 @@ int16_t SX127x::setCurrentLimit(uint8_t currentLimit) {
     raw = (currentLimit + 30) / 10;
     state |= _mod->SPIsetRegValue(SX127X_REG_OCP, SX127X_OCP_ON | raw, 5, 0);
   }
-  
   return(state);
 }
 
@@ -305,17 +312,16 @@ int16_t SX127x::setPreambleLength(uint16_t preambleLength) {
 
 int16_t SX127x::setFrequencyRaw(float newFreq) {
   // set mode to standby
-  setMode(SX127X_STANDBY);
+  int16_t state = setMode(SX127X_STANDBY);
   
   // calculate register values
   uint32_t base = 1;
   uint32_t FRF = (newFreq * (base << 19)) / 32.0;
   
   // write registers
-  int16_t state = _mod->SPIsetRegValue(SX127X_REG_FRF_MSB, (FRF & 0xFF0000) >> 16);
+  state |= _mod->SPIsetRegValue(SX127X_REG_FRF_MSB, (FRF & 0xFF0000) >> 16);
   state |= _mod->SPIsetRegValue(SX127X_REG_FRF_MID, (FRF & 0x00FF00) >> 8);
   state |= _mod->SPIsetRegValue(SX127X_REG_FRF_LSB, FRF & 0x0000FF);
-  
   return(state);
 }
 
@@ -377,24 +383,15 @@ int16_t SX127x::readData(uint8_t* data, size_t len) {
 int16_t SX127x::config() {
   // set mode to SLEEP
   int16_t state = setMode(SX127X_SLEEP);
-  if(state != ERR_NONE) {
-    return(state);
-  }
   
   // set LoRa mode
-  state = _mod->SPIsetRegValue(SX127X_REG_OP_MODE, SX127X_LORA, 7, 7);
-  if(state != ERR_NONE) {
-    return(state);
-  }
+  state |= _mod->SPIsetRegValue(SX127X_REG_OP_MODE, SX127X_LORA, 7, 7);
   
   // set mode to STANDBY
-  state = setMode(SX127X_STANDBY);
-  if(state != ERR_NONE) {
-    return(state);
-  }
+  state |= setMode(SX127X_STANDBY);
   
   // turn off frequency hopping
-  state = _mod->SPIsetRegValue(SX127X_REG_HOP_PERIOD, SX127X_HOP_PERIOD_OFF);
+  state |= _mod->SPIsetRegValue(SX127X_REG_HOP_PERIOD, SX127X_HOP_PERIOD_OFF);
   return(state);
 }
 
