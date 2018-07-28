@@ -43,6 +43,7 @@ setSyncWord	KEYWORD2
 setCurrentLimit	KEYWORD2
 setPreambleLength	KEYWORD2
 setGain	KEYWORD2
+getFrequencyError	KEYWORD2
 
 #######################################
 # Constants (LITERAL1)
