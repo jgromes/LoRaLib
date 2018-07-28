@@ -29,8 +29,10 @@ receive	KEYWORD2
 sleep	KEYWORD2
 standby	KEYWORD2
 scanChannel	KEYWORD2
-listen	KEYWORD2
-onReceive	KEYWORD2
+setDio0Action	KEYWORD2
+setDio1Action	KEYWORD2
+startTransmit	KEYWORD2
+startReceive	KEYWORD2
 readData	KEYWORD2
 
 setBandwidth	KEYWORD2

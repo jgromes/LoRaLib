@@ -180,12 +180,16 @@ class SX127x {
     int16_t scanChannel();
     int16_t sleep();
     int16_t standby();
-    int16_t listen();
     
     // interrupt methods
+    void setDio0Action(void (*func)(void));
+    void setDio1Action(void (*func)(void));
+    int16_t startTransmit(String& str);
+    int16_t startTransmit(const char* str);
+    int16_t startTransmit(uint8_t* data, size_t len);
+    int16_t startReceive();
     int16_t readData(String& str, size_t len = 0);
     int16_t readData(uint8_t* data, size_t len);
-    void onReceive(void (*func)(void));
     
     // configuration methods
     int16_t setSyncWord(uint8_t syncWord);

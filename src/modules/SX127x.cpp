@@ -242,7 +242,7 @@ int16_t SX127x::standby() {
   return(setMode(SX127X_STANDBY));
 }
 
-int16_t SX127x::listen() {
+int16_t SX127x::startReceive() {
   // set mode to standby
   int16_t state = setMode(SX127X_STANDBY);
   
@@ -261,6 +261,105 @@ int16_t SX127x::listen() {
   
   // set mode to continuous reception
   return(setMode(SX127X_RXCONTINUOUS));
+}
+
+void SX127x::setDio0Action(void (*func)(void)) {
+  attachInterrupt(digitalPinToInterrupt(_mod->int0()), func, RISING);
+}
+
+void SX127x::setDio1Action(void (*func)(void)) {
+  attachInterrupt(digitalPinToInterrupt(_mod->int1()), func, RISING);
+}
+
+int16_t SX127x::startTransmit(String& str) {
+  return(SX127x::startTransmit(str.c_str()));
+}
+
+int16_t SX127x::startTransmit(const char* str) {
+  return(SX127x::startTransmit((uint8_t*)str, strlen(str)));
+}
+
+int16_t SX127x::startTransmit(uint8_t* data, size_t len) {
+  // check packet length
+  if(len >= 256) {
+    return(ERR_PACKET_TOO_LONG);
+  }
+  
+  // set mode to standby
+  int16_t state = setMode(SX127X_STANDBY);
+  
+  // set DIO mapping
+  _mod->SPIsetRegValue(SX127X_REG_DIO_MAPPING_1, SX127X_DIO0_TX_DONE, 7, 6);
+  
+  // clear interrupt flags
+  clearIRQFlags();
+  
+  // set packet length
+  state |= _mod->SPIsetRegValue(SX127X_REG_PAYLOAD_LENGTH, len);
+  
+  // set FIFO pointers
+  state |= _mod->SPIsetRegValue(SX127X_REG_FIFO_TX_BASE_ADDR, SX127X_FIFO_TX_BASE_ADDR_MAX);
+  state |= _mod->SPIsetRegValue(SX127X_REG_FIFO_ADDR_PTR, SX127X_FIFO_TX_BASE_ADDR_MAX);
+  
+  // write packet to FIFO
+  _mod->SPIwriteRegisterBurst(SX127X_REG_FIFO, data, len);
+  
+  // start transmission
+  state |= setMode(SX127X_TX);
+  if(state != ERR_NONE) {
+    return(state);
+  }
+}
+
+int16_t SX127x::readData(String& str, size_t len) {
+  // create temporary array to store received data
+  char* data = new char[len];
+  int16_t state = SX127x::readData((uint8_t*)data, len);
+  
+  // if packet was received successfully, copy data into String
+  if(state == ERR_NONE) {
+    str = String(data);
+  }
+  
+  delete[] data;
+  return(state);
+}
+
+int16_t SX127x::readData(uint8_t* data, size_t len) {
+  // check integrity CRC
+  if(_mod->SPIgetRegValue(SX127X_REG_IRQ_FLAGS, 5, 5) == SX127X_CLEAR_IRQ_FLAG_PAYLOAD_CRC_ERROR) {
+    return(ERR_CRC_MISMATCH);
+  }
+  
+  // get packet length
+  size_t length = len;
+  if(_sf != 6) {
+    length = _mod->SPIgetRegValue(SX127X_REG_RX_NB_BYTES);
+  }
+  
+  // read packet data
+  if(len == 0) {
+    // argument len equal to zero indicates String call, which means dynamically allocated data array
+    // dispose of the original and create a new one
+    delete[] data;
+    data = new uint8_t[length];
+  }
+  _mod->SPIreadRegisterBurst(SX127X_REG_FIFO, length, data);
+  
+  // add terminating null
+  if(len == 0) {
+    data[length] = 0;
+  }
+  
+  // update RSSI and SNR
+  lastPacketRSSI = -157 + _mod->SPIgetRegValue(SX127X_REG_PKT_RSSI_VALUE);
+  int8_t rawSNR = (int8_t)_mod->SPIgetRegValue(SX127X_REG_PKT_SNR_VALUE);
+  lastPacketSNR = rawSNR / 4.0;
+  
+  // clear interrupt flags
+  clearIRQFlags();
+  
+  return(ERR_NONE);
 }
 
 int16_t SX127x::setSyncWord(uint8_t syncWord) {
@@ -323,61 +422,6 @@ int16_t SX127x::setFrequencyRaw(float newFreq) {
   state |= _mod->SPIsetRegValue(SX127X_REG_FRF_MID, (FRF & 0x00FF00) >> 8);
   state |= _mod->SPIsetRegValue(SX127X_REG_FRF_LSB, FRF & 0x0000FF);
   return(state);
-}
-
-void SX127x::onReceive(void (*func)(void)) {
-  attachInterrupt(digitalPinToInterrupt(_mod->int0()), func, RISING);
-}
-
-int16_t SX127x::readData(String& str, size_t len) {
-  // create temporary array to store received data
-  char* data = new char[len];
-  int16_t state = SX127x::readData((uint8_t*)data, len);
-  
-  // if packet was received successfully, copy data into String
-  if(state == ERR_NONE) {
-    str = String(data);
-  }
-  
-  delete[] data;
-  return(state);
-}
-
-int16_t SX127x::readData(uint8_t* data, size_t len) {
-  // check integrity CRC
-  if(_mod->SPIgetRegValue(SX127X_REG_IRQ_FLAGS, 5, 5) == SX127X_CLEAR_IRQ_FLAG_PAYLOAD_CRC_ERROR) {
-    return(ERR_CRC_MISMATCH);
-  }
-  
-  // get packet length
-  size_t length = len;
-  if(_sf != 6) {
-    length = _mod->SPIgetRegValue(SX127X_REG_RX_NB_BYTES);
-  }
-  
-  // read packet data
-  if(len == 0) {
-    // argument len equal to zero indicates String call, which means dynamically allocated data array
-    // dispose of the original and create a new one
-    delete[] data;
-    data = new uint8_t[length];
-  }
-  _mod->SPIreadRegisterBurst(SX127X_REG_FIFO, length, data);
-  
-  // add terminating null
-  if(len == 0) {
-    data[length] = 0;
-  }
-  
-  // update RSSI and SNR
-  lastPacketRSSI = -157 + _mod->SPIgetRegValue(SX127X_REG_PKT_RSSI_VALUE);
-  int8_t rawSNR = (int8_t)_mod->SPIgetRegValue(SX127X_REG_PKT_SNR_VALUE);
-  lastPacketSNR = rawSNR / 4.0;
-  
-  // clear interrupt flags
-  clearIRQFlags();
-  
-  return(ERR_NONE);
 }
 
 int16_t SX127x::config() {
