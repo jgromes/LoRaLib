@@ -125,18 +125,23 @@ void loop() {
       Serial.println("Received packet!");
   
       // print data of the packet
-      Serial.print("Data:\t\t");
+      Serial.print("Data:\t\t\t");
       Serial.println(str);
   
       // print RSSI (Received Signal Strength Indicator) 
-      Serial.print("RSSI:\t\t");
+      Serial.print("RSSI:\t\t\t");
       Serial.print(lora.lastPacketRSSI);
       Serial.println(" dBm");
   
       // print SNR (Signal-to-Noise Ratio) 
-      Serial.print("SNR:\t\t");
+      Serial.print("SNR:\t\t\t");
       Serial.print(lora.lastPacketSNR);
       Serial.println(" dBm");
+
+      // print frequency error
+      Serial.print("Frequency error:\t");
+      Serial.print(lora.getFrequencyError());
+      Serial.println(" Hz");
   
     } else if (state == ERR_CRC_MISMATCH) {
       // packet was received, but is malformed

@@ -409,6 +409,27 @@ int16_t SX127x::setPreambleLength(uint16_t preambleLength) {
   return(state);
 }
 
+float SX127x::getFrequencyError() {
+  // get raw frequency error
+  uint32_t raw = _mod->SPIgetRegValue(SX127X_REG_FEI_MSB, 3, 0) << 16;
+  raw |= _mod->SPIgetRegValue(SX127X_REG_FEI_MID) << 8;
+  raw |= _mod->SPIgetRegValue(SX127X_REG_FEI_LSB);
+  
+  uint32_t base = (uint32_t)2 << 23;
+  float error;
+  
+  // check the first bit
+  if(raw & 0x80000) {
+    // frequency error is negative
+    raw = ~raw + 1;
+    error = (((float)raw * (float)base)/32000000.0) * (_bw/500.0) * -1.0;
+  } else {
+    error = (((float)raw * (float)base)/32000000.0) * (_bw/500.0);
+  }
+  
+  return(error);
+}
+
 int16_t SX127x::setFrequencyRaw(float newFreq) {
   // set mode to standby
   int16_t state = setMode(SX127X_STANDBY);

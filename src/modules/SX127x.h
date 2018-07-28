@@ -195,6 +195,7 @@ class SX127x {
     int16_t setSyncWord(uint8_t syncWord);
     int16_t setCurrentLimit(uint8_t currentLimit);
     int16_t setPreambleLength(uint16_t preambleLength);
+    float getFrequencyError();
   
   protected:
     Module* _mod;
