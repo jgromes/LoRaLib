@@ -12,7 +12,7 @@ int16_t SX127x::begin(uint8_t chipVersion, uint8_t syncWord, uint8_t currentLimi
   uint8_t i = 0;
   bool flagFound = false;
   while((i < 10) && !flagFound) {
-    int16_t version = _mod->SPIreadRegister(SX127X_REG_VERSION);
+    uint8_t version = _mod->SPIreadRegister(SX127X_REG_VERSION);
     if(version == chipVersion) {
       flagFound = true;
     } else {
@@ -21,8 +21,8 @@ int16_t SX127x::begin(uint8_t chipVersion, uint8_t syncWord, uint8_t currentLimi
         Serial.print(i + 1);
         Serial.print(F(" of 10 tries) SX127X_REG_VERSION == "));
         
-        char buffHex[7];
-        sprintf(buffHex, "0x%04X", version);
+        char buffHex[5];
+        sprintf(buffHex, "0x%02X", version);
         Serial.print(buffHex);
         Serial.print(F(", expected 0x00"));
         Serial.print(chipVersion, HEX);

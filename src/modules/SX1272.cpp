@@ -17,6 +17,13 @@ int16_t SX1272::begin(float freq, float bw, uint8_t sf, uint8_t cr, uint8_t sync
     return(state);
   }
   
+  // mitigation of receiver spurious response
+  // see SX1272/73 Errata, section 2.2 for details
+  state = _mod->SPIsetRegValue(0x31, 0b10000000, 7, 7);
+  if(state != ERR_NONE) {
+    return(state);
+  }
+  
   // configure publicly accessible settings
   state = setFrequency(freq);
   state |= setBandwidth(bw);
