@@ -26,11 +26,35 @@ int16_t SX1272::begin(float freq, float bw, uint8_t sf, uint8_t cr, uint8_t sync
   
   // configure publicly accessible settings
   state = setFrequency(freq);
-  state |= setBandwidth(bw);
-  state |= setSpreadingFactor(sf);
-  state |= setCodingRate(cr);
-  state |= setOutputPower(power);
-  state |= setGain(gain);
+  if(state != ERR_NONE) {
+    return(state);
+  }
+  
+  state = setBandwidth(bw);
+  if(state != ERR_NONE) {
+    return(state);
+  }
+  
+  state = setSpreadingFactor(sf);
+  if(state != ERR_NONE) {
+    return(state);
+  }
+  
+  state = setCodingRate(cr);
+  if(state != ERR_NONE) {
+    return(state);
+  }
+  
+  state = setOutputPower(power);
+  if(state != ERR_NONE) {
+    return(state);
+  }
+  
+  state = setGain(gain);
+  if(state != ERR_NONE) {
+    return(state);
+  }
+  
   return(state);
 }
 

@@ -42,12 +42,21 @@ int16_t SX127x::begin(uint8_t chipVersion, uint8_t syncWord, uint8_t currentLimi
   
   // set LoRa sync word
   int16_t state = SX127x::setSyncWord(syncWord);
+  if(state != ERR_NONE) {
+    return(state);
+  }
   
   // set over current protection
-  state |= SX127x::setCurrentLimit(currentLimit);
+  state = SX127x::setCurrentLimit(currentLimit);
+  if(state != ERR_NONE) {
+    return(state);
+  }
   
   // set preamble length
-  state |= SX127x::setPreambleLength(preambleLength);
+  state = SX127x::setPreambleLength(preambleLength);
+  if(state != ERR_NONE) {
+    return(state);
+  }
   
   return(state);
 }
