@@ -85,8 +85,10 @@ class SX1278: public SX127x {
     int16_t setSpreadingFactorRaw(uint8_t newSpreadingFactor);
     int16_t setCodingRateRaw(uint8_t newCodingRate);
     
-  private:
     int16_t config();
+    
+  private:
+    
 };
 
 #endif
