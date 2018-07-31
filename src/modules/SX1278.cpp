@@ -59,7 +59,7 @@ int16_t SX1278::setFrequency(float freq) {
   
   // sensitivity optimization for 500kHz bandwidth
   // see SX1276/77/78 Errata, section 2.1 for details
-  if(_bw == 500.0) {
+  if(abs(_bw - 500.0) <= 0.001) {
     if((freq >= 862.0) && (freq <= 1020.0)) {
       _mod->SPIwriteRegister(0x36, 0x02);
       _mod->SPIwriteRegister(0x3a, 0x64);
@@ -71,49 +71,49 @@ int16_t SX1278::setFrequency(float freq) {
   
   // mitigation of receiver spurious response
   // see SX1276/77/78 Errata, section 2.3 for details
-  if(_bw == 7.8) {
+  if(abs(_bw - 7.8) <= 0.001) {
     _mod->SPIsetRegValue(0x31, 0b0000000, 7, 7);
     _mod->SPIsetRegValue(0x2F, 0x48);
     _mod->SPIsetRegValue(0x30, 0x00);
     freq += 7.8;
-  } else if(_bw == 10.4) {
+  } else if(abs(_bw - 10.4) <= 0.001) {
     _mod->SPIsetRegValue(0x31, 0b0000000, 7, 7);
     _mod->SPIsetRegValue(0x2F, 0x44);
     _mod->SPIsetRegValue(0x30, 0x00);
     freq += 10.4;
-  } else if(_bw == 15.6) {
+  } else if(abs(_bw - 15.6) <= 0.001) {
     _mod->SPIsetRegValue(0x31, 0b0000000, 7, 7);
     _mod->SPIsetRegValue(0x2F, 0x44);
     _mod->SPIsetRegValue(0x30, 0x00);
     freq += 15.6;
-  } else if(_bw == 20.8) {
+  } else if(abs(_bw - 20.8) <= 0.001) {
     _mod->SPIsetRegValue(0x31, 0b0000000, 7, 7);
     _mod->SPIsetRegValue(0x2F, 0x44);
     _mod->SPIsetRegValue(0x30, 0x00);
     freq += 20.8;
-  } else if(_bw == 31.25) {
+  } else if(abs(_bw - 31.25) <= 0.001) {
     _mod->SPIsetRegValue(0x31, 0b0000000, 7, 7);
     _mod->SPIsetRegValue(0x2F, 0x44);
     _mod->SPIsetRegValue(0x30, 0x00);
     freq += 31.25;
-  } else if(_bw == 41.7) {
+  } else if(abs(_bw - 41.7) <= 0.001) {
     _mod->SPIsetRegValue(0x31, 0b0000000, 7, 7);
     _mod->SPIsetRegValue(0x2F, 0x44);
     _mod->SPIsetRegValue(0x30, 0x00);
     freq += 41.7;
-  } else if(_bw == 62.5) {
+  } else if(abs(_bw - 62.5) <= 0.001) {
     _mod->SPIsetRegValue(0x31, 0b0000000, 7, 7);
     _mod->SPIsetRegValue(0x2F, 0x40);
     _mod->SPIsetRegValue(0x30, 0x00);
-  } else if(_bw == 125.0) {
+  } else if(abs(_bw - 125.0) <= 0.001) {
     _mod->SPIsetRegValue(0x31, 0b0000000, 7, 7);
     _mod->SPIsetRegValue(0x2F, 0x40);
     _mod->SPIsetRegValue(0x30, 0x00);
-  } else if(_bw == 250.0) {
+  } else if(abs(_bw - 250.0) <= 0.001) {
     _mod->SPIsetRegValue(0x31, 0b0000000, 7, 7);
     _mod->SPIsetRegValue(0x2F, 0x40);
     _mod->SPIsetRegValue(0x30, 0x00);
-  } else if(_bw == 500.0) {
+  } else if(abs(_bw - 500.0) <= 0.001) {
     _mod->SPIsetRegValue(0x31, 0b1000000, 7, 7);
   }
   
@@ -125,25 +125,25 @@ int16_t SX1278::setBandwidth(float bw) {
   uint8_t newBandwidth;
   
   // check alowed bandwidth values
-  if(bw == 7.8) {
+  if(abs(bw - 7.8) <= 0.001) {
     newBandwidth = SX1278_BW_7_80_KHZ;
-  } else if(bw == 10.4) {
+  } else if(abs(bw - 10.4) <= 0.001) {
     newBandwidth = SX1278_BW_10_40_KHZ;
-  } else if(bw == 15.6) {
+  } else if(abs(bw - 15.6) <= 0.001) {
     newBandwidth = SX1278_BW_15_60_KHZ;
-  } else if(bw == 20.8) {
+  } else if(abs(bw - 20.8) <= 0.001) {
     newBandwidth = SX1278_BW_20_80_KHZ;
-  } else if(bw == 31.25) {
+  } else if(abs(bw - 32.5) <= 0.001) {
     newBandwidth = SX1278_BW_31_25_KHZ;
-  } else if(bw == 41.7) {
+  } else if(abs(bw - 41.7) <= 0.001) {
     newBandwidth = SX1278_BW_41_70_KHZ;
-  } else if(bw == 62.5) {
+  } else if(abs(bw - 62.5) <= 0.001) {
     newBandwidth = SX1278_BW_62_50_KHZ;
-  } else if(bw == 125.0) {
+  } else if(abs(bw - 125.0) <= 0.001) {
     newBandwidth = SX1278_BW_125_00_KHZ;
-  } else if(bw == 250.0) {
+  } else if(abs(bw - 250.0) <= 0.001) {
     newBandwidth = SX1278_BW_250_00_KHZ;
-  } else if(bw == 500.0) {
+  } else if(abs(bw - 500.0) <= 0.001) {
     newBandwidth = SX1278_BW_500_00_KHZ;
   } else {
     return(ERR_INVALID_BANDWIDTH);
