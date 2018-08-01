@@ -188,10 +188,10 @@ int16_t SX127x::receive(uint8_t* data, size_t len) {
   
   // read packet data
   if(len == 0) {
-    // argument len equal to zero indicates String call, which means dynamically allocated data array
+    // argument 'len' equal to zero indicates String call, which means dynamically allocated data array
     // dispose of the original and create a new one
     delete[] data;
-    data = new uint8_t[length];
+    data = new uint8_t[length + 1];
   }
   _mod->SPIreadRegisterBurst(SX127X_REG_FIFO, length, data);
   
@@ -351,7 +351,7 @@ int16_t SX127x::readData(uint8_t* data, size_t len) {
     // argument len equal to zero indicates String call, which means dynamically allocated data array
     // dispose of the original and create a new one
     delete[] data;
-    data = new uint8_t[length];
+    data = new uint8_t[length + 1];
   }
   _mod->SPIreadRegisterBurst(SX127X_REG_FIFO, length, data);
   
