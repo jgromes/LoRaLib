@@ -51,15 +51,15 @@ void setup() {
 
   // initialize the LoRa module with default settings
   Serial.print(F("Initializing SX1278 ... "));
-  // carrier frequency:                   434.0 MHz
-  // bandwidth:                           125.0 kHz
-  // spreading factor:                    9
-  // coding rate:                         7
-  // sync word:                           0x12
-  // output power:                        17 dBm
-  // current limit:                       100 mA
-  // preamble length:                     8 symbols
-  // amplifier gain:                      0 (automatic gain control)
+  // carrier frequency:           434.0 MHz
+  // bandwidth:                   125.0 kHz
+  // spreading factor:            9
+  // coding rate:                 7
+  // sync word:                   0x12
+  // output power:                17 dBm
+  // current limit:               100 mA
+  // preamble length:             8 symbols
+  // amplifier gain:              0 (automatic gain control)
   int state = loraSX1278.begin();
   if (state == ERR_NONE) {
     Serial.println(F("success!"));
@@ -74,15 +74,15 @@ void setup() {
   // this LoRa link will have maximum range, 
   // but very low data rate
   Serial.print(F("Initializing SX1276 ... "));
-  // carrier frequency:                   434.0 MHz
-  // bandwidth:                           7.8 kHz
-  // spreading factor:                    12
-  // coding rate:                         8
-  // sync word:                           0x13
-  // output power:                        17 dBm
-  // current limit:                       100 mA
-  // preamble length:                     8 symbols
-  // amplifier gain:                      0 (automatic gain control)
+  // carrier frequency:           434.0 MHz
+  // bandwidth:                   7.8 kHz
+  // spreading factor:            12
+  // coding rate:                 8
+  // sync word:                   0x13
+  // output power:                17 dBm
+  // current limit:               100 mA
+  // preamble length:             8 symbols
+  // amplifier gain:              0 (automatic gain control)
   state = loraSX1276.begin(434.0, 7.8, 12, 8, 0x13);
   if (state == ERR_NONE) {
     Serial.println(F("success!"));
@@ -101,15 +101,15 @@ void setup() {
   //       you have to pass the number of expected bytes
   //       to the receive() method
   Serial.print(F("Initializing SX1272 ... "));
-  // carrier frequency:                   915.0 MHz
-  // bandwidth:                           500.0 kHz
-  // spreading factor:                    6
-  // coding rate:                         5
-  // sync word:                           0x14
-  // output power:                        2 dBm
-  // current limit:                       50 mA
-  // preamble length:                     20 symbols
-  // amplifier gain:                      1 (maximum gain)
+  // carrier frequency:           915.0 MHz
+  // bandwidth:                   500.0 kHz
+  // spreading factor:            6
+  // coding rate:                 5
+  // sync word:                   0x14
+  // output power:                2 dBm
+  // current limit:               50 mA
+  // preamble length:             20 symbols
+  // amplifier gain:              1 (maximum gain)
   state = loraSX1272.begin(915.0, 500.0, 6, 5, 0x14, 2, 50, 20);
   if (state == ERR_NONE) {
     Serial.println(F("success!"));
