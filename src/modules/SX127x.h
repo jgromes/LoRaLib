@@ -485,6 +485,21 @@
 #define SX127X_FLAG_CRC_OK                            0b00000010  //  1     1     CRC check passed
 #define SX127X_FLAG_LOW_BAT                           0b00000001  //  0     0     battery voltage dropped below threshold
 
+// SX127X_REG_DIO_MAPPING_1
+#define SX127X_DIO0_CONT_SYNC_ADDRESS                 0b00000000  //  7     6     
+#define SX127X_DIO0_CONT_TX_READY                     0b00000000  //  7     6     
+#define SX127X_DIO0_CONT_RSSI_PREAMBLE_DETECTED       0b01000000  //  7     6     
+#define SX127X_DIO0_CONT_RX_READY                     0b10000000  //  7     6     
+#define SX127X_DIO0_PACK_PAYLOAD_READY                0b00000000  //  7     6     
+#define SX127X_DIO0_PACK_PACKET_SENT                  0b00000000  //  7     6     
+#define SX127X_DIO0_PACK_CRC_OK                       0b01000000  //  7     6     
+#define SX127X_DIO0_PACK_TEMP_CHANGE_LOW_BAT          0b11000000  //  7     6     
+#define SX127X_DIO1_CONT_DCLK                         0b00000000  //  5     4     
+#define SX127X_DIO1_CONT_RSSI_PREAMBLE_DETECTED       0b00010000  //  5     4     
+#define SX127X_DIO1_PACK_FIFO_LEVEL                   0b00000000  //  5     4     
+#define SX127X_DIO1_PACK_FIFO_EMPTY                   0b00010000  //  5     4     
+#define SX127X_DIO1_PACK_FIFO_FULL                    0b00100000  //  5     4     
+
 // SX1272_REG_PLL_HOP + SX1278_REG_PLL_HOP
 #define SX127X_FAST_HOP_OFF                           0b10000000  //  7     7     carrier frequency validated when FRF registers are written
 #define SX127X_FAST_HOP_ON                            0b00000000  //  7     7     carrier frequency validated when FS modes are requested
