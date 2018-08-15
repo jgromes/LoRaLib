@@ -33,6 +33,7 @@ void setup() {
   // Rx bandwidth:                125.0 kHz
   // frequency deviation:         50.0 kHz
   // output power:                13 dBm
+  // current limit:               100 mA
   // sync word:                   0x2D  0x01
   int state = lora.beginFSK();
   if (state == ERR_NONE) {

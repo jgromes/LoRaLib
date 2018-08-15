@@ -87,7 +87,7 @@ int16_t SX127x::beginFSK(uint8_t chipVersion, float br, float rxBw, float freqDe
     return(state);
   }
   
-  // default sync word values 0x2D01 is the same as the default in LowPowerLab RFM69 library
+  // default sync word value 0x2D01 is the same as the default in LowPowerLab RFM69 library
   uint8_t syncWord[] = {0x2D, 0x01};
   state = setSyncWord(syncWord, 2);
   if(state != ERR_NONE) {
@@ -181,7 +181,6 @@ int16_t SX127x::transmit(uint8_t* data, size_t len) {
     
     // check address filtering
     
-    
     // write packet to FIFO
     _mod->SPIwriteRegisterBurst(SX127X_REG_FIFO, data, len);
     
@@ -191,7 +190,7 @@ int16_t SX127x::transmit(uint8_t* data, size_t len) {
       return(state);
     }
     
-    // wait for transmission end
+    // wait for transmission end or timeout (150 % of expected time-one-air)
     uint32_t timeout = (uint32_t)((((float)(len * 8)) / (_br * 1000.0)) * 1500.0);
     uint32_t start = millis();
     while(!digitalRead(_mod->int0())) {
@@ -291,7 +290,58 @@ int16_t SX127x::receive(uint8_t* data, size_t len) {
     return(ERR_NONE);
     
   } else if(modem == SX127X_FSK_OOK) {
-  
+    // set mode to standby
+    int16_t state = setMode(SX127X_STANDBY);
+    
+    // set DIO pin mapping
+    state |= _mod->SPIsetRegValue(SX127X_REG_DIO_MAPPING_1, SX127X_DIO0_PACK_PACKET_SENT, 7, 6);
+    
+    // clear interrupt flags
+    clearIRQFlags();
+    
+    // set mode to receive
+    state |= setMode(SX127X_RX);
+    if(state != ERR_NONE) {
+      return(state);
+    }
+    
+    // wait for packet reception or timeout (150 % of expected time-one-air)
+    size_t maxLen = len;
+    if(len == 0) {
+      maxLen = 0xFF;
+    }
+    uint32_t timeout = (uint32_t)((((float)(maxLen * 8)) / (_br * 1000.0)) * 1500.0);
+    uint32_t start = millis();
+    while(!digitalRead(_mod->int0())) {
+      if(millis() - start > timeout) {
+        clearIRQFlags();
+        return(ERR_RX_TIMEOUT);
+      }
+    }
+    
+    // get packet length
+    size_t length = _mod->SPIreadRegister(SX127X_REG_FIFO);
+    
+    // check address filtering
+    
+    // read packet data
+    if(len == 0) {
+      // argument len equal to zero indicates String call, which means dynamically allocated data array
+      // dispose of the original and create a new one
+      delete[] data;
+      data = new uint8_t[length + 1];
+    }
+    _mod->SPIreadRegisterBurst(SX127X_REG_FIFO, length, data);
+    
+    // add terminating null
+    if(len == 0) {
+      data[length] = 0;
+    }
+    
+    // clear interrupt flags
+    clearIRQFlags();
+    
+    return(ERR_NONE);
   }
   
   return(ERR_UNKNOWN);
@@ -550,6 +600,7 @@ int16_t SX127x::setBitRate(float br) {
   uint16_t bitRate = 32000 / br;
   state = _mod->SPIsetRegValue(SX127X_REG_BITRATE_MSB, (bitRate & 0xFF00) >> 8, 7, 0);
   state |= _mod->SPIsetRegValue(SX127X_REG_BITRATE_MSB, bitRate & 0x00FF, 7, 0);
+  // TODO: fractional part of bit rate setting
   if(state == ERR_NONE) {
     SX127x::_br = br;
   }
@@ -632,11 +683,18 @@ int16_t SX127x::setRxBandwidth(float rxBw) {
     return(state);
   }
   
+  // set Rx bandwidth during AFC
+  state = _mod->SPIsetRegValue(SX127X_REG_AFC_BW, bwMant | bwExp, 4, 0);
+  if(state != ERR_NONE) {
+    return(state);
+  }
+  
   // set Rx bandwidth
   state = _mod->SPIsetRegValue(SX127X_REG_RX_BW, bwMant | bwExp, 4, 0);
   if(state == ERR_NONE) {
     SX127x::_rxBw = rxBw;
   }
+  
   return(state);
 }
 
@@ -657,7 +715,6 @@ int16_t SX127x::setFrequencyDeviation(float freqDev) {
   uint32_t FDEV = (freqDev * (base << 19)) / 32000;
   state = _mod->SPIsetRegValue(SX127X_REG_FDEV_MSB, (FDEV & 0xFF00) >> 8, 5, 0);
   state |= _mod->SPIsetRegValue(SX127X_REG_FDEV_LSB, FDEV & 0x00FF, 7, 0);
-  
   return(state);
 }
 
@@ -708,14 +765,8 @@ int16_t SX127x::config() {
 }
 
 int16_t SX127x::configFSK() {
-  // set mode to SLEEP
-  int16_t state = setMode(SX127X_SLEEP);
-  
-  // set FSK mode
-  state |= _mod->SPIsetRegValue(SX127X_REG_OP_MODE, SX127X_FSK_OOK, 7, 7);
-  
-  // set mode to STANDBY
-  state |= setMode(SX127X_STANDBY);
+  // set FSK modulation
+  int16_t state = _mod->SPIsetRegValue(SX127X_REG_OP_MODE, SX127X_MODULATION_FSK, 6, 5);
   if(state != ERR_NONE) {
     return(state);
   }
@@ -729,21 +780,9 @@ int16_t SX127x::configFSK() {
   // reset FIFO flag
   _mod->SPIwriteRegister(SX127X_REG_IRQ_FLAGS_2, SX127X_FLAG_FIFO_OVERRUN);
   
-  // disable ClkOut on DIO5
-  /*state = _mod->SPIsetRegValue();
-  if(state != ERR_NONE) {
-    return(state);
-  }*/
-  
   // set packet configuration
   state = _mod->SPIsetRegValue(SX127X_REG_PACKET_CONFIG_1, SX127X_PACKET_VARIABLE | SX127X_DC_FREE_NONE | SX127X_CRC_ON | SX127X_CRC_AUTOCLEAR_ON | SX127X_ADDRESS_FILTERING_OFF, 7, 1);
   state |= _mod->SPIsetRegValue(SX127X_REG_PACKET_CONFIG_2, SX127X_DATA_MODE_PACKET | SX127X_IO_HOME_OFF, 6, 5);
-  if(state != ERR_NONE) {
-    return(state);
-  }
-  
-  // set payload length
-  state = _mod->SPIsetRegValue(SX127X_REG_PAYLOAD_LENGTH_FSK, 0x40);
   if(state != ERR_NONE) {
     return(state);
   }
@@ -755,19 +794,18 @@ int16_t SX127x::configFSK() {
     return(state);
   }
   
-  // set Rx timeouts
-  state = _mod->SPIsetRegValue(SX127X_REG_RX_TIMEOUT_1, 0xFF);
-  state |= _mod->SPIsetRegValue(SX127X_REG_RX_TIMEOUT_2, 0xFF);
-  state |= _mod->SPIsetRegValue(SX127X_REG_RX_TIMEOUT_3, 0xFF);
+  // disable Rx timeouts
+  state = _mod->SPIsetRegValue(SX127X_REG_RX_TIMEOUT_1, SX127X_TIMEOUT_RX_RSSI_OFF);
+  state |= _mod->SPIsetRegValue(SX127X_REG_RX_TIMEOUT_2, SX127X_TIMEOUT_RX_PREAMBLE_OFF);
+  state |= _mod->SPIsetRegValue(SX127X_REG_RX_TIMEOUT_3, SX127X_TIMEOUT_SIGNAL_SYNC_OFF);
   if(state != ERR_NONE) {
     return(state);
   }
   
-  // enable improved fading margin
-  /*state = _mod->SPIsetRegValue();
-  if(state != ERR_NONE) {
-    return(state);
-  }*/
+  // enable preamble detector and set preamble length
+  state = _mod->SPIsetRegValue(SX127X_REG_PREAMBLE_DETECT, SX127X_REG_PREAMBLE_DETECT | SX127X_PREAMBLE_DETECTOR_1_BYTE | SX127X_PREAMBLE_DETECTOR_TOL);
+  state |= _mod->SPIsetRegValue(SX127X_REG_PREAMBLE_MSB_FSK, SX127X_PREAMBLE_SIZE_MSB);
+  state |= _mod->SPIsetRegValue(SX127X_REG_PREAMBLE_LSB_FSK, SX127X_PREAMBLE_SIZE_LSB);
   
   return(state);
 }
