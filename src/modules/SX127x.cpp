@@ -564,24 +564,33 @@ int16_t SX127x::setPreambleLength(uint16_t preambleLength) {
 }
 
 float SX127x::getFrequencyError() {
-  // get raw frequency error
-  uint32_t raw = _mod->SPIgetRegValue(SX127X_REG_FEI_MSB, 3, 0) << 16;
-  raw |= _mod->SPIgetRegValue(SX127X_REG_FEI_MID) << 8;
-  raw |= _mod->SPIgetRegValue(SX127X_REG_FEI_LSB);
-  
-  uint32_t base = (uint32_t)2 << 23;
-  float error;
-  
-  // check the first bit
-  if(raw & 0x80000) {
-    // frequency error is negative
-    raw = ~raw + 1;
-    error = (((float)raw * (float)base)/32000000.0) * (_bw/500.0) * -1.0;
-  } else {
-    error = (((float)raw * (float)base)/32000000.0) * (_bw/500.0);
+  int16_t modem = getActiveModem();
+  if(modem == SX127X_LORA) {
+    // get raw frequency error
+    uint32_t raw = _mod->SPIgetRegValue(SX127X_REG_FEI_MSB, 3, 0) << 16;
+    raw |= _mod->SPIgetRegValue(SX127X_REG_FEI_MID) << 8;
+    raw |= _mod->SPIgetRegValue(SX127X_REG_FEI_LSB);
+    
+    uint32_t base = (uint32_t)2 << 23;
+    float error;
+    
+    // check the first bit
+    if(raw & 0x80000) {
+      // frequency error is negative
+      raw = ~raw + 1;
+      error = (((float)raw * (float)base)/32000000.0) * (_bw/500.0) * -1.0;
+    } else {
+      error = (((float)raw * (float)base)/32000000.0) * (_bw/500.0);
+    }
+    
+    return(error);
+  } else if(modem == SX127X_FSK_OOK) {
+    // get raw frequency error
+    uint16_t raw = _mod->SPIgetRegValue(SX127X_REG_FEI_MSB_FSK) << 8;
+    raw |= _mod->SPIgetRegValue(SX127X_REG_FEI_LSB_FSK);
   }
   
-  return(error);
+  return(ERR_UNKNOWN);
 }
 
 int16_t SX127x::setBitRate(float br) {
