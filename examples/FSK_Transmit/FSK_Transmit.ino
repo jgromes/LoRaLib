@@ -65,15 +65,15 @@ void loop() {
 
   if (state == ERR_NONE) {
     // the packet was successfully transmitted
-    Serial.println(" success!");
+    Serial.println("success!");
 
   } else if (state == ERR_PACKET_TOO_LONG) {
     // the supplied packet was longer than 256 bytes
-    Serial.println(" too long!");
+    Serial.println("too long!");
 
   } else if (state == ERR_TX_TIMEOUT) {
     // timeout occurred while transmitting packet
-    Serial.println(" timeout!");
+    Serial.println("timeout!");
 
   }
 

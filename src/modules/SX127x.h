@@ -554,7 +554,7 @@ class SX127x {
     int16_t setBitRate(float br);
     int16_t setRxBandwidth(float rxBw);
     int16_t setFrequencyDeviation(float freqDev);
-    int16_t setSyncWordFSK(uint8_t* syncWord, size_t len);
+    int16_t setSyncWord(uint8_t* syncWord, size_t len);
   
   protected:
     Module* _mod;

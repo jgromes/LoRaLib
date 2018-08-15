@@ -89,7 +89,7 @@ int16_t SX127x::beginFSK(uint8_t chipVersion, float br, float rxBw, float freqDe
   
   // default sync word values 0x2D01 is the same as the default in LowPowerLab RFM69 library
   uint8_t syncWord[] = {0x2D, 0x01};
-  state = setSyncWordFSK(syncWord, 2);
+  state = setSyncWord(syncWord, 2);
   if(state != ERR_NONE) {
     return(state);
   }
@@ -192,7 +192,14 @@ int16_t SX127x::transmit(uint8_t* data, size_t len) {
     }
     
     // wait for transmission end
-    while(!digitalRead(_mod->int0()));
+    uint32_t timeout = (uint32_t)((((float)(len * 8)) / (_br * 1000.0)) * 1500.0);
+    uint32_t start = millis();
+    while(!digitalRead(_mod->int0())) {
+      if(millis() - start > timeout) {
+        clearIRQFlags();
+        return(ERR_TX_TIMEOUT);
+      }
+    }
     
     // clear interrupt flags
     clearIRQFlags();
