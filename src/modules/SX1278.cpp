@@ -51,6 +51,38 @@ int16_t SX1278::begin(float freq, float bw, uint8_t sf, uint8_t cr, uint8_t sync
   return(state);
 }
 
+int16_t SX1278::beginFSK(float freq, float br, float rxBw, float freqDev, int8_t power, uint8_t currentLimit, uint8_t gain) {
+  // execute common part
+  int16_t state = SX127x::beginFSK(SX1278_CHIP_VERSION, br, rxBw, freqDev, currentLimit);
+  if(state != ERR_NONE) {
+    return(state);
+  }
+  
+  // configure settings not accessible by API
+  state = configFSK();
+  if(state != ERR_NONE) {
+    return(state);
+  }
+  
+  // configure publicly accessible settings
+  state = setFrequency(freq);
+  if(state != ERR_NONE) {
+    return(state);
+  }
+  
+  state = setOutputPower(power);
+  if(state != ERR_NONE) {
+    return(state);
+  }
+  
+  state = setGain(gain);
+  if(state != ERR_NONE) {
+    return(state);
+  }
+  
+  return(state);
+}
+
 int16_t SX1278::setFrequency(float freq) {
   // check frequency range
   if((freq < 137.0) || (freq > 525.0)) {
@@ -325,5 +357,21 @@ int16_t SX1278::config() {
   } else {
     state = _mod->SPIsetRegValue(SX1278_REG_MODEM_CONFIG_3, SX1278_LOW_DATA_RATE_OPT_OFF, 0, 0);
   }
+  return(state);
+}
+
+int16_t SX1278::configFSK() {
+  // configure common registers
+  int16_t state = SX127x::configFSK();
+  if(state != ERR_NONE) {
+    return(state);
+  }
+  
+  // set data shaping
+  state = _mod->SPIsetRegValue(SX127X_REG_PA_RAMP, SX1278_FSK_GAUSSIAN_0_3, 6, 5);
+  if(state != ERR_NONE) {
+    return(state);
+  }
+  
   return(state);
 }

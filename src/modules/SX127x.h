@@ -366,7 +366,7 @@
 // SX127X_REG_PACKET_CONFIG_1
 #define SX127X_PACKET_FIXED                           0b00000000  //  7     7     packet format: fixed length
 #define SX127X_PACKET_VARIABLE                        0b10000000  //  7     7                    variable length (default)
-#define SX127X_DC_FREE_OFF                            0b00000000  //  6     5     DC-free encoding: disabled (default)
+#define SX127X_DC_FREE_NONE                           0b00000000  //  6     5     DC-free encoding: disabled (default)
 #define SX127X_DC_FREE_MANCHESTER                     0b00100000  //  6     5                       Manchester
 #define SX127X_DC_FREE_WHITENING                      0b01000000  //  6     5                       Whitening
 #define SX127X_CRC_OFF                                0b00000000  //  4     4     CRC disabled
@@ -380,8 +380,8 @@
 #define SX127X_CRC_WHITENING_TYPE_IBM                 0b00000001  //  0     0                                   IBM CRC with alternate whitening
 
 // SX127X_REG_PACKET_CONFIG_2
-#define SX127X_DATA_MODE_CONTINUOUS                   0b00000000  //  6     6     data mode: continuous
-#define SX127X_DATA_MODE_PACKET                       0b01000000  //  6     6                packet
+#define SX127X_DATA_MODE_PACKET                       0b01000000  //  6     6     data mode: packet (default)
+#define SX127X_DATA_MODE_CONTINUOUS                   0b00000000  //  6     6                continuous
 #define SX127X_IO_HOME_OFF                            0b00000000  //  5     5     io-homecontrol compatibility disabled (default)
 #define SX127X_IO_HOME_ON                             0b00100000  //  5     5     io-homecontrol compatibility enabled
 
@@ -526,6 +526,7 @@ class SX127x {
     
     // basic methods
     int16_t begin(uint8_t chipVersion, uint8_t syncWord, uint8_t currentLimit, uint16_t preambleLength);
+    int16_t beginFSK(uint8_t chipVersion, float br, float rxBw, float freqDev, uint8_t currentLimit);
     int16_t transmit(String& str);
     int16_t transmit(const char* str);
     int16_t transmit(uint8_t* data, size_t len);
@@ -550,6 +551,10 @@ class SX127x {
     int16_t setCurrentLimit(uint8_t currentLimit);
     int16_t setPreambleLength(uint16_t preambleLength);
     float getFrequencyError();
+    int16_t setBitRate(float br);
+    int16_t setRxBandwidth(float rxBw);
+    int16_t setFrequencyDeviation(float freqDev);
+    int16_t setSyncWordFSK(uint8_t* syncWord, size_t len);
   
   protected:
     Module* _mod;
@@ -557,14 +562,20 @@ class SX127x {
     float _bw;
     uint8_t _sf;
     uint8_t _cr;
+    float _br;
+    float _rxBw;
     
     int16_t tx(char* data, uint8_t length);
     int16_t rxSingle(char* data, uint8_t* length);
     int16_t setFrequencyRaw(float newFreq);
     int16_t config();
+    int16_t configFSK();
   
   private:
+    bool findChip(uint8_t ver);
     int16_t setMode(uint8_t mode);
+    int16_t getActiveModem();
+    int16_t setActiveModem(uint8_t modem);
     void clearIRQFlags();
 };
 
