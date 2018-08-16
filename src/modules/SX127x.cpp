@@ -37,9 +37,6 @@ int16_t SX127x::begin(uint8_t chipVersion, uint8_t syncWord, uint8_t currentLimi
   
   // set preamble length
   state = SX127x::setPreambleLength(preambleLength);
-  if(state != ERR_NONE) {
-    return(state);
-  }
   
   return(state);
 }
@@ -93,6 +90,9 @@ int16_t SX127x::beginFSK(uint8_t chipVersion, float br, float rxBw, float freqDe
   if(state != ERR_NONE) {
     return(state);
   }
+  
+  // disable address filtering
+  state = disableAddressFiltering();
   
   return(state);
 }
@@ -812,6 +812,45 @@ int16_t SX127x::setSyncWord(uint8_t* syncWord, size_t len) {
   return(ERR_NONE);
 }
 
+int16_t SX127x::setNodeAddress(uint8_t nodeAddr) {
+  // enable address filtering (node only)
+  int16_t state = _mod->SPIsetRegValue(SX127X_REG_PACKET_CONFIG_1, SX127X_ADDRESS_FILTERING_NODE, 2, 1);
+  if(state != ERR_NONE) {
+    return(state);
+  }
+  
+  // set node address
+  return(_mod->SPIsetRegValue(SX127X_REG_NODE_ADRS, nodeAddr));
+}
+
+int16_t SX127x::setBroadcastAddress(uint8_t broadAddr) {
+  // enable address filtering (node + broadcast)
+  int16_t state = _mod->SPIsetRegValue(SX127X_REG_PACKET_CONFIG_1, SX127X_ADDRESS_FILTERING_NODE_BROADCAST, 2, 1);
+  if(state != ERR_NONE) {
+    return(state);
+  }
+  
+  // set broadcast address
+  return(_mod->SPIsetRegValue(SX127X_REG_BROADCAST_ADRS, broadAddr));
+}
+
+int16_t SX127x::disableAddressFiltering() {
+  // disable address filtering
+  int16_t state = _mod->SPIsetRegValue(SX127X_REG_PACKET_CONFIG_1, SX127X_ADDRESS_FILTERING_OFF, 2, 1);
+  if(state != ERR_NONE) {
+    return(state);
+  }
+  
+  // set node address to default (0x00)
+  state = _mod->SPIsetRegValue(SX127X_REG_NODE_ADRS, 0x00);
+  if(state != ERR_NONE) {
+    return(state);
+  }
+  
+  // set broadcast address to default (0x00)
+  return(_mod->SPIsetRegValue(SX127X_REG_BROADCAST_ADRS, 0x00));
+}
+
 int16_t SX127x::setFrequencyRaw(float newFreq) {
   // set mode to standby
   int16_t state = setMode(SX127X_STANDBY);
@@ -850,7 +889,7 @@ int16_t SX127x::configFSK() {
   _mod->SPIwriteRegister(SX127X_REG_IRQ_FLAGS_2, SX127X_FLAG_FIFO_OVERRUN);
   
   // set packet configuration
-  state = _mod->SPIsetRegValue(SX127X_REG_PACKET_CONFIG_1, SX127X_PACKET_VARIABLE | SX127X_DC_FREE_NONE | SX127X_CRC_ON | SX127X_CRC_AUTOCLEAR_ON | SX127X_ADDRESS_FILTERING_OFF, 7, 1);
+  state = _mod->SPIsetRegValue(SX127X_REG_PACKET_CONFIG_1, SX127X_PACKET_VARIABLE | SX127X_DC_FREE_NONE | SX127X_CRC_ON | SX127X_CRC_AUTOCLEAR_ON, 7, 3);
   state |= _mod->SPIsetRegValue(SX127X_REG_PACKET_CONFIG_2, SX127X_DATA_MODE_PACKET | SX127X_IO_HOME_OFF, 6, 5);
   if(state != ERR_NONE) {
     return(state);

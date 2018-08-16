@@ -48,6 +48,9 @@ getFrequencyError	KEYWORD2
 setBitRate	KEYWORD2
 setRxBandwidth	KEYWORD2
 setFrequencyDeviation	KEYWORD2
+setNodeAddress	KEYWORD2
+setBroadcastAddress	KEYWORD2
+disableAddressFiltering	KEYWORD2
 
 #######################################
 # Constants (LITERAL1)

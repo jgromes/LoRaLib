@@ -555,6 +555,9 @@ class SX127x {
     int16_t setRxBandwidth(float rxBw);
     int16_t setFrequencyDeviation(float freqDev);
     int16_t setSyncWord(uint8_t* syncWord, size_t len);
+    int16_t setNodeAddress(uint8_t nodeAddr);
+    int16_t setBroadcastAddress(uint8_t broadAddr);
+    int16_t disableAddressFiltering();
   
   protected:
     Module* _mod;
