@@ -149,6 +149,11 @@ int16_t SX1278::setFrequency(float freq) {
 }
 
 int16_t SX1278::setBandwidth(float bw) {
+  // check active modem
+  if(getActiveModem() != SX127X_LORA) {
+    return(ERR_WRONG_MODEM);
+  }
+
   uint8_t newBandwidth;
   
   // check alowed bandwidth values
@@ -185,6 +190,11 @@ int16_t SX1278::setBandwidth(float bw) {
 }
 
 int16_t SX1278::setSpreadingFactor(uint8_t sf) {
+  // check active modem
+  if(getActiveModem() != SX127X_LORA) {
+    return(ERR_WRONG_MODEM);
+  }
+
   uint8_t newSpreadingFactor;
   
   // check allowed spreading factor values
@@ -223,6 +233,11 @@ int16_t SX1278::setSpreadingFactor(uint8_t sf) {
 }
 
 int16_t SX1278::setCodingRate(uint8_t cr) {
+  // check active modem
+  if(getActiveModem() != SX127X_LORA) {
+    return(ERR_WRONG_MODEM);
+  }
+
   uint8_t newCodingRate;
   
   // check allowed coding rate values
@@ -281,6 +296,11 @@ int16_t SX1278::setOutputPower(int8_t power) {
 }
 
 int16_t SX1278::setGain(uint8_t gain) {
+  // check active modem
+  if(getActiveModem() != SX127X_LORA) {
+    return(ERR_WRONG_MODEM);
+  }
+
   // check allowed range
   if(gain > 6) {
     return(ERR_INVALID_GAIN);

@@ -552,8 +552,8 @@ class SX127x {
     int16_t setPreambleLength(uint16_t preambleLength);
     float getFrequencyError();
     int16_t setBitRate(float br);
-    int16_t setRxBandwidth(float rxBw);
     int16_t setFrequencyDeviation(float freqDev);
+    int16_t setRxBandwidth(float rxBw);
     int16_t setSyncWord(uint8_t* syncWord, size_t len);
     int16_t setNodeAddress(uint8_t nodeAddr);
     int16_t setBroadcastAddress(uint8_t broadAddr);
@@ -573,11 +573,11 @@ class SX127x {
     int16_t setFrequencyRaw(float newFreq);
     int16_t config();
     int16_t configFSK();
+    int16_t getActiveModem();
   
   private:
     bool findChip(uint8_t ver);
     int16_t setMode(uint8_t mode);
-    int16_t getActiveModem();
     int16_t setActiveModem(uint8_t modem);
     void clearIRQFlags();
 };

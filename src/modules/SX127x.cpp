@@ -353,42 +353,38 @@ int16_t SX127x::receive(uint8_t* data, size_t len) {
 }
 
 int16_t SX127x::scanChannel() {
-  int16_t modem = getActiveModem();
-  if(modem == SX127X_LORA) {
-    // set mode to standby
-    int16_t state = setMode(SX127X_STANDBY);
-    
-    // set DIO pin mapping
-    state |= _mod->SPIsetRegValue(SX127X_REG_DIO_MAPPING_1, SX127X_DIO0_CAD_DONE | SX127X_DIO1_CAD_DETECTED, 7, 4);
-    
-    // clear interrupt flags
-    clearIRQFlags();
-    
-    // set mode to CAD
-    state |= setMode(SX127X_CAD);
-    if(state != ERR_NONE) {
-      return(state);
-    }
-    
-    // wait for channel activity detected or timeout
-    while(!digitalRead(_mod->int0())) {
-      if(digitalRead(_mod->int1())) {
-        clearIRQFlags();
-        return(PREAMBLE_DETECTED);
-      }
-    }
-    
-    // clear interrupt flags
-    clearIRQFlags();
-    
-    return(CHANNEL_FREE);
-    
-  } else if(modem == SX127X_FSK_OOK) {
-    // CAD is only available in LoRa mode
+  // check active modem
+  if(getActiveModem() != SX127X_LORA) {
     return(ERR_WRONG_MODEM);
   }
+
+  // set mode to standby
+  int16_t state = setMode(SX127X_STANDBY);
   
-  return(ERR_UNKNOWN);
+  // set DIO pin mapping
+  state |= _mod->SPIsetRegValue(SX127X_REG_DIO_MAPPING_1, SX127X_DIO0_CAD_DONE | SX127X_DIO1_CAD_DETECTED, 7, 4);
+  
+  // clear interrupt flags
+  clearIRQFlags();
+  
+  // set mode to CAD
+  state |= setMode(SX127X_CAD);
+  if(state != ERR_NONE) {
+    return(state);
+  }
+  
+  // wait for channel activity detected or timeout
+  while(!digitalRead(_mod->int0())) {
+    if(digitalRead(_mod->int1())) {
+      clearIRQFlags();
+      return(PREAMBLE_DETECTED);
+    }
+  }
+  
+  // clear interrupt flags
+  clearIRQFlags();
+  
+  return(CHANNEL_FREE);
 }
 
 int16_t SX127x::sleep() {
@@ -582,6 +578,11 @@ int16_t SX127x::readData(uint8_t* data, size_t len) {
 }
 
 int16_t SX127x::setSyncWord(uint8_t syncWord) {
+  // check active modem
+  if(getActiveModem() != SX127X_LORA) {
+    return(ERR_WRONG_MODEM);
+  }
+
   // set mode to standby
   setMode(SX127X_STANDBY);
   
@@ -614,6 +615,11 @@ int16_t SX127x::setCurrentLimit(uint8_t currentLimit) {
 }
 
 int16_t SX127x::setPreambleLength(uint16_t preambleLength) {
+  // check active modem
+  if(getActiveModem() != SX127X_LORA) {
+    return(ERR_WRONG_MODEM);
+  }
+
   // check allowed range
   if(preambleLength < 6) {
     return(ERR_INVALID_PREAMBLE_LENGTH);
@@ -659,6 +665,11 @@ float SX127x::getFrequencyError() {
 }
 
 int16_t SX127x::setBitRate(float br) {
+  // check active modem
+  if(getActiveModem() != SX127X_FSK_OOK) {
+    return(ERR_WRONG_MODEM);
+  }
+
   // check allowed bitrate
   if((br < 1.2) || (br > 300.0)) {
     return(ERR_INVALID_BIT_RATE);
@@ -681,7 +692,37 @@ int16_t SX127x::setBitRate(float br) {
   return(state);
 }
 
+int16_t SX127x::setFrequencyDeviation(float freqDev) {
+  // check active modem
+  if(getActiveModem() != SX127X_FSK_OOK) {
+    return(ERR_WRONG_MODEM);
+  }
+
+  // check frequency deviation range
+  if(!((freqDev + _br/2.0 <= 250.0) && (freqDev >= 0.6) && (freqDev <= 200.0))) {
+    return(ERR_INVALID_FREQUENCY_DEVIATION);
+  }
+
+  // set mode to STANDBY
+  int16_t state = setMode(SX127X_STANDBY);
+  if(state != ERR_NONE) {
+    return(state);
+  }
+  
+  // set allowed frequency deviation
+  uint32_t base = 1;
+  uint32_t FDEV = (freqDev * (base << 19)) / 32000;
+  state = _mod->SPIsetRegValue(SX127X_REG_FDEV_MSB, (FDEV & 0xFF00) >> 8, 5, 0);
+  state |= _mod->SPIsetRegValue(SX127X_REG_FDEV_LSB, FDEV & 0x00FF, 7, 0);
+  return(state);
+}
+
 int16_t SX127x::setRxBandwidth(float rxBw) {
+  // check active modem
+  if(getActiveModem() != SX127X_FSK_OOK) {
+    return(ERR_WRONG_MODEM);
+  }
+
   // check allowed bandwidth values
   uint8_t bwMant, bwExp;
   if(rxBw == 2.6) {
@@ -772,27 +813,12 @@ int16_t SX127x::setRxBandwidth(float rxBw) {
   return(state);
 }
 
-int16_t SX127x::setFrequencyDeviation(float freqDev) {
-  // check frequency deviation range
-  if(!((freqDev + _br/2.0 <= 250.0) && (freqDev >= 0.6) && (freqDev <= 200.0))) {
-    return(ERR_INVALID_FREQUENCY_DEVIATION);
-  }
-
-  // set mode to STANDBY
-  int16_t state = setMode(SX127X_STANDBY);
-  if(state != ERR_NONE) {
-    return(state);
-  }
-  
-  // set allowed frequency deviation
-  uint32_t base = 1;
-  uint32_t FDEV = (freqDev * (base << 19)) / 32000;
-  state = _mod->SPIsetRegValue(SX127X_REG_FDEV_MSB, (FDEV & 0xFF00) >> 8, 5, 0);
-  state |= _mod->SPIsetRegValue(SX127X_REG_FDEV_LSB, FDEV & 0x00FF, 7, 0);
-  return(state);
-}
-
 int16_t SX127x::setSyncWord(uint8_t* syncWord, size_t len) {
+  // check active modem
+  if(getActiveModem() != SX127X_FSK_OOK) {
+    return(ERR_WRONG_MODEM);
+  }
+
   // check constraints
   if(len > 7) {
     return(ERR_INVALID_SYNC_WORD);
@@ -818,6 +844,11 @@ int16_t SX127x::setSyncWord(uint8_t* syncWord, size_t len) {
 }
 
 int16_t SX127x::setNodeAddress(uint8_t nodeAddr) {
+  // check active modem
+  if(getActiveModem() != SX127X_FSK_OOK) {
+    return(ERR_WRONG_MODEM);
+  }
+
   // enable address filtering (node only)
   int16_t state = _mod->SPIsetRegValue(SX127X_REG_PACKET_CONFIG_1, SX127X_ADDRESS_FILTERING_NODE, 2, 1);
   if(state != ERR_NONE) {
@@ -829,6 +860,11 @@ int16_t SX127x::setNodeAddress(uint8_t nodeAddr) {
 }
 
 int16_t SX127x::setBroadcastAddress(uint8_t broadAddr) {
+  // check active modem
+  if(getActiveModem() != SX127X_FSK_OOK) {
+    return(ERR_WRONG_MODEM);
+  }
+
   // enable address filtering (node + broadcast)
   int16_t state = _mod->SPIsetRegValue(SX127X_REG_PACKET_CONFIG_1, SX127X_ADDRESS_FILTERING_NODE_BROADCAST, 2, 1);
   if(state != ERR_NONE) {
@@ -840,6 +876,11 @@ int16_t SX127x::setBroadcastAddress(uint8_t broadAddr) {
 }
 
 int16_t SX127x::disableAddressFiltering() {
+  // check active modem
+  if(getActiveModem() != SX127X_FSK_OOK) {
+    return(ERR_WRONG_MODEM);
+  }
+
   // disable address filtering
   int16_t state = _mod->SPIsetRegValue(SX127X_REG_PACKET_CONFIG_1, SX127X_ADDRESS_FILTERING_OFF, 2, 1);
   if(state != ERR_NONE) {
