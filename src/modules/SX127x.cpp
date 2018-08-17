@@ -41,7 +41,7 @@ int16_t SX127x::begin(uint8_t chipVersion, uint8_t syncWord, uint8_t currentLimi
   return(state);
 }
 
-int16_t SX127x::beginFSK(uint8_t chipVersion, float br, float rxBw, float freqDev, uint8_t currentLimit) {
+int16_t SX127x::beginFSK(uint8_t chipVersion, float br, float freqDev, float rxBw, uint8_t currentLimit) {
   // set module properties
   _mod->init(USE_SPI, INT_BOTH);
   
@@ -66,14 +66,14 @@ int16_t SX127x::beginFSK(uint8_t chipVersion, float br, float rxBw, float freqDe
     return(state);
   }
   
-  // set receiver bandwidth
-  state = SX127x::setRxBandwidth(rxBw);
+  // set frequency deviation
+  state = SX127x::setFrequencyDeviation(freqDev);
   if(state != ERR_NONE) {
     return(state);
   }
   
-  // set frequency deviation
-  state = SX127x::setFrequencyDeviation(freqDev);
+  // set receiver bandwidth
+  state = SX127x::setRxBandwidth(rxBw);
   if(state != ERR_NONE) {
     return(state);
   }

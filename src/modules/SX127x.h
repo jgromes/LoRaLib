@@ -526,7 +526,7 @@ class SX127x {
     
     // basic methods
     int16_t begin(uint8_t chipVersion, uint8_t syncWord, uint8_t currentLimit, uint16_t preambleLength);
-    int16_t beginFSK(uint8_t chipVersion, float br, float rxBw, float freqDev, uint8_t currentLimit);
+    int16_t beginFSK(uint8_t chipVersion, float br, float freqDev, float rxBw, uint8_t currentLimit);
     int16_t transmit(String& str);
     int16_t transmit(const char* str);
     int16_t transmit(uint8_t* data, size_t len);

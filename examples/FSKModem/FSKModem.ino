@@ -25,8 +25,8 @@ void setup() {
   Serial.print(F("Initializing ... "));
   // carrier frequency:           434.0 MHz
   // bit rate:                    48.0 kbps
-  // Rx bandwidth:                125.0 kHz
   // frequency deviation:         50.0 kHz
+  // Rx bandwidth:                125.0 kHz
   // output power:                13 dBm
   // current limit:               100 mA
   // sync word:                   0x2D  0x01
@@ -47,8 +47,8 @@ void setup() {
   // FSK modem supports the following settings:
   state = fsk.setFrequency(433.5);
   state = fsk.setBitRate(100.0);
-  state = fsk.setRxBandwidth(250.0);
   state = fsk.setFrequencyDeviation(10.0);
+  state = fsk.setRxBandwidth(250.0);
   state = fsk.setOutputPower(10.0);
   state = fsk.setCurrentLimit(100);
   uint8_t syncWord[] = {0x01, 0x23, 0x45, 0x67, 

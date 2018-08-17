@@ -51,9 +51,9 @@ int16_t SX1278::begin(float freq, float bw, uint8_t sf, uint8_t cr, uint8_t sync
   return(state);
 }
 
-int16_t SX1278::beginFSK(float freq, float br, float rxBw, float freqDev, int8_t power, uint8_t currentLimit) {
+int16_t SX1278::beginFSK(float freq, float br, float freqDev, float rxBw, int8_t power, uint8_t currentLimit) {
   // execute common part
-  int16_t state = SX127x::beginFSK(SX1278_CHIP_VERSION, br, rxBw, freqDev, currentLimit);
+  int16_t state = SX127x::beginFSK(SX1278_CHIP_VERSION, br, freqDev, rxBw, currentLimit);
   if(state != ERR_NONE) {
     return(state);
   }
