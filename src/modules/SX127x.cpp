@@ -106,16 +106,16 @@ int16_t SX127x::transmit(const char* str) {
 }
 
 int16_t SX127x::transmit(uint8_t* data, size_t len) {
-  // check packet length
-  if(len >= 256) {
-    return(ERR_PACKET_TOO_LONG);
-  }
-  
   // set mode to standby
   int16_t state = setMode(SX127X_STANDBY);
   
   int16_t modem = getActiveModem();
   if(modem == SX127X_LORA) {
+    // check packet length
+    if(len >= 256) {
+      return(ERR_PACKET_TOO_LONG);
+    }
+  
     // calculate timeout
     uint16_t base = 1;
     float symbolLength = (float)(base << _sf) / (float)_bw;
@@ -170,6 +170,11 @@ int16_t SX127x::transmit(uint8_t* data, size_t len) {
     return(ERR_NONE);
   
   } else if(modem == SX127X_FSK_OOK) {
+    // check packet length
+    if(len >= 64) {
+      return(ERR_PACKET_TOO_LONG);
+    }
+  
     // set DIO mapping
     _mod->SPIsetRegValue(SX127X_REG_DIO_MAPPING_1, SX127X_DIO0_PACK_PACKET_SENT, 7, 6);
     

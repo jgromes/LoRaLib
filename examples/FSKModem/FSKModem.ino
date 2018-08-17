@@ -64,6 +64,7 @@ void setup() {
 void loop() {
   // FSK modem can use the same transmit/receive methods
   // as the LoRa modem, even their interrupt-driven versions
+  // NOTE: FSK modem maximum packet length is 63 bytes!
   
   // transmit FSK packet
   int state = fsk.transmit("Hello World!");
