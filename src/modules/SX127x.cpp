@@ -725,67 +725,67 @@ int16_t SX127x::setRxBandwidth(float rxBw) {
 
   // check allowed bandwidth values
   uint8_t bwMant, bwExp;
-  if(rxBw == 2.6) {
+  if(abs(rxBw - 2.6) <= 0.001) {
     bwMant = SX127X_RX_BW_MANT_24;
     bwExp = 7;
-  } else if(rxBw == 3.1) {
+  } else if(abs(rxBw - 3.1) <= 0.001) {
     bwMant = SX127X_RX_BW_MANT_20;
     bwExp = 7;
-  } else if(rxBw == 3.9) {
+  } else if(abs(rxBw - 3.9) <= 0.001) {
     bwMant = SX127X_RX_BW_MANT_16;
     bwExp = 7;
-  } else if(rxBw == 5.2) {
+  } else if(abs(rxBw - 5.2) <= 0.001) {
     bwMant = SX127X_RX_BW_MANT_24;
     bwExp = 6;
-  } else if(rxBw == 6.3) {
+  } else if(abs(rxBw - 6.3) <= 0.001) {
     bwMant = SX127X_RX_BW_MANT_20;
     bwExp = 6;
-  } else if(rxBw == 7.8) {
+  } else if(abs(rxBw - 7.8) <= 0.001) {
     bwMant = SX127X_RX_BW_MANT_16;
     bwExp = 6;
-  } else if(rxBw == 10.4) {
+  } else if(abs(rxBw - 10.4) <= 0.001) {
     bwMant = SX127X_RX_BW_MANT_24;
     bwExp = 5;
-  } else if(rxBw == 12.5) {
+  } else if(abs(rxBw - 12.5) <= 0.001) {
     bwMant = SX127X_RX_BW_MANT_20;
     bwExp = 5;
-  } else if(rxBw == 15.6) {
+  } else if(abs(rxBw - 15.6) <= 0.001) {
     bwMant = SX127X_RX_BW_MANT_16;
     bwExp = 5;
-  } else if(rxBw == 20.8) {
+  } else if(abs(rxBw - 20.8) <= 0.001) {
     bwMant = SX127X_RX_BW_MANT_24;
     bwExp = 4;
-  } else if(rxBw == 25.0) {
+  } else if(abs(rxBw - 25.0) <= 0.001) {
     bwMant = SX127X_RX_BW_MANT_20;
     bwExp = 4;
-  } else if(rxBw == 31.3) {
+  } else if(abs(rxBw - 31.3) <= 0.001) {
     bwMant = SX127X_RX_BW_MANT_16;
     bwExp = 4;
-  } else if(rxBw == 41.7) {
+  } else if(abs(rxBw - 41.7) <= 0.001) {
     bwMant = SX127X_RX_BW_MANT_24;
     bwExp = 3;
-  } else if(rxBw == 50.0) {
+  } else if(abs(rxBw - 50.0) <= 0.001) {
     bwMant = SX127X_RX_BW_MANT_20;
     bwExp = 3;
-  } else if(rxBw == 62.5) {
+  } else if(abs(rxBw - 62.5) <= 0.001) {
     bwMant = SX127X_RX_BW_MANT_16;
     bwExp = 3;
-  } else if(rxBw == 83.3) {
+  } else if(abs(rxBw - 83.3) <= 0.001) {
     bwMant = SX127X_RX_BW_MANT_24;
     bwExp = 2;
-  } else if(rxBw == 100.0) {
+  } else if(abs(rxBw - 100.0) <= 0.001) {
     bwMant = SX127X_RX_BW_MANT_20;
     bwExp = 2;
-  } else if(rxBw == 125.0) {
+  } else if(abs(rxBw - 125.0) <= 0.001) {
     bwMant = SX127X_RX_BW_MANT_16;
     bwExp = 2;
-  } else if(rxBw == 166.7) {
+  } else if(abs(rxBw - 166.7) <= 0.001) {
     bwMant = SX127X_RX_BW_MANT_24;
     bwExp = 1;
-  } else if(rxBw == 200.0) {
+  } else if(abs(rxBw - 200.0) <= 0.001) {
     bwMant = SX127X_RX_BW_MANT_20;
     bwExp = 1;
-  } else if(rxBw == 250.0) {
+  } else if(abs(rxBw - 250.0) <= 0.001) {
     bwMant = SX127X_RX_BW_MANT_16;
     bwExp = 1;
   } else {
