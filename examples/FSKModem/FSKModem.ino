@@ -5,6 +5,9 @@
 
    For more detailed information, see the LoRaLib Wiki
    https://github.com/jgromes/LoRaLib/wiki
+
+   For more information on FSK modem, see
+   https://github.com/jgromes/LoRaLib/wiki/FSK-Modem
 */
 
 // include the library
