@@ -105,15 +105,15 @@ int16_t SX127x::beginFSK(uint8_t chipVersion, float br, float freqDev, float rxB
   return(state);
 }
 
-int16_t SX127x::transmit(String& str) {
-  return(SX127x::transmit(str.c_str()));
+int16_t SX127x::transmit(String& str, uint8_t addr) {
+  return(SX127x::transmit(str.c_str()), addr);
 }
 
-int16_t SX127x::transmit(const char* str) {
-  return(SX127x::transmit((uint8_t*)str, strlen(str)));
+int16_t SX127x::transmit(const char* str, uint8_t addr) {
+  return(SX127x::transmit((uint8_t*)str, strlen(str)), addr);
 }
 
-int16_t SX127x::transmit(uint8_t* data, size_t len) {
+int16_t SX127x::transmit(uint8_t* data, size_t len, uint8_t addr) {
   // set mode to standby
   int16_t state = setMode(SX127X_STANDBY);
   
@@ -193,6 +193,10 @@ int16_t SX127x::transmit(uint8_t* data, size_t len) {
     _mod->SPIwriteRegister(SX127X_REG_FIFO, len);
     
     // check address filtering
+    uint8_t filter = _mod->SPIgetRegValue(SX127X_REG_PACKET_CONFIG_1, 2, 1);
+    if((filter == SX127X_ADDRESS_FILTERING_NODE) || (filter == SX127X_ADDRESS_FILTERING_NODE_BROADCAST)) {
+      _mod->SPIwriteRegister(SX127X_REG_FIFO, addr);
+    }
     
     // write packet to FIFO
     _mod->SPIwriteRegisterBurst(SX127X_REG_FIFO, data, len);
@@ -336,6 +340,10 @@ int16_t SX127x::receive(uint8_t* data, size_t len) {
     size_t length = _mod->SPIreadRegister(SX127X_REG_FIFO);
     
     // check address filtering
+    uint8_t filter = _mod->SPIgetRegValue(SX127X_REG_PACKET_CONFIG_1, 2, 1);
+    if((filter == SX127X_ADDRESS_FILTERING_NODE) || (filter == SX127X_ADDRESS_FILTERING_NODE_BROADCAST)) {
+      _mod->SPIreadRegister(SX127X_REG_FIFO);
+    }
     
     // read packet data
     if(len == 0) {
@@ -434,15 +442,15 @@ void SX127x::setDio1Action(void (*func)(void)) {
   attachInterrupt(digitalPinToInterrupt(_mod->int1()), func, RISING);
 }
 
-int16_t SX127x::startTransmit(String& str) {
-  return(SX127x::startTransmit(str.c_str()));
+int16_t SX127x::startTransmit(String& str, uint8_t addr) {
+  return(SX127x::startTransmit(str.c_str()), addr);
 }
 
-int16_t SX127x::startTransmit(const char* str) {
-  return(SX127x::startTransmit((uint8_t*)str, strlen(str)));
+int16_t SX127x::startTransmit(const char* str, uint8_t addr) {
+  return(SX127x::startTransmit((uint8_t*)str, strlen(str)), addr);
 }
 
-int16_t SX127x::startTransmit(uint8_t* data, size_t len) {
+int16_t SX127x::startTransmit(uint8_t* data, size_t len, uint8_t addr) {
   // check packet length
   if(len >= 256) {
     return(ERR_PACKET_TOO_LONG);
@@ -488,6 +496,10 @@ int16_t SX127x::startTransmit(uint8_t* data, size_t len) {
     _mod->SPIwriteRegister(SX127X_REG_FIFO, len);
     
     // check address filtering
+    uint8_t filter = _mod->SPIgetRegValue(SX127X_REG_PACKET_CONFIG_1, 2, 1);
+    if((filter == SX127X_ADDRESS_FILTERING_NODE) || (filter == SX127X_ADDRESS_FILTERING_NODE_BROADCAST)) {
+      _mod->SPIwriteRegister(SX127X_REG_FIFO, addr);
+    }
     
     // write packet to FIFO
     _mod->SPIwriteRegisterBurst(SX127X_REG_FIFO, data, len);
@@ -561,6 +573,10 @@ int16_t SX127x::readData(uint8_t* data, size_t len) {
     size_t length = _mod->SPIreadRegister(SX127X_REG_FIFO);
     
     // check address filtering
+    uint8_t filter = _mod->SPIgetRegValue(SX127X_REG_PACKET_CONFIG_1, 2, 1);
+    if((filter == SX127X_ADDRESS_FILTERING_NODE) || (filter == SX127X_ADDRESS_FILTERING_NODE_BROADCAST)) {
+      _mod->SPIreadRegister(SX127X_REG_FIFO);
+    }
     
     // read packet data
     if(len == 0) {
@@ -990,11 +1006,8 @@ int16_t SX127x::configFSK() {
   // set frequency error to zero
   // for some reason unbeknownst to man, this write always fails, yet without it, switching modems doesn't work
   // literally spent 8 hours debugging this ... well played Semtech, well played
-  state = _mod->SPIsetRegValue(SX127X_REG_FEI_MSB_FSK, 0x00);
-  state |= _mod->SPIsetRegValue(SX127X_REG_FEI_LSB_FSK, 0x00);
-  if(state != ERR_NONE) {
-    return(state);
-  }
+  _mod->SPIsetRegValue(SX127X_REG_FEI_MSB_FSK, 0x00);
+  _mod->SPIsetRegValue(SX127X_REG_FEI_LSB_FSK, 0x00);
   
   return(state);
 }

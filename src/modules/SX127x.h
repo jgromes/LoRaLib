@@ -527,9 +527,9 @@ class SX127x {
     // basic methods
     int16_t begin(uint8_t chipVersion, uint8_t syncWord, uint8_t currentLimit, uint16_t preambleLength);
     int16_t beginFSK(uint8_t chipVersion, float br, float freqDev, float rxBw, uint8_t currentLimit);
-    int16_t transmit(String& str);
-    int16_t transmit(const char* str);
-    int16_t transmit(uint8_t* data, size_t len);
+    int16_t transmit(String& str, uint8_t addr = 0);
+    int16_t transmit(const char* str, uint8_t addr = 0);
+    int16_t transmit(uint8_t* data, size_t len, uint8_t addr = 0);
     int16_t receive(String& str, size_t len = 0);
     int16_t receive(uint8_t* data, size_t len);
     int16_t scanChannel();
@@ -539,9 +539,9 @@ class SX127x {
     // interrupt methods
     void setDio0Action(void (*func)(void));
     void setDio1Action(void (*func)(void));
-    int16_t startTransmit(String& str);
-    int16_t startTransmit(const char* str);
-    int16_t startTransmit(uint8_t* data, size_t len);
+    int16_t startTransmit(String& str, uint8_t addr = 0);
+    int16_t startTransmit(const char* str, uint8_t addr = 0);
+    int16_t startTransmit(uint8_t* data, size_t len, uint8_t addr = 0);
     int16_t startReceive();
     int16_t readData(String& str, size_t len = 0);
     int16_t readData(uint8_t* data, size_t len);
