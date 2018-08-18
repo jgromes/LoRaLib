@@ -655,10 +655,25 @@ float SX127x::getFrequencyError() {
     }
     
     return(error);
+    
   } else if(modem == SX127X_FSK_OOK) {
     // get raw frequency error
     uint16_t raw = _mod->SPIgetRegValue(SX127X_REG_FEI_MSB_FSK) << 8;
     raw |= _mod->SPIgetRegValue(SX127X_REG_FEI_LSB_FSK);
+    
+    uint32_t base = 1;
+    float error;
+    
+    // check the first bit
+    if(raw & 0x8000) {
+      // frequency error is negative
+      raw = ~raw + 1;
+      error = (float)raw * (32000000.0 / (float)(base << 19)) * -1.0;
+    } else {
+      error = (float)raw * (32000000.0 / (float)(base << 19));
+    }
+    
+    return(error);
   }
   
   return(ERR_UNKNOWN);
