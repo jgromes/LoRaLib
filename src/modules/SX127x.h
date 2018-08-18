@@ -558,6 +558,10 @@ class SX127x {
     int16_t setNodeAddress(uint8_t nodeAddr);
     int16_t setBroadcastAddress(uint8_t broadAddr);
     int16_t disableAddressFiltering();
+    
+    #ifdef KITELIB_DEBUG
+      void regDump();
+    #endif
   
   protected:
     Module* _mod;

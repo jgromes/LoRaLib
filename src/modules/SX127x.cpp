@@ -17,10 +17,14 @@ int16_t SX127x::begin(uint8_t chipVersion, uint8_t syncWord, uint8_t currentLimi
     DEBUG_PRINTLN_STR("Found SX127x!");
   }
   
-  // set LoRa mode
-  int16_t state = setActiveModem(SX127X_LORA);
-  if(state != ERR_NONE) {
-    return(state);
+  // check active modem
+  int16_t state;
+  if(getActiveModem() != SX127X_LORA) {
+    // set LoRa mode
+    state = setActiveModem(SX127X_LORA);
+    if(state != ERR_NONE) {
+      return(state);
+    }
   }
   
   // set LoRa sync word
@@ -54,10 +58,14 @@ int16_t SX127x::beginFSK(uint8_t chipVersion, float br, float freqDev, float rxB
     DEBUG_PRINTLN_STR("Found SX127x!");
   }
   
-  // set FSK mode
-  int16_t state = setActiveModem(SX127X_FSK_OOK);
-  if(state != ERR_NONE) {
-    return(state);
+  // check currently active modem
+  int16_t state;
+  if(getActiveModem() != SX127X_FSK_OOK) {
+    // set FSK mode
+    state = setActiveModem(SX127X_FSK_OOK);
+    if(state != ERR_NONE) {
+      return(state);
+    }
   }
   
   // set bit rate
@@ -975,6 +983,18 @@ int16_t SX127x::configFSK() {
   state = _mod->SPIsetRegValue(SX127X_REG_PREAMBLE_DETECT, SX127X_REG_PREAMBLE_DETECT | SX127X_PREAMBLE_DETECTOR_1_BYTE | SX127X_PREAMBLE_DETECTOR_TOL);
   state |= _mod->SPIsetRegValue(SX127X_REG_PREAMBLE_MSB_FSK, SX127X_PREAMBLE_SIZE_MSB);
   state |= _mod->SPIsetRegValue(SX127X_REG_PREAMBLE_LSB_FSK, SX127X_PREAMBLE_SIZE_LSB);
+  if(state != ERR_NONE) {
+    return(state);
+  }
+  
+  // set frequency error to zero
+  // for some reason unbeknownst to man, this write always fails, yet without it, switching modems doesn't work
+  // literally spent 8 hours debugging this ... well played Semtech, well played
+  state = _mod->SPIsetRegValue(SX127X_REG_FEI_MSB_FSK, 0x00);
+  state |= _mod->SPIsetRegValue(SX127X_REG_FEI_LSB_FSK, 0x00);
+  if(state != ERR_NONE) {
+    return(state);
+  }
   
   return(state);
 }
@@ -1036,3 +1056,28 @@ void SX127x::clearIRQFlags() {
     _mod->SPIwriteRegister(SX127X_REG_IRQ_FLAGS_2, 0b11111111);
   }
 }
+
+#ifdef KITELIB_DEBUG
+void SX127x::regDump() {
+  Serial.println();
+  Serial.println(F("ADDR\tVALUE"));
+  for(uint16_t addr = 0x01; addr <= 0x70; addr++) {
+    if(addr <= 0x0F) {
+      Serial.print(F("0x0"));
+    } else {
+      Serial.print(F("0x"));
+    }
+    Serial.print(addr, HEX);
+    Serial.print('\t');
+    uint8_t val = _mod->SPIreadRegister(addr);
+    if(val <= 0x0F) {
+      Serial.print(F("0x0"));
+    } else {
+      Serial.print(F("0x"));
+    }
+    Serial.println(val, HEX);
+    
+    delay(50);
+  }
+}
+#endif
