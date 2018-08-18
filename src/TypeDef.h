@@ -65,5 +65,10 @@
 #define ERR_INVALID_CURRENT_LIMIT             -17
 #define ERR_INVALID_PREAMBLE_LENGTH           -18
 #define ERR_INVALID_GAIN                      -19
+#define ERR_WRONG_MODEM                       -20
+#define ERR_INVALID_BIT_RATE                  -21
+#define ERR_INVALID_RX_BANDWIDTH              -22
+#define ERR_INVALID_FREQUENCY_DEVIATION       -23
+#define ERR_INVALID_SYNC_WORD                 -24
 
 #endif
