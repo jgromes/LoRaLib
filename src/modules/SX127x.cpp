@@ -902,7 +902,7 @@ int16_t SX127x::setSyncWord(uint8_t* syncWord, size_t len) {
   }
 
   // check constraints
-  if(len > 7) {
+  if(len >= 7) {
     return(ERR_INVALID_SYNC_WORD);
   }
   
