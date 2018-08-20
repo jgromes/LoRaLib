@@ -2,6 +2,8 @@
    LoRaLib FSK Modem Example
 
    This example shows how to use FSK modem in SX127x chips.
+   NOTE: The code below is just a guide, do not attempt
+         to run it!
 
    For more detailed information, see the LoRaLib Wiki
    https://github.com/jgromes/LoRaLib/wiki
@@ -140,9 +142,6 @@ void loop() {
   if (state != ERR_NONE) {
     Serial.println(F("Unable to start direct mode, code "));
   }
-  // NOTE: you will not be able to send or receive packets
-  // while direct mode is active! to deactivate it, call method
-  // fsk.packetMode()
 
   // using the direct mode, it is possible to transmit
   // FM notes with Arduino tone() function
@@ -153,4 +152,27 @@ void loop() {
   // transmit FM note at 500 Hz for 1 second
   tone(4, 500);
   delay(1000);
+  
+  // NOTE: you will not be able to send or receive packets
+  // while direct mode is active! to deactivate it, call method
+  // fsk.packetMode()
+
+  // "directMode()" method also has an override that allows
+  // you to set raw frequency as 24-bit number
+  // this allows you to send RTTY data
+
+  // set frequency deviation to 0 (required for RTTY)
+  fsk.setFrequencyDeviation(0);
+  // start baud rate timer
+  unsigned long start = micros();
+  // send space (low; 0x6C9999 * 61 Hz = 434.149 749 MHz)
+  fsk.directMode(0x6C9999)
+  // wait for baud rate 45
+  while(micros() - start < 22222);
+  // restart baud rate timer
+  start = micros();
+  // send mark (high; 0x6C999C * 61 Hz = 434.149 932 MHz; 183 Hz shift)
+  fsk.directMode(0x6C9999)
+  // wait for baud rate 45
+  while(micros() - start < 22222);
 }
