@@ -166,13 +166,13 @@ void loop() {
   // start baud rate timer
   unsigned long start = micros();
   // send space (low; 0x6C9999 * 61 Hz = 434.149 749 MHz)
-  fsk.directMode(0x6C9999)
+  fsk.directMode(0x6C9999);
   // wait for baud rate 45
   while(micros() - start < 22222);
   // restart baud rate timer
   start = micros();
   // send mark (high; 0x6C999C * 61 Hz = 434.149 932 MHz; 183 Hz shift)
-  fsk.directMode(0x6C9999)
+  fsk.directMode(0x6C9999);
   // wait for baud rate 45
   while(micros() - start < 22222);
 }
