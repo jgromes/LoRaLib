@@ -2,6 +2,8 @@
    LoRaLib FSK Modem Example
 
    This example shows how to use FSK modem in SX127x chips.
+   NOTE: The code below is just a guide, do not attempt
+         to run it!
 
    For more detailed information, see the LoRaLib Wiki
    https://github.com/jgromes/LoRaLib/wiki
@@ -58,7 +60,7 @@ void setup() {
                         0x89, 0xAB, 0xCD, 0xEF};
   state = fsk.setSyncWord(syncWord, 8);
   if (state != ERR_NONE) {
-    Serial.print(F("failed, code "));
+    Serial.print(F("Unable to set configuration, code "));
     Serial.println(state);
     while (true);
   }
@@ -77,11 +79,13 @@ void loop() {
     int state = lora.transmit(byteArr, 8);
   */
   if (state == ERR_NONE) {
-    Serial.println("success!");
+    Serial.println(F("Packet transmitted successfully!"));
   } else if (state == ERR_PACKET_TOO_LONG) {
-    Serial.println("too long!");
+    Serial.println(F("Packet too long!"));
   } else if (state == ERR_TX_TIMEOUT) {
-    Serial.println("timeout!");
+    Serial.println(F("Timed out while transmitting!"));
+  } else {
+    Serial.println(F("Failed to transmit packet, code "));
   }
 
   // receive FSK packet
@@ -92,27 +96,31 @@ void loop() {
     int state = lora.receive(byteArr, 8);
   */
   if (state == ERR_NONE) {
-    Serial.println("success!");
-    Serial.print("Data:\t");
+    Serial.println(F("Received packet!"));
+    Serial.print(F("Data:\t"));
     Serial.println(str);
   } else if (state == ERR_RX_TIMEOUT) {
-    Serial.println("timeout!");
+    Serial.println(F("Timed out while waiting for packet!"));
+  } else {
+    Serial.println(F("Failed to receive packet, code "));
   }
 
   // FSK modem has built-in address filtering system
   // it can be enabled by setting node address, broadcast
   // address, or both
+  //
+  // to transmit packet to a particular address, 
+  // use the following methods:
+  //
+  // fsk.transmit("Hello World!", address);
+  // fsk.startTransmit("Hello World!", address);
 
   // set node address to 0x02
   state = fsk.setNodeAddress(0x02);
   // set broadcast address to 0xFF
   state = fsk.setBroadcastAddress(0xFF);
-  if (state == ERR_NONE) {
-    Serial.println(F("success!"));
-  } else {
-    Serial.print(F("failed, code "));
-    Serial.println(state);
-    while (true);
+  if (state != ERR_NONE) {
+    Serial.println(F("Unable to set address filter, code "));
   }
 
   // address filtering can also be disabled
@@ -120,12 +128,51 @@ void loop() {
   // node and broadcast address
   /*
     state = fsk.disableAddressFiltering();
-    if(state == ERR_NONE) {
-      Serial.println(F("success!"));
-    } else {
-      Serial.print(F("failed, code "));
-      Serial.println(state);
-      while(true);
+    if (state != ERR_NONE) {
+      Serial.println(F("Unable to remove address filter, code "));
     }
   */
+
+  // FSK modem supports direct data transmission
+  // in this mode, SX127x directly transmits any data
+  // received on DIO1 (data) and DIO2 (clock)
+
+  // activate direct mode
+  state = fsk.directMode();
+  if (state != ERR_NONE) {
+    Serial.println(F("Unable to start direct mode, code "));
+  }
+
+  // using the direct mode, it is possible to transmit
+  // FM notes with Arduino tone() function
+  // transmit FM note at 1000 Hz for 1 second
+  // (DIO2 is connected to Arduino pin 4)
+  tone(4, 1000);
+  delay(1000);
+  // transmit FM note at 500 Hz for 1 second
+  tone(4, 500);
+  delay(1000);
+  
+  // NOTE: you will not be able to send or receive packets
+  // while direct mode is active! to deactivate it, call method
+  // fsk.packetMode()
+
+  // "directMode()" method also has an override that allows
+  // you to set raw frequency as 24-bit number
+  // this allows you to send RTTY data
+
+  // set frequency deviation to 0 (required for RTTY)
+  fsk.setFrequencyDeviation(0);
+  // start baud rate timer
+  unsigned long start = micros();
+  // send space (low; 0x6C9999 * 61 Hz = 434.149 749 MHz)
+  fsk.directMode(0x6C9999)
+  // wait for baud rate 45
+  while(micros() - start < 22222);
+  // restart baud rate timer
+  start = micros();
+  // send mark (high; 0x6C999C * 61 Hz = 434.149 932 MHz; 183 Hz shift)
+  fsk.directMode(0x6C9999)
+  // wait for baud rate 45
+  while(micros() - start < 22222);
 }
