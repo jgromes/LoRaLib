@@ -413,10 +413,19 @@ int16_t SX127x::standby() {
   return(setMode(SX127X_STANDBY));
 }
 
-int16_t SX127x::directMode() {
+int16_t SX127x::directMode(uint32_t FRF) {
   // check modem
   if(getActiveModem() != SX127X_FSK_OOK) {
     return(ERR_WRONG_MODEM);
+  }
+  
+  // user requested to start transmitting immediately (required for RTTY)
+  if(FRF != 0) {
+    _mod->SPIsetRegValue(SX127X_REG_FRF_MSB, (FRF & 0xFF0000) >> 16);
+    _mod->SPIsetRegValue(SX127X_REG_FRF_MID, (FRF & 0x00FF00) >> 8);
+    _mod->SPIsetRegValue(SX127X_REG_FRF_LSB, FRF & 0x0000FF);
+  
+    return(setMode(SX127X_TX));
   }
   
   // set mode to standby
@@ -772,7 +781,7 @@ int16_t SX127x::setFrequencyDeviation(float freqDev) {
   }
 
   // check frequency deviation range
-  if(!((freqDev + _br/2.0 <= 250.0) && (freqDev >= 0.6) && (freqDev <= 200.0))) {
+  if(!((freqDev + _br/2.0 <= 250.0) && (freqDev <= 200.0))) {
     return(ERR_INVALID_FREQUENCY_DEVIATION);
   }
 
