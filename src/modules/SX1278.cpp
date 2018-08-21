@@ -184,7 +184,9 @@ int16_t SX1278::setBandwidth(float bw) {
   // set bandwidth and if successful, save the new setting
   int16_t state = SX1278::setBandwidthRaw(newBandwidth);
   if(state == ERR_NONE) {
-    SX127x::_bw = bw;
+    // TODO: replace the following hotfix for https://github.com/jgromes/LoRaLib/issues/40
+    // with actual solution
+    //SX127x::_bw = bw;
   }
   return(state);
 }
