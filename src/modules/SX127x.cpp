@@ -704,7 +704,7 @@ float SX127x::getFrequencyError() {
   int16_t modem = getActiveModem();
   if(modem == SX127X_LORA) {
     // get raw frequency error
-    uint32_t raw = _mod->SPIgetRegValue(SX127X_REG_FEI_MSB, 3, 0) << 16;
+    uint32_t raw = (uint32_t)_mod->SPIgetRegValue(SX127X_REG_FEI_MSB, 3, 0) << 16;
     raw |= _mod->SPIgetRegValue(SX127X_REG_FEI_MID) << 8;
     raw |= _mod->SPIgetRegValue(SX127X_REG_FEI_LSB);
     
