@@ -263,7 +263,6 @@ int16_t SX127x::receive(uint8_t* data, size_t len) {
     }
     
     // wait for packet reception or timeout
-    uint32_t start = millis();
     while(!digitalRead(_mod->int0())) {
       if(digitalRead(_mod->int1())) {
         clearIRQFlags();
