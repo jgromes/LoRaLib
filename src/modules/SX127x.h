@@ -555,7 +555,7 @@ class SX127x: public PhysicalLayer {
     int16_t setSyncWord(uint8_t syncWord);
     int16_t setCurrentLimit(uint8_t currentLimit);
     int16_t setPreambleLength(uint16_t preambleLength);
-    float getFrequencyError();
+    float getFrequencyError(bool autoCorrect = false);
     int16_t setBitRate(float br);
     int16_t setFrequencyDeviation(float freqDev);
     int16_t setRxBandwidth(float rxBw);

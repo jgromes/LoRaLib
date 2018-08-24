@@ -700,7 +700,7 @@ int16_t SX127x::setPreambleLength(uint16_t preambleLength) {
   return(state);
 }
 
-float SX127x::getFrequencyError() {
+float SX127x::getFrequencyError(bool autoCorrect) {
   int16_t modem = getActiveModem();
   if(modem == SX127X_LORA) {
     // get raw frequency error
@@ -718,6 +718,12 @@ float SX127x::getFrequencyError() {
       error = (((float)raw * (float)base)/32000000.0) * (_bw/500.0) * -1.0;
     } else {
       error = (((float)raw * (float)base)/32000000.0) * (_bw/500.0);
+    }
+    
+    if(autoCorrect) {
+      // adjust LoRa modem data rate
+      float ppmOffset = 0.95 * (error/32.0);
+      _mod->SPIwriteRegister(0x27, (uint8_t)ppmOffset);
     }
     
     return(error);
