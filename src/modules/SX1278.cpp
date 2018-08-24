@@ -168,7 +168,7 @@ int16_t SX1278::setBandwidth(float bw) {
     newBandwidth = SX1278_BW_15_60_KHZ;
   } else if(abs(bw - 20.8) <= 0.001) {
     newBandwidth = SX1278_BW_20_80_KHZ;
-  } else if(abs(bw - 32.5) <= 0.001) {
+  } else if(abs(bw - 31.25) <= 0.001) {
     newBandwidth = SX1278_BW_31_25_KHZ;
   } else if(abs(bw - 41.7) <= 0.001) {
     newBandwidth = SX1278_BW_41_70_KHZ;
