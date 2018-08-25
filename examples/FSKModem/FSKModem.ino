@@ -163,23 +163,4 @@ void loop() {
   // NOTE: you will not be able to send or receive packets
   // while direct mode is active! to deactivate it, call method
   // fsk.packetMode()
-
-  // "directMode()" method also has an override that allows
-  // you to set raw frequency as 24-bit number
-  // this allows you to send RTTY data
-
-  // set frequency deviation to 0 (required for RTTY)
-  fsk.setFrequencyDeviation(0);
-  // start baud rate timer
-  unsigned long start = micros();
-  // send space (low; 0x6C9999 * 61 Hz = 434.149 749 MHz)
-  fsk.directMode(0x6C9999);
-  // wait for baud rate 45
-  while(micros() - start < 22222);
-  // restart baud rate timer
-  start = micros();
-  // send mark (high; 0x6C999C * 61 Hz = 434.149 932 MHz; 183 Hz shift)
-  fsk.directMode(0x6C9999);
-  // wait for baud rate 45
-  while(micros() - start < 22222);
 }
