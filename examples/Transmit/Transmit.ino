@@ -37,7 +37,7 @@ void setup() {
   // current limit:               100 mA
   // preamble length:             8 symbols
   // amplifier gain:              0 (automatic gain control)
-  int state = lora.beginFSK();
+  int state = lora.begin();
   if (state == ERR_NONE) {
     Serial.println(F("success!"));
   } else {
