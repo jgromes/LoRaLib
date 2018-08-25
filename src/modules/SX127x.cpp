@@ -714,6 +714,7 @@ float SX127x::getFrequencyError(bool autoCorrect) {
     // check the first bit
     if(raw & 0x80000) {
       // frequency error is negative
+      raw |= (uint32_t)0xFFF00000;
       raw = ~raw + 1;
       error = (((float)raw * (float)base)/32000000.0) * (_bw/500.0) * -1.0;
     } else {
@@ -739,6 +740,7 @@ float SX127x::getFrequencyError(bool autoCorrect) {
     // check the first bit
     if(raw & 0x8000) {
       // frequency error is negative
+      raw |= (uint32_t)0xFFF00000;
       raw = ~raw + 1;
       error = (float)raw * (32000000.0 / (float)(base << 19)) * -1.0;
     } else {
