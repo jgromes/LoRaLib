@@ -18,7 +18,7 @@
 // create instance of LoRa class using SX1278 module
 // this pinout corresponds to LoRenz shield:
 // https://github.com/jgromes/LoRenz
-// NSS pin:   7
+// NSS pin:   7 (18 on ESP32 boards)
 // DIO0 pin:  2
 // DIO1 pin:  3
 SX1278 lora = new LoRa;
@@ -37,7 +37,7 @@ void setup() {
   // current limit:               100 mA
   // preamble length:             8 symbols
   // amplifier gain:              0 (automatic gain control)
-  int state = lora.begin();
+  int state = lora.beginFSK();
   if (state == ERR_NONE) {
     Serial.println(F("success!"));
   } else {

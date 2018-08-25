@@ -8,9 +8,17 @@
 #define SPI_READ  0b00000000
 #define SPI_WRITE 0b10000000
 
+#ifdef ESP32
+  // ESP32 boards: pin 7 conflicts with ESP32 flash connections
+  #define LORALIB_DEFAULT_SPI_CS                      4
+#else
+  // all other architectures: pin 7 does not conflict with anything
+  #define LORALIB_DEFAULT_SPI_CS                      7
+#endif
+
 class Module {
   public:
-    Module(int cs = 7, int int0 = 2, int int1 = 3);
+    Module(int cs = LORALIB_DEFAULT_SPI_CS, int int0 = 2, int int1 = 3);
     
     void init(uint8_t interface, uint8_t gpio);
     

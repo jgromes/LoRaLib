@@ -2,9 +2,13 @@
    LoRaLib FSK Modem Example
 
    This example shows how to use FSK modem in SX127x chips.
-   NOTE: The code below is just a guide, do not attempt
-         to run it!
-
+   
+   NOTE: The sketch below is just a guide on how to use
+         FSK modem, so this code should not be run directly!
+         Instead, modify the other examples to use FSK
+         modem and use the appropriate configuration
+         methods.
+   
    For more detailed information, see the LoRaLib Wiki
    https://github.com/jgromes/LoRaLib/wiki
 
@@ -18,7 +22,7 @@
 // create instance of LoRa class using SX1278 module
 // this pinout corresponds to LoRenz shield:
 // https://github.com/jgromes/LoRenz
-// NSS pin:   7
+// NSS pin:   7 (18 on ESP32 boards)
 // DIO0 pin:  2
 // DIO1 pin:  3
 SX1278 fsk = new LoRa;
@@ -49,7 +53,8 @@ void setup() {
   // lora.begin()       start LoRa mode (and disable FSK)
   // lora.beginFSK()    start FSK mode (and disable LoRa)
 
-  // FSK modem supports the following settings:
+  // the following settings can also 
+  // be modified at run-time
   state = fsk.setFrequency(433.5);
   state = fsk.setBitRate(100.0);
   state = fsk.setFrequencyDeviation(10.0);
@@ -64,6 +69,8 @@ void setup() {
     Serial.println(state);
     while (true);
   }
+
+  #error "This sketch is just an API guide! Read the note at line 6."
 }
 
 void loop() {
