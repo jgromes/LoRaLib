@@ -310,7 +310,7 @@ int16_t SX127x::receive(uint8_t* data, size_t len) {
     int16_t state = setMode(SX127X_STANDBY);
     
     // set DIO pin mapping
-    state |= _mod->SPIsetRegValue(SX127X_REG_DIO_MAPPING_1, SX127X_DIO0_PACK_PACKET_SENT, 7, 6);
+    state |= _mod->SPIsetRegValue(SX127X_REG_DIO_MAPPING_1, SX127X_DIO0_PACK_PAYLOAD_READY, 7, 6);
     
     // clear interrupt flags
     clearIRQFlags();
