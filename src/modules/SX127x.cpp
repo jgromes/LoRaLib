@@ -106,11 +106,11 @@ int16_t SX127x::beginFSK(uint8_t chipVersion, float br, float freqDev, float rxB
 }
 
 int16_t SX127x::transmit(String& str, uint8_t addr) {
-  return(SX127x::transmit(str.c_str()), addr);
+  return(SX127x::transmit(str.c_str(), addr));
 }
 
 int16_t SX127x::transmit(const char* str, uint8_t addr) {
-  return(SX127x::transmit((uint8_t*)str, strlen(str)), addr);
+  return(SX127x::transmit((uint8_t*)str, strlen(str), addr));
 }
 
 int16_t SX127x::transmit(uint8_t* data, size_t len, uint8_t addr) {
@@ -207,7 +207,7 @@ int16_t SX127x::transmit(uint8_t* data, size_t len, uint8_t addr) {
       return(state);
     }
     
-    // wait for transmission end or timeout (150 % of expected time-one-air)
+    // wait for transmission end or timeout (150 % of expected time-on-air)
     uint32_t timeout = (uint32_t)((((float)(len * 8)) / (_br * 1000.0)) * 1500.0);
     uint32_t start = millis();
     while(!digitalRead(_mod->int0())) {
@@ -485,11 +485,11 @@ void SX127x::setDio1Action(void (*func)(void)) {
 }
 
 int16_t SX127x::startTransmit(String& str, uint8_t addr) {
-  return(SX127x::startTransmit(str.c_str()), addr);
+  return(SX127x::startTransmit(str.c_str(), addr));
 }
 
 int16_t SX127x::startTransmit(const char* str, uint8_t addr) {
-  return(SX127x::startTransmit((uint8_t*)str, strlen(str)), addr);
+  return(SX127x::startTransmit((uint8_t*)str, strlen(str), addr));
 }
 
 int16_t SX127x::startTransmit(uint8_t* data, size_t len, uint8_t addr) {
