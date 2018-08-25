@@ -241,11 +241,11 @@ int16_t SX127x::receive(String& str, size_t len) {
 }
 
 int16_t SX127x::receive(uint8_t* data, size_t len) {
+  // set mode to standby
+  int16_t state = setMode(SX127X_STANDBY);
+
   int16_t modem = getActiveModem();
   if(modem == SX127X_LORA) {
-    // set mode to standby
-    int16_t state = setMode(SX127X_STANDBY);
-    
     // set DIO pin mapping
     state |= _mod->SPIsetRegValue(SX127X_REG_DIO_MAPPING_1, SX127X_DIO0_RX_DONE | SX127X_DIO1_RX_TIMEOUT, 7, 4);
     
@@ -306,9 +306,6 @@ int16_t SX127x::receive(uint8_t* data, size_t len) {
     return(ERR_NONE);
     
   } else if(modem == SX127X_FSK_OOK) {
-    // set mode to standby
-    int16_t state = setMode(SX127X_STANDBY);
-    
     // set DIO pin mapping
     state |= _mod->SPIsetRegValue(SX127X_REG_DIO_MAPPING_1, SX127X_DIO0_PACK_PAYLOAD_READY, 7, 6);
     
@@ -459,21 +456,35 @@ int16_t SX127x::startReceive() {
   // set mode to standby
   int16_t state = setMode(SX127X_STANDBY);
   
-  // set DIO pin mapping
-  state |= _mod->SPIsetRegValue(SX127X_REG_DIO_MAPPING_1, SX127X_DIO0_RX_DONE | SX127X_DIO1_RX_TIMEOUT, 7, 4);
-  
-  // clear interrupt flags
-  clearIRQFlags();
-  
-  // set FIFO pointers
-  state |= _mod->SPIsetRegValue(SX127X_REG_FIFO_RX_BASE_ADDR, SX127X_FIFO_RX_BASE_ADDR_MAX);
-  state |= _mod->SPIsetRegValue(SX127X_REG_FIFO_ADDR_PTR, SX127X_FIFO_RX_BASE_ADDR_MAX);
-  if(state != ERR_NONE) {
-    return(state);
+  if(modem == SX127X_LORA) {
+    // set DIO pin mapping
+    state |= _mod->SPIsetRegValue(SX127X_REG_DIO_MAPPING_1, SX127X_DIO0_RX_DONE | SX127X_DIO1_RX_TIMEOUT, 7, 4);
+    
+    // clear interrupt flags
+    clearIRQFlags();
+    
+    // set FIFO pointers
+    state |= _mod->SPIsetRegValue(SX127X_REG_FIFO_RX_BASE_ADDR, SX127X_FIFO_RX_BASE_ADDR_MAX);
+    state |= _mod->SPIsetRegValue(SX127X_REG_FIFO_ADDR_PTR, SX127X_FIFO_RX_BASE_ADDR_MAX);
+    if(state != ERR_NONE) {
+      return(state);
+    }
+    
+    // set mode to continuous reception
+    return(setMode(SX127X_RXCONTINUOUS));
+    
+  } else if(modem == SX127X_FSK_OOK) {
+    // set DIO pin mapping
+    state |= _mod->SPIsetRegValue(SX127X_REG_DIO_MAPPING_1, SX127X_DIO0_PACK_PAYLOAD_READY, 7, 6);
+    
+    // clear interrupt flags
+    clearIRQFlags();
+    
+    // set mode to receive
+    return(setMode(SX127X_RX));
   }
   
-  // set mode to continuous reception
-  return(setMode(SX127X_RXCONTINUOUS));
+  return(ERR_UNKNOWN);
 }
 
 void SX127x::setDio0Action(void (*func)(void)) {
