@@ -41,10 +41,10 @@ SX1272 loraSX1272 = new LoRa(6, 4, 5);
 // SX1276 module and user-specified pinout
 // we ran out of Uno digital pins, so here we use 
 // analog ones
-// NSS pin:   A0
-// DIO0 pin:  A1
-// DIO1 pin:  A2
-SX1276 loraSX1276 = new LoRa(A0, A1, A2);
+// NSS pin:   14 (A0)
+// DIO0 pin:  15 (A1)
+// DIO1 pin:  16 (A2)
+SX1276 loraSX1276 = new LoRa(14, 15, 16);
 
 void setup() {
   Serial.begin(9600);
