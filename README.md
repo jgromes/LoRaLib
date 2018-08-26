@@ -1,4 +1,4 @@
-# LoRaLib
+# LoRaLib [![Build Status](https://travis-ci.org/jgromes/LoRaLib.svg?branch=master)](https://travis-ci.org/jgromes/LoRaLib)
 
 ## Arduino library for LoRa modules based on SX1278 and SX1272 chips
 
