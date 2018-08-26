@@ -152,13 +152,17 @@ void loop() {
 
   // using the direct mode, it is possible to transmit
   // FM notes with Arduino tone() function
-  // transmit FM note at 1000 Hz for 1 second
+
+  // tone() function is not available on ESP32 and Arduino Due
+  #if !defined(ESP32) && !defined(_VARIANT_ARDUINO_DUE_X_)
+  // transmit FM tone at 1000 Hz for 1 second
   // (DIO2 is connected to Arduino pin 4)
   tone(4, 1000);
   delay(1000);
   // transmit FM note at 500 Hz for 1 second
   tone(4, 500);
   delay(1000);
+  #endif
   
   // NOTE: you will not be able to send or receive packets
   // while direct mode is active! to deactivate it, call method
