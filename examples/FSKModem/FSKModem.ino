@@ -70,7 +70,7 @@ void setup() {
     while (true);
   }
 
-  #error "This sketch is just an API guide! Read the note at line 6."
+  #warning "This sketch is just an API guide! Read the note at line 6."
 }
 
 void loop() {
