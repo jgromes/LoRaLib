@@ -167,7 +167,7 @@ void loop() {
   // NOTE: after calling transmitDirect(), SX127x will start
   // transmitting immediately! This signal can jam other
   // devices at the same frequency, it is up to the user
-  // to disable it with idle() method!
+  // to disable it with standby() method!
 
   // direct mode transmissions can also be received
   // as bit stream on DIO1 (data) and DIO2 (clock)
