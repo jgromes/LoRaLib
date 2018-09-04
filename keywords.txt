@@ -35,7 +35,8 @@ setDio1Action	KEYWORD2
 startTransmit	KEYWORD2
 startReceive	KEYWORD2
 readData	KEYWORD2
-directMode	KEYWORD2
+transmitDirect	KEYWORD2
+receiveDirect	KEYWORD2
 packetMode	KEYWORD2
 
 setBandwidth	KEYWORD2
