@@ -1,23 +1,34 @@
 language: c
-sudo: false
-cache:
-  directories:
-    - ~/arduino_ide
-    - ~/.arduino15/packages/
-git:
-  depth: false
-  quiet: true
 env:
   global:
      - ARDUINO_IDE_VERSION="1.8.5"
+  matrix:
+    - BOARD="arduino:avr:uno"
+    - BOARD="arduino:avr:leonardo"
+    - BOARD="arduino:avr:mega:cpu=atmega2560"
+    - BOARD="esp8266:esp8266:generic"
+    - BOARD="esp32:esp32:esp32"
 before_install:
-  - source <(curl -SLs https://raw.githubusercontent.com/adafruit/travis-ci-arduino/master/install.sh)
+  #install Arduino IDE
+  - wget http://downloads.arduino.cc/arduino-$ARDUINO_IDE_VERSION-linux64.tar.xz
+  - tar xf arduino-$ARDUINO_IDE_VERSION-linux64.tar.xz
+  - mv arduino-$ARDUINO_IDE_VERSION $HOME/arduino-ide
+  - export PATH=$PATH:$HOME/arduino-ide
+  
+  #install 3rd party boards
+  - arduino --pref "boardsmanager.additional.urls="http://arduino.esp8266.com/stable/package_esp8266com_index.json,https://dl.espressif.com/dl/package_esp32_index.json"
+  
+  #command to build example sketch
+  - buildExample() { arduino --verbose-build --verify --board $BOARD $PWD/examples/$1/$1.ino; }
 install:
-  - arduino --install-library "LoRaLib"
+  - mkdir -p $HOME/Arduino/libraries
+  - ln -s $PWD $HOME/Arduino/libraries/LoRaLib
 script:
-  - build_main_platforms
-notifications:
-  email:
-    on_success: change
-    on_failure: change
-
+  - buildExample FSKModem
+  - buildExample ChannelActivityDetection
+  - buildExample Receive
+  - buildExample ReceiveInterrupt
+  - buildExample Settings
+  - buildExample Transmit
+  - buildExample TransmitInterrupt
+  
