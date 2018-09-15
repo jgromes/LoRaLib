@@ -6,7 +6,7 @@ env:
     - BOARD="arduino:avr:uno"
     - BOARD="arduino:avr:leonardo"
     - BOARD="arduino:avr:mega:cpu=atmega2560"
-    - BOARD="esp8266:esp8266:generic:FlashSize=512K"
+    - BOARD="esp8266:esp8266:generic:FlashSize=512K0"
     - BOARD="esp32:esp32:esp32"
 before_install:
   #install Arduino IDE
