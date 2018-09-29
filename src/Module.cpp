@@ -99,15 +99,6 @@ void Module::SPIreadRegisterBurst(uint8_t reg, uint8_t numBytes, uint8_t* inByte
   digitalWrite(_cs, HIGH);
 }
 
-void Module::SPIreadRegisterBurstStr(uint8_t reg, uint8_t numBytes, char* inBytes) {
-  digitalWrite(_cs, LOW);
-  SPI.transfer(reg | SPI_READ);
-  for(uint8_t i = 0; i < numBytes; i++) {
-    inBytes[i] = SPI.transfer(reg);
-  }
-  digitalWrite(_cs, HIGH);
-}
-
 uint8_t Module::SPIreadRegister(uint8_t reg) {
   uint8_t inByte;
   digitalWrite(_cs, LOW);
@@ -120,15 +111,6 @@ uint8_t Module::SPIreadRegister(uint8_t reg) {
 }
 
 void Module::SPIwriteRegisterBurst(uint8_t reg, uint8_t* data, uint8_t numBytes) {
-  digitalWrite(_cs, LOW);
-  SPI.transfer(reg | SPI_WRITE);
-  for(uint8_t i = 0; i < numBytes; i++) {
-    SPI.transfer(data[i]);
-  }
-  digitalWrite(_cs, HIGH);
-}
-
-void Module::SPIwriteRegisterBurstStr(uint8_t reg, const char* data, uint8_t numBytes) {
   digitalWrite(_cs, LOW);
   SPI.transfer(reg | SPI_WRITE);
   for(uint8_t i = 0; i < numBytes; i++) {

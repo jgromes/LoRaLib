@@ -26,11 +26,9 @@ class Module {
     int16_t SPIsetRegValue(uint8_t reg, uint8_t value, uint8_t msb = 7, uint8_t lsb = 0);
     
     void SPIreadRegisterBurst(uint8_t reg, uint8_t numBytes, uint8_t* inBytes);
-    void SPIreadRegisterBurstStr(uint8_t reg, uint8_t numBytes, char* str);
     uint8_t SPIreadRegister(uint8_t reg);
     
     void SPIwriteRegisterBurst(uint8_t reg, uint8_t* data, uint8_t numBytes);
-    void SPIwriteRegisterBurstStr(uint8_t reg, const char* data, uint8_t numBytes);
     void SPIwriteRegister(uint8_t reg, uint8_t data);
     
     int int0() const { return(_int0); }
