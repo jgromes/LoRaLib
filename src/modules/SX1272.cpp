@@ -300,7 +300,7 @@ int16_t SX1272::config() {
   // calculate symbol length and set low datarate optimization, if needed
   uint16_t base = 1;
   float symbolLength = (float)(base << _sf) / (float)_bw;
-  if(symbolLength >= 0.016) {
+  if(symbolLength >= 16.0) {
     state = _mod->SPIsetRegValue(SX127X_REG_MODEM_CONFIG_1, SX1272_LOW_DATA_RATE_OPT_ON, 0, 0);
   } else {
     state = _mod->SPIsetRegValue(SX127X_REG_MODEM_CONFIG_1, SX1272_LOW_DATA_RATE_OPT_OFF, 0, 0);

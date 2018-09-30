@@ -128,14 +128,14 @@ int16_t SX127x::transmit(uint8_t* data, size_t len, uint8_t addr) {
     uint16_t base = 1;
     float symbolLength = (float)(base << _sf) / (float)_bw;
     float de = 0;
-    if(symbolLength >= 0.016) {
+    if(symbolLength >= 16.0) {
       de = 1;
     }
     float ih = (float)_mod->SPIgetRegValue(SX127X_REG_MODEM_CONFIG_1, 0, 0);
     float crc = (float)(_mod->SPIgetRegValue(SX127X_REG_MODEM_CONFIG_2, 2, 2) >> 2);
     float n_pre = (float)_mod->SPIgetRegValue(SX127X_REG_PREAMBLE_LSB);
     float n_pay = 8.0 + max(ceil((8.0 * (float)len - 4.0 * (float)_sf + 28.0 + 16.0 * crc - 20.0 * ih)/(4.0 * (float)_sf - 8.0 * de)) * (float)_cr, 0.0);
-    uint32_t timeout = ceil(symbolLength * (n_pre + n_pay + 4.25) * 1000.0);
+    uint32_t timeout = ceil(symbolLength * (n_pre + n_pay + 4.25) * 1.5);
     
     // set DIO mapping
     _mod->SPIsetRegValue(SX127X_REG_DIO_MAPPING_1, SX127X_DIO0_TX_DONE, 7, 6);
