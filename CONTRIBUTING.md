@@ -7,5 +7,7 @@ To keep this library organized, please follow these rules.
 Any issues without description will be considered spam and as such will be **CLOSED** and **LOCKED** immediately!
 2. **This repository has issue templates.**  
 To report bugs or suggest new features, use the provided issue templates. Use the default issue only if the templates do not fit your issue type.
-3. **LoRaLib is a driver.**  
+3. **Be as clear as possible when creating issues.**  
+Issues with generic titles (e.g. "not working", "lora", etc.) will be **CLOSED** until the title is fixed, since the title is supposed to categorize the issue. The same applies for issues with very little information and gramatical or formatting errors that make it difficult to find out what is the actual issue.
+4. **LoRaLib is a driver.**  
 This means that only features available in the SX127x chips will be implemented. LoRaLib will not implement protocols such as LoRaWAN.
