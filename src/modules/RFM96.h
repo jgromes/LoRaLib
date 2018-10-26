@@ -7,7 +7,7 @@
 #include "SX1278.h"
 
 // SX127X_REG_VERSION
-#define RFM9X_CHIP_VERSION                            0x11
+#define RFM9X_CHIP_VERSION                            0x12  // according to datasheet, this should be 0x11, but all modules seem to have 0x12
 
 class RFM96: public SX1278 {
   public:
