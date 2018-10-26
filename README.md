@@ -1,6 +1,6 @@
 # LoRaLib [![Build Status](https://travis-ci.org/jgromes/LoRaLib.svg?branch=master)](https://travis-ci.org/jgromes/LoRaLib)
 
-## Arduino library for LoRa modules based on SX1278 and SX1272 chips
+## Arduino library for LoRa modules based on LoRa chips by Semtech (SX1272, SX1276, SX1278) and HopeRF (RFM95, RFM96, RFM97)
 
 ## See the [Wiki](https://github.com/jgromes/LoRaLib/wiki) for detailed API reference and further information.
 
@@ -9,13 +9,14 @@ If you're looking for an open-source shield to use with this library, it has its
 
 ---
 
-DISCLAIMER: This library is provided 'AS IS'. See `license.txt` for details.
+**DISCLAIMER: This library is provided 'AS IS'. See `license.txt` for details.**
 
-This library enables easy long range communaction with SX127x family of LoRa modules. It was designed to be used with LoRenz Rev.B shields. However, they are not required and this library can be used with any LoRa module, as long as it is based on of the Semtech LoRa chips.
+This library enables easy long range communaction with SX127x family of LoRa modules. It was designed to be used with LoRenz Rev.B shields. However, they are not required and this library can be used with any LoRa module, as long as it is based on of the supported LoRa chips.
 
 Currently supported chips:
 * SX1272 and SX1273
 * SX1278, SX1276, SX1277 and SX1279
+* RFM95, RFM96, RFM97 and RFM98
 
 Currently supported platforms:
 * All Arduino AVR boards (tested on Uno and Mega)
