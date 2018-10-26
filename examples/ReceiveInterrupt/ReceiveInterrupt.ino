@@ -70,14 +70,19 @@ void setup() {
     while (true);
   }
 
-  // if needed, 'listen' mode can be disabled by calling
-  // any of the following methods:
+  // if needed (e.g. to transmit after
+  // receiving packet with interrupt), 
+  // 'listen' mode will be disabled automatically
+  // by calling any of the following methods:
   //
   // lora.standby()
   // lora.sleep()
   // lora.transmit();
   // lora.receive();
   // lora.scanChannel();
+  //
+  // call lora.startReceive() to re-enable
+  // 'listen mode'
 }
 
 // flag to indicate that a packet was received
