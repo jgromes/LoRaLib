@@ -7,7 +7,7 @@
 #include "SX1278.h"
 
 // SX127X_REG_VERSION
-#define RFM9X_CHIP_VERSION                            0x11
+#define RFM95_CHIP_VERSION                            0x11
 
 class RFM95: public SX1278 {
   public:
