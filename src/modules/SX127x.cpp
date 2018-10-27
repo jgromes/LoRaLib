@@ -1043,7 +1043,7 @@ int16_t SX127x::config() {
 
 int16_t SX127x::configFSK() {
   // set FSK modulation
-  int16_t state = _mod->SPIsetRegValue(SX127X_REG_OP_MODE, SX127X_MODULATION_FSK, 6, 5);
+  int16_t state = _mod->SPIsetRegValue(SX127X_REG_OP_MODE, SX127X_MODULATION_FSK, 6, 5, 5);
   if(state != ERR_NONE) {
     return(state);
   }
@@ -1119,7 +1119,7 @@ bool SX127x::findChip(uint8_t ver) {
 }
 
 int16_t SX127x::setMode(uint8_t mode) {
-  return(_mod->SPIsetRegValue(SX127X_REG_OP_MODE, mode, 2, 0));
+  return(_mod->SPIsetRegValue(SX127X_REG_OP_MODE, mode, 2, 0, 5));
 }
 
 int16_t SX127x::getActiveModem() {
@@ -1131,7 +1131,7 @@ int16_t SX127x::setActiveModem(uint8_t modem) {
   int16_t state = setMode(SX127X_SLEEP);
   
   // set LoRa mode
-  state |= _mod->SPIsetRegValue(SX127X_REG_OP_MODE, modem, 7, 7);
+  state |= _mod->SPIsetRegValue(SX127X_REG_OP_MODE, modem, 7, 7, 5);
   
   // set mode to STANDBY
   state |= setMode(SX127X_STANDBY);
