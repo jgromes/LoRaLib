@@ -9,11 +9,11 @@
 #define SPI_WRITE 0b10000000
 
 #ifdef ESP32
-  // ESP32 boards: pin 7 conflicts with ESP32 flash connections
+  // ESP32 boards (pin 10 conflicts with ESP32 flash connections)
   #define LORALIB_DEFAULT_SPI_CS                      4
 #else
-  // all other architectures: pin 7 does not conflict with anything
-  #define LORALIB_DEFAULT_SPI_CS                      7
+  // all other architectures
+  #define LORALIB_DEFAULT_SPI_CS                      10
 #endif
 
 class Module {

@@ -14,10 +14,10 @@
 // include the library
 #include <LoRaLib.h>
 
-// create instance of LoRa class using SX1278 module 
-// this pinout corresponds to LoRenz shield:
-// https://github.com/jgromes/LoRenz
-// NSS pin:   7 (18 on ESP32 boards)
+// create instance of LoRa class using SX1278 module
+// this pinout corresponds to KITE Shield
+// https://github.com/jgromes/KiteShield
+// NSS pin:   10 (4 on ESP32 boards)
 // DIO0 pin:  2
 // DIO1 pin:  3
 SX1278 lora = new LoRa;
