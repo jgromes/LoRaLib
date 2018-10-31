@@ -135,13 +135,13 @@ void loop() {
   
       // print RSSI (Received Signal Strength Indicator) 
       Serial.print("RSSI:\t\t\t");
-      Serial.print(lora.lastPacketRSSI);
+      Serial.print(lora.getRSSI());
       Serial.println(" dBm");
   
       // print SNR (Signal-to-Noise Ratio) 
       Serial.print("SNR:\t\t\t");
-      Serial.print(lora.lastPacketSNR);
-      Serial.println(" dBm");
+      Serial.print(lora.getSNR());
+      Serial.println(" dB");
 
       // print frequency error
       Serial.print("Frequency error:\t");

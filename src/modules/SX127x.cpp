@@ -42,6 +42,9 @@ int16_t SX127x::begin(uint8_t chipVersion, uint8_t syncWord, uint8_t currentLimi
   // set preamble length
   state = SX127x::setPreambleLength(preambleLength);
   
+  // initalize internal variables
+  _dataRate = 0.0;
+  
   return(state);
 }
 
@@ -170,7 +173,7 @@ int16_t SX127x::transmit(uint8_t* data, size_t len, uint8_t addr) {
     uint32_t elapsed = millis() - start;
     
     // update data rate
-    dataRate = (len*8.0)/((float)elapsed/1000.0);
+    _dataRate = (len*8.0)/((float)elapsed/1000.0);
     
     // clear interrupt flags
     clearIRQFlags();
@@ -294,11 +297,6 @@ int16_t SX127x::receive(uint8_t* data, size_t len) {
     if(len == 0) {
       data[length] = 0;
     }
-    
-    // update RSSI and SNR
-    lastPacketRSSI = -157 + _mod->SPIgetRegValue(SX127X_REG_PKT_RSSI_VALUE);
-    int8_t rawSNR = (int8_t)_mod->SPIgetRegValue(SX127X_REG_PKT_SNR_VALUE);
-    lastPacketSNR = rawSNR / 4.0;
     
     // clear interrupt flags
     clearIRQFlags();
@@ -634,11 +632,6 @@ int16_t SX127x::readData(uint8_t* data, size_t len) {
       data[length] = 0;
     }
     
-    // update RSSI and SNR
-    lastPacketRSSI = -157 + _mod->SPIgetRegValue(SX127X_REG_PKT_RSSI_VALUE);
-    int8_t rawSNR = (int8_t)_mod->SPIgetRegValue(SX127X_REG_PKT_SNR_VALUE);
-    lastPacketSNR = rawSNR / 4.0;
-    
     // clear interrupt flags
     clearIRQFlags();
     
@@ -785,6 +778,26 @@ float SX127x::getFrequencyError(bool autoCorrect) {
   }
   
   return(ERR_UNKNOWN);
+}
+
+float SX127x::getSNR() {
+  // check active modem
+  if(getActiveModem() != SX127X_LORA) {
+    return(0);
+  }
+  
+  // get SNR value
+  int8_t rawSNR = (int8_t)_mod->SPIgetRegValue(SX127X_REG_PKT_SNR_VALUE);
+  return(rawSNR / 4.0);
+}
+
+float SX127x::getDataRate() {
+  // check active modem
+  if(getActiveModem() != SX127X_LORA) {
+    return(0);
+  }
+
+  return(_dataRate);
 }
 
 int16_t SX127x::setBitRate(float br) {

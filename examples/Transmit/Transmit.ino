@@ -67,7 +67,7 @@ void loop() {
 
     // print measured data rate
     Serial.print("Datarate:\t");
-    Serial.print(lora.dataRate);
+    Serial.print(lora.getDataRate());
     Serial.println(" bps");
 
   } else if (state == ERR_PACKET_TOO_LONG) {

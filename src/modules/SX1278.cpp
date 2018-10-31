@@ -147,8 +147,12 @@ int16_t SX1278::setFrequency(float freq) {
     }
   }
   
-  // set frequency
-  return(SX127x::setFrequencyRaw(freq));
+  // set frequency and if successful, save the new setting
+  int16_t state = SX127x::setFrequencyRaw(freq);
+  if(state == ERR_NONE) {
+    SX127x::_freq = freq;
+  }
+  return(state);
 }
 
 int16_t SX1278::setBandwidth(float bw) {
@@ -321,6 +325,31 @@ int16_t SX1278::setGain(uint8_t gain) {
     state |= _mod->SPIsetRegValue(SX127X_REG_LNA, (gain << 5) | SX127X_LNA_BOOST_ON);
   }
   return(state);
+}
+
+int8_t SX1278::getRSSI() {
+  // check active modem
+  if(getActiveModem() != SX127X_LORA) {
+    return(0);
+  }
+
+  int8_t lastPacketRSSI;
+  
+  // RSSI calculation uses different constant for low-frequency and high-frequency ports
+  if(_freq < 868.0) {
+    lastPacketRSSI = -164 + _mod->SPIgetRegValue(SX127X_REG_PKT_RSSI_VALUE);
+  } else {
+    lastPacketRSSI = -157 + _mod->SPIgetRegValue(SX127X_REG_PKT_RSSI_VALUE);
+  }
+  
+  // spread-spectrum modulation signal can be received below noise floor
+  // check last packet SNR and if it's less than 0, add it to reported RSSI to get the correct value
+  float lastPacketSNR = SX127x::getSNR();
+  if(lastPacketSNR < 0.0) {
+    lastPacketRSSI += lastPacketSNR;
+  }
+  
+  return(lastPacketRSSI);
 }
 
 int16_t SX1278::setBandwidthRaw(uint8_t newBandwidth) {

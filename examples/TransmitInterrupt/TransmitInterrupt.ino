@@ -103,6 +103,10 @@ void loop() {
                         0x78, 0xAB, 0xCD, 0xEF};
       int state = lora.transmit(byteArr, 8);
     */
+
+    // NOTE: when using interrupt-driven transmit method,
+    //       it is not possible to automatically measure
+    //       transmission data rate using getDataRate()
     
     if (state != ERR_NONE) {
       Serial.print(F("failed, code "));

@@ -24,9 +24,6 @@ RFM98	KEYWORD1
 # Methods and Functions (KEYWORD2)
 #######################################
 
-dataRate	KEYWORD2
-lastPacketRSSI	KEYWORD2
-lastPacketSNR	KEYWORD2
 begin	KEYWORD2
 beginFSK	KEYWORD2
 transmit	KEYWORD2
@@ -52,6 +49,9 @@ setCurrentLimit	KEYWORD2
 setPreambleLength	KEYWORD2
 setGain	KEYWORD2
 getFrequencyError	KEYWORD2
+getRSSI	KEYWORD2
+getSNR	KEYWORD2
+getDataRate	KEYWORD2
 setBitRate	KEYWORD2
 setRxBandwidth	KEYWORD2
 setFrequencyDeviation	KEYWORD2
