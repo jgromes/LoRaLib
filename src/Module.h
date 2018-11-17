@@ -8,8 +8,8 @@
 #define SPI_READ  0b00000000
 #define SPI_WRITE 0b10000000
 
-#ifdef ESP32
-  // ESP32 boards (pin 10 conflicts with ESP32 flash connections)
+#if defined(ESP32) || defined(ESP8266)
+  // ESP32/ESP8266 boards (pin 10 conflicts with ESP32/ESP8266 flash connections)
   #define LORALIB_DEFAULT_SPI_CS                      4
 #else
   // all other architectures

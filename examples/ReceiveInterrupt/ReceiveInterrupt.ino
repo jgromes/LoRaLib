@@ -23,7 +23,7 @@
 // create instance of LoRa class using SX1278 module
 // this pinout corresponds to KITE Shield
 // https://github.com/jgromes/KiteShield
-// NSS pin:   10 (4 on ESP32 boards)
+// NSS pin:   10 (4 on ESP32/ESP8266 boards)
 // DIO0 pin:  2
 // DIO1 pin:  3
 // IMPORTANT: because this example uses external interrupts,
