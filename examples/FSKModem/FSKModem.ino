@@ -38,6 +38,7 @@ void setup() {
   // Rx bandwidth:                125.0 kHz
   // output power:                13 dBm
   // current limit:               100 mA
+  // data shaping:                Gaussian, BT = 0.3
   // sync word:                   0x2D  0x01
   int state = fsk.beginFSK();
   if (state == ERR_NONE) {
@@ -61,6 +62,7 @@ void setup() {
   state = fsk.setRxBandwidth(250.0);
   state = fsk.setOutputPower(10.0);
   state = fsk.setCurrentLimit(100);
+  state = fsk.setDataShaping(0.5);
   uint8_t syncWord[] = {0x01, 0x23, 0x45, 0x67, 
                         0x89, 0xAB, 0xCD, 0xEF};
   state = fsk.setSyncWord(syncWord, 8);
@@ -93,6 +95,7 @@ void loop() {
     Serial.println(F("Timed out while transmitting!"));
   } else {
     Serial.println(F("Failed to transmit packet, code "));
+    Serial.println(state);
   }
 
   // receive FSK packet
@@ -110,6 +113,7 @@ void loop() {
     Serial.println(F("Timed out while waiting for packet!"));
   } else {
     Serial.println(F("Failed to receive packet, code "));
+    Serial.println(state);
   }
 
   // FSK modem has built-in address filtering system
@@ -128,6 +132,7 @@ void loop() {
   state = fsk.setBroadcastAddress(0xFF);
   if (state != ERR_NONE) {
     Serial.println(F("Unable to set address filter, code "));
+    Serial.println(state);
   }
 
   // address filtering can also be disabled
@@ -148,10 +153,19 @@ void loop() {
   state = fsk.transmitDirect();
   if (state != ERR_NONE) {
     Serial.println(F("Unable to start direct transmission mode, code "));
+    Serial.println(state);
   }
 
   // using the direct mode, it is possible to transmit
   // FM notes with Arduino tone() function
+  
+  // it is recommended to set data shaping to 0
+  // (no shaping) when transmitting audio
+  state = fsk.setDataShaping(0.0);
+  if (state != ERR_NONE) {
+    Serial.println(F("Unable to set data shaping, code "));
+    Serial.println(state);
+  }
 
   // tone() function is not available on ESP32 and Arduino Due
   #if !defined(ESP32) && !defined(_VARIANT_ARDUINO_DUE_X_)
@@ -174,6 +188,7 @@ void loop() {
   state = fsk.receiveDirect();
   if (state != ERR_NONE) {
     Serial.println(F("Unable to start direct reception mode, code "));
+    Serial.println(state);
   }
   
   // NOTE: you will not be able to send or receive packets

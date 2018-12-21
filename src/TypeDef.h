@@ -70,5 +70,6 @@
 #define ERR_INVALID_RX_BANDWIDTH              -22
 #define ERR_INVALID_FREQUENCY_DEVIATION       -23
 #define ERR_INVALID_SYNC_WORD                 -24
+#define ERR_INVALID_DATA_SHAPING              -25
 
 #endif
