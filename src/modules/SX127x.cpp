@@ -1,6 +1,6 @@
 #include "SX127x.h"
 
-SX127x::SX127x(Module* mod) {
+SX127x::SX127x(Module* mod) : PhysicalLayer(SX127X_CRYSTAL_FREQ, SX127X_DIV_EXPONENT) {
   _mod = mod;
 }
 
