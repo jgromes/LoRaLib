@@ -8,6 +8,8 @@ env:
     - BOARD="arduino:avr:uno"
     - BOARD="arduino:avr:leonardo"
     - BOARD="arduino:avr:mega:cpu=atmega2560"
+    - BOARD="esp8266:esp8266:generic:xtal=80,ResetMethod=ck,CrystalFreq=26,FlashFreq=40,FlashMode=qio,eesz=512K"
+    - BOARD="esp32:esp32:esp32"
 
 before_install:
   # install Arduino IDE
