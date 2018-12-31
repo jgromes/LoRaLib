@@ -164,7 +164,7 @@ int16_t SX127x::transmit(uint8_t* data, size_t len, uint8_t addr) {
     
     // wait for packet transmission or timeout
     uint32_t start = millis();
-    while(!digitalRead(_mod->int0())) {
+    while(!digitalRead(_mod->getInt0())) {
       if(millis() - start > timeout) {
         clearIRQFlags();
         return(ERR_TX_TIMEOUT);
@@ -213,7 +213,7 @@ int16_t SX127x::transmit(uint8_t* data, size_t len, uint8_t addr) {
     // wait for transmission end or timeout (150 % of expected time-on-air)
     uint32_t timeout = (uint32_t)((((float)(len * 8)) / (_br * 1000.0)) * 1500.0);
     uint32_t start = millis();
-    while(!digitalRead(_mod->int0())) {
+    while(!digitalRead(_mod->getInt0())) {
       if(millis() - start > timeout) {
         clearIRQFlags();
         return(ERR_TX_TIMEOUT);
@@ -266,8 +266,8 @@ int16_t SX127x::receive(uint8_t* data, size_t len) {
     }
     
     // wait for packet reception or timeout
-    while(!digitalRead(_mod->int0())) {
-      if(digitalRead(_mod->int1())) {
+    while(!digitalRead(_mod->getInt0())) {
+      if(digitalRead(_mod->getInt1())) {
         clearIRQFlags();
         return(ERR_RX_TIMEOUT);
       }
@@ -323,7 +323,7 @@ int16_t SX127x::receive(uint8_t* data, size_t len) {
     }
     uint32_t timeout = (uint32_t)((((float)(maxLen * 8)) / (_br * 1000.0)) * 1500.0);
     uint32_t start = millis();
-    while(!digitalRead(_mod->int0())) {
+    while(!digitalRead(_mod->getInt0())) {
       if(millis() - start > timeout) {
         clearIRQFlags();
         return(ERR_RX_TIMEOUT);
@@ -384,8 +384,8 @@ int16_t SX127x::scanChannel() {
   }
   
   // wait for channel activity detected or timeout
-  while(!digitalRead(_mod->int0())) {
-    if(digitalRead(_mod->int1())) {
+  while(!digitalRead(_mod->getInt0())) {
+    if(digitalRead(_mod->getInt1())) {
       clearIRQFlags();
       return(PREAMBLE_DETECTED);
     }
@@ -509,11 +509,11 @@ int16_t SX127x::startReceive() {
 }
 
 void SX127x::setDio0Action(void (*func)(void)) {
-  attachInterrupt(digitalPinToInterrupt(_mod->int0()), func, RISING);
+  attachInterrupt(digitalPinToInterrupt(_mod->getInt0()), func, RISING);
 }
 
 void SX127x::setDio1Action(void (*func)(void)) {
-  attachInterrupt(digitalPinToInterrupt(_mod->int1()), func, RISING);
+  attachInterrupt(digitalPinToInterrupt(_mod->getInt1()), func, RISING);
 }
 
 int16_t SX127x::startTransmit(String& str, uint8_t addr) {
@@ -1038,8 +1038,7 @@ int16_t SX127x::setFrequencyRaw(float newFreq) {
   int16_t state = setMode(SX127X_STANDBY);
   
   // calculate register values
-  uint32_t base = 1;
-  uint32_t FRF = (newFreq * (base << 19)) / 32.0;
+  uint32_t FRF = (newFreq * (uint32_t(1) << SX127X_DIV_EXPONENT)) / SX127X_CRYSTAL_FREQ;
   
   // write registers
   state |= _mod->SPIsetRegValue(SX127X_REG_FRF_MSB, (FRF & 0xFF0000) >> 16);
