@@ -74,7 +74,7 @@ class Module {
       
       \param checkInterval Number of milliseconds between register writing and verification reading. Some registers need up to 10ms to process the change.
       
-      \returns Status code.
+      \returns \ref status_codes
     */
     int16_t SPIsetRegValue(uint8_t reg, uint8_t value, uint8_t msb = 7, uint8_t lsb = 0, uint8_t checkInterval = 2);
     

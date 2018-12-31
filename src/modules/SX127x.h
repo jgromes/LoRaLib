@@ -552,7 +552,7 @@ class SX127x: public PhysicalLayer {
       
       \param preambleLength Length of %LoRa transmission preamble in symbols.
       
-      \returns Status code.
+      \returns \ref status_codes
     */
     int16_t begin(uint8_t chipVersion, uint8_t syncWord, uint8_t currentLimit, uint16_t preambleLength);
     
@@ -569,7 +569,7 @@ class SX127x: public PhysicalLayer {
       
       \param currentLimit Trim value for OCP (over current protection) in mA.
       
-      \returns Status code.
+      \returns \ref status_codes
     */
     int16_t beginFSK(uint8_t chipVersion, float br, float freqDev, float rxBw, uint8_t currentLimit);
     
@@ -580,7 +580,7 @@ class SX127x: public PhysicalLayer {
       
       \param addr Node address to transmit the packet to. Only used in FSK mode.
       
-      \returns Status code.
+      \returns \ref status_codes
     */
     int16_t transmit(String& str, uint8_t addr = 0);
     
@@ -591,7 +591,7 @@ class SX127x: public PhysicalLayer {
       
       \param addr Node address to transmit the packet to. Only used in FSK mode.
       
-      \returns Status code.
+      \returns \ref status_codes
     */
     int16_t transmit(const char* str, uint8_t addr = 0);
     
@@ -604,7 +604,7 @@ class SX127x: public PhysicalLayer {
       
       \param addr Node address to transmit the packet to. Only used in FSK mode.
       
-      \returns Status code.
+      \returns \ref status_codes
     */
     int16_t transmit(uint8_t* data, size_t len, uint8_t addr = 0);
     
@@ -615,7 +615,7 @@ class SX127x: public PhysicalLayer {
       
       \param len Expected number of characters in the message. Must be known in advance for %LoRa spreading factor 6.
       
-      \returns Status code.
+      \returns \ref status_codes
     */
     int16_t receive(String& str, size_t len = 0);
     
@@ -626,14 +626,14 @@ class SX127x: public PhysicalLayer {
       
       \param len Number of bytes that will be received. Must be known in advance for binary transmissions.
       
-      \returns Status code.
+      \returns \ref status_codes
     */
     int16_t receive(uint8_t* data, size_t len);
     
     /*!
       \brief Performs scan for valid %LoRa preamble in the current channel.
       
-      \returns Status code.
+      \returns \ref status_codes
     */
     int16_t scanChannel();
     
@@ -641,14 +641,14 @@ class SX127x: public PhysicalLayer {
       \brief Sets the %LoRa module to sleep to save power. %Module will not be able to transmit or receive any data while in sleep mode.
       %Module will wake up autmatically when methods like transmit or receive are called.
       
-      \returns Status code.
+      \returns \ref status_codes
     */
     int16_t sleep();
     
     /*!
       \brief Sets the %LoRa module to standby.
       
-      \returns Status code.
+      \returns \ref status_codes
     */
     int16_t standby();
     
@@ -658,7 +658,7 @@ class SX127x: public PhysicalLayer {
       
       \param FRF 24-bit raw frequency value to start transmitting at. Required for quick frequency shifts in RTTY.
       
-      \returns Status code.
+      \returns \ref status_codes
     */
     int16_t transmitDirect(uint32_t FRF = 0);
     
@@ -666,14 +666,14 @@ class SX127x: public PhysicalLayer {
       \brief Enables direct reception mode on pins DIO1 (clock) and DIO2 (data). 
       While in direct mode, the module will not be able to transmit or receive packets. Can only be activated in FSK mode.
       
-      \returns Status code.
+      \returns \ref status_codes
     */
     int16_t receiveDirect();
     
     /*!
       \brief Disables direct mode and enables packet mode, allowing the module to receive packets. Can only be activated in FSK mode.
       
-      \returns Status code.
+      \returns \ref status_codes
     */
     int16_t packetMode();
     
@@ -702,7 +702,7 @@ class SX127x: public PhysicalLayer {
       
       \param addr Node address to transmit the packet to. Only used in FSK mode.
       
-      \returns Status code.
+      \returns \ref status_codes
     */
     int16_t startTransmit(String& str, uint8_t addr = 0);
     
@@ -714,7 +714,7 @@ class SX127x: public PhysicalLayer {
       
       \param addr Node address to transmit the packet to. Only used in FSK mode.
       
-      \returns Status code.
+      \returns \ref status_codes
     */
     int16_t startTransmit(const char* str, uint8_t addr = 0);
     
@@ -727,14 +727,14 @@ class SX127x: public PhysicalLayer {
       
       \param addr Node address to transmit the packet to. Only used in FSK mode.
       
-      \returns Status code.
+      \returns \ref status_codes
     */
     int16_t startTransmit(uint8_t* data, size_t len, uint8_t addr = 0);
     
     /*!
       \brief Interrupt-driven receive method. DIO0 will be activated when full valid packet is received.
       
-      \returns Status code.
+      \returns \ref status_codes
     */
     int16_t startReceive();
     
@@ -745,7 +745,7 @@ class SX127x: public PhysicalLayer {
       
       \param len Expected number of characters in the message. Must be known in advance for %LoRa spreading factor 6.
       
-      \returns Status code.
+      \returns \ref status_codes
     */
     int16_t readData(String& str, size_t len = 0);
     
@@ -756,7 +756,7 @@ class SX127x: public PhysicalLayer {
       
       \param len Number of bytes that will be received. Must be known in advance for binary transmissions.
       
-      \returns Status code.
+      \returns \ref status_codes
     */
     int16_t readData(uint8_t* data, size_t len);
     
@@ -768,7 +768,7 @@ class SX127x: public PhysicalLayer {
       
       \param syncWord Sync word to be set.
       
-      \returns Status code.
+      \returns \ref status_codes
     */
     int16_t setSyncWord(uint8_t syncWord);
     
@@ -777,7 +777,7 @@ class SX127x: public PhysicalLayer {
       
       \param currentLimit Current limit to be set (in mA).
       
-      \returns Status code.
+      \returns \ref status_codes
     */
     int16_t setCurrentLimit(uint8_t currentLimit);
     
@@ -786,7 +786,7 @@ class SX127x: public PhysicalLayer {
       
       \param preambleLength Preamble length to be set (in symbols).
       
-      \returns Status code.
+      \returns \ref status_codes
     */
     int16_t setPreambleLength(uint16_t preambleLength);
     
@@ -818,7 +818,7 @@ class SX127x: public PhysicalLayer {
       
       \param br Bit rate to be set (in kbps).
       
-      \returns Status code.
+      \returns \ref status_codes
     */
     int16_t setBitRate(float br);
     
@@ -827,7 +827,7 @@ class SX127x: public PhysicalLayer {
       
       \param freqDev Frequency deviation to be set (in kHz).
       
-      \returns Status code.
+      \returns \ref status_codes
     */
     int16_t setFrequencyDeviation(float freqDev);
     
@@ -836,7 +836,7 @@ class SX127x: public PhysicalLayer {
       
       \param rxBw Receiver bandwidth to be set (in kHz).
       
-      \returns Status code.
+      \returns \ref status_codes
     */
     int16_t setRxBandwidth(float rxBw);
     
@@ -847,7 +847,7 @@ class SX127x: public PhysicalLayer {
       
       \param len Sync word length (in bytes).
       
-      \returns Status code.
+      \returns \ref status_codes
     */
     int16_t setSyncWord(uint8_t* syncWord, size_t len);
     
@@ -856,7 +856,7 @@ class SX127x: public PhysicalLayer {
       
       \param nodeAddr Node address to be set.
       
-      \returns Status code.
+      \returns \ref status_codes
     */
     int16_t setNodeAddress(uint8_t nodeAddr);
     
@@ -865,14 +865,14 @@ class SX127x: public PhysicalLayer {
       
       \param broadAddr Broadcast address to be set.
       
-      \returns Status code.
+      \returns \ref status_codes
     */
     int16_t setBroadcastAddress(uint8_t broadAddr);
     
     /*!
       \brief Disables FSK address filtering.
       
-      \returns Status code.
+      \returns \ref status_codes
     */
     int16_t disableAddressFiltering();
     
