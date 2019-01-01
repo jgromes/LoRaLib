@@ -44,6 +44,8 @@
 #define INT_1                                 0x02
 #define INT_BOTH                              0x03
 
+// Status/error codes
+
 /*!
   \defgroup status_codes Status Codes
   
@@ -63,7 +65,7 @@
 
 /*! 
   \brief %SX127x chip was not found during initialization. This can be caused by specifying wrong chip type in the constructor 
-  (i.e. calling SX1272 contructor for SX1278 chip) or by a fault in your wiring (incorrect slave select pin).
+  (i.e. calling SX1272 constructor for SX1278 chip) or by a fault in your wiring (incorrect slave select pin).
 */
 #define ERR_CHIP_NOT_FOUND                    -2
 

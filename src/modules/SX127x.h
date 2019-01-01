@@ -529,6 +529,9 @@
 */
 class SX127x: public PhysicalLayer {
   public:
+    // introduce PhysicalLayer overloads
+    using PhysicalLayer::transmit;
+    using PhysicalLayer::receive;
     
     // constructor
     
@@ -574,29 +577,8 @@ class SX127x: public PhysicalLayer {
     int16_t beginFSK(uint8_t chipVersion, float br, float freqDev, float rxBw, uint8_t currentLimit);
     
     /*!
-      \brief Arduino String transmit method. Will transmit Arduino String up to 255 characters long using %LoRa or up to 63 bytes using FSK modem.
-      
-      \param str Address of Arduino string that will be transmitted.
-      
-      \param addr Node address to transmit the packet to. Only used in FSK mode.
-      
-      \returns \ref status_codes
-    */
-    int16_t transmit(String& str, uint8_t addr = 0);
-    
-    /*!
-      \brief C-string transmit method. Will transmit C-string up to 255 characters long using %LoRa or up to 63 characters using FSK modem.
-      
-      \param str C-string that will be transmitted.
-      
-      \param addr Node address to transmit the packet to. Only used in FSK mode.
-      
-      \returns \ref status_codes
-    */
-    int16_t transmit(const char* str, uint8_t addr = 0);
-    
-    /*!
       \brief Binary transmit method. Will transmit arbitrary binary data up to 255 bytes long using %LoRa or up to 63 bytes using FSK modem.
+      For overloads to transmit Arduino String or C-string, see PhysicalLayer::transmit.
       
       \param data Binary data that will be transmitted.
       
@@ -609,18 +591,8 @@ class SX127x: public PhysicalLayer {
     int16_t transmit(uint8_t* data, size_t len, uint8_t addr = 0);
     
     /*!
-      \brief Arduino String receive method. Will attempt to receive Arduino String up to 255 characters long using %LoRa or up to 63 characters using FSK modem.
-      
-      \param str Address of Arduino String to save the received data.
-      
-      \param len Expected number of characters in the message. Must be known in advance for %LoRa spreading factor 6.
-      
-      \returns \ref status_codes
-    */
-    int16_t receive(String& str, size_t len = 0);
-    
-    /*!
       \brief Binary receive method. Will attempt to receive arbitrary binary data up to 255 bytes long using %LoRa or up to 63 bytes using FSK modem.
+      For overloads to receive Arduino String, see PhysicalLayer::receive.
       
       \param data Pointer to array to save the received binary data.
       
@@ -791,7 +763,7 @@ class SX127x: public PhysicalLayer {
     int16_t setPreambleLength(uint16_t preambleLength);
     
     /*!
-      \brief Get frequency error of the latest received packet.
+      \brief Gets frequency error of the latest received packet.
       
       \param autoCorrect When set to true, frequency will be autmatically corrected.
       
@@ -800,9 +772,9 @@ class SX127x: public PhysicalLayer {
     float getFrequencyError(bool autoCorrect = false);
     
     /*!
-      \brief Get signal-to-noise ratio of the latest received packet.
+      \brief Gets signal-to-noise ratio of the latest received packet.
       
-      \returns Last packet signal-to-noise ratio.
+      \returns Last packet signal-to-noise ratio (SNR).
     */
     float getSNR();
     

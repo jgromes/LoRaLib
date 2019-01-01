@@ -108,14 +108,6 @@ int16_t SX127x::beginFSK(uint8_t chipVersion, float br, float freqDev, float rxB
   return(state);
 }
 
-int16_t SX127x::transmit(String& str, uint8_t addr) {
-  return(SX127x::transmit(str.c_str(), addr));
-}
-
-int16_t SX127x::transmit(const char* str, uint8_t addr) {
-  return(SX127x::transmit((uint8_t*)str, strlen(str), addr));
-}
-
 int16_t SX127x::transmit(uint8_t* data, size_t len, uint8_t addr) {
   // set mode to standby
   int16_t state = setMode(SX127X_STANDBY);
@@ -227,20 +219,6 @@ int16_t SX127x::transmit(uint8_t* data, size_t len, uint8_t addr) {
   }
   
   return(ERR_UNKNOWN);
-}
-
-int16_t SX127x::receive(String& str, size_t len) {
-  // create temporary array to store received data
-  char* data = new char[len + 1];
-  int16_t state = SX127x::receive((uint8_t*)data, len);
-  
-  // if packet was received successfully, copy data into String
-  if(state == ERR_NONE) {
-    str = String(data);
-  }
-  
-  delete[] data;
-  return(state);
 }
 
 int16_t SX127x::receive(uint8_t* data, size_t len) {

@@ -2,12 +2,13 @@
 #define _LORALIB_H
 
 /*!
-  \mainpage LoRaLib Arduino Library Documentation
+  \mainpage LoRaLib Documentation
   
-  \section intro Introduction
-  Arduino library for %LoRa modules based on %LoRa chips by Semtech (%SX1272, %SX1276, %SX1278) and HopeRF (%RFM95, %RFM96, %RFM98).
+  LoRaLib is Arduino library for %LoRa modules based on %LoRa chips by Semtech (%SX1272, %SX1276, %SX1278) and HopeRF (%RFM95, %RFM96, %RFM98).
   
-  \copyright  Copyright (C) 2019 Jan Gromes
+  \see https://github.com/jgromes/LoRaLib
+  
+  \copyright  Copyright (c) 2019 Jan Gromes
 */
 
 #include "TypeDef.h"
