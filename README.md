@@ -2,7 +2,7 @@
 
 ## Arduino library for LoRa modules based on LoRa chips by Semtech (SX1272, SX1276, SX1278) and HopeRF (RFM95, RFM96, RFM98)
 
-## See the [Wiki](https://github.com/jgromes/LoRaLib/wiki) for detailed API reference and further information.
+## See the [Wiki](https://github.com/jgromes/LoRaLib/wiki) for further information. See the [GitHub Pages](https://jgromes.github.io/LoRaLib) for detailed and up-to-date API reference.
 
 ### This is not the shield you are looking for!
 If you're looking for an open-source shield to use with this library, it has its own repository: [https://github.com/jgromes/LoRenz](https://github.com/jgromes/LoRenz)
