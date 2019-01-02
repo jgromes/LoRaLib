@@ -838,71 +838,7 @@ int16_t SX127x::setRxBandwidth(float rxBw) {
   }
 
   // check allowed bandwidth values
-  uint8_t bwMant, bwExp;
-  if(abs(rxBw - 2.6) <= 0.001) {
-    bwMant = SX127X_RX_BW_MANT_24;
-    bwExp = 7;
-  } else if(abs(rxBw - 3.1) <= 0.001) {
-    bwMant = SX127X_RX_BW_MANT_20;
-    bwExp = 7;
-  } else if(abs(rxBw - 3.9) <= 0.001) {
-    bwMant = SX127X_RX_BW_MANT_16;
-    bwExp = 7;
-  } else if(abs(rxBw - 5.2) <= 0.001) {
-    bwMant = SX127X_RX_BW_MANT_24;
-    bwExp = 6;
-  } else if(abs(rxBw - 6.3) <= 0.001) {
-    bwMant = SX127X_RX_BW_MANT_20;
-    bwExp = 6;
-  } else if(abs(rxBw - 7.8) <= 0.001) {
-    bwMant = SX127X_RX_BW_MANT_16;
-    bwExp = 6;
-  } else if(abs(rxBw - 10.4) <= 0.001) {
-    bwMant = SX127X_RX_BW_MANT_24;
-    bwExp = 5;
-  } else if(abs(rxBw - 12.5) <= 0.001) {
-    bwMant = SX127X_RX_BW_MANT_20;
-    bwExp = 5;
-  } else if(abs(rxBw - 15.6) <= 0.001) {
-    bwMant = SX127X_RX_BW_MANT_16;
-    bwExp = 5;
-  } else if(abs(rxBw - 20.8) <= 0.001) {
-    bwMant = SX127X_RX_BW_MANT_24;
-    bwExp = 4;
-  } else if(abs(rxBw - 25.0) <= 0.001) {
-    bwMant = SX127X_RX_BW_MANT_20;
-    bwExp = 4;
-  } else if(abs(rxBw - 31.3) <= 0.001) {
-    bwMant = SX127X_RX_BW_MANT_16;
-    bwExp = 4;
-  } else if(abs(rxBw - 41.7) <= 0.001) {
-    bwMant = SX127X_RX_BW_MANT_24;
-    bwExp = 3;
-  } else if(abs(rxBw - 50.0) <= 0.001) {
-    bwMant = SX127X_RX_BW_MANT_20;
-    bwExp = 3;
-  } else if(abs(rxBw - 62.5) <= 0.001) {
-    bwMant = SX127X_RX_BW_MANT_16;
-    bwExp = 3;
-  } else if(abs(rxBw - 83.3) <= 0.001) {
-    bwMant = SX127X_RX_BW_MANT_24;
-    bwExp = 2;
-  } else if(abs(rxBw - 100.0) <= 0.001) {
-    bwMant = SX127X_RX_BW_MANT_20;
-    bwExp = 2;
-  } else if(abs(rxBw - 125.0) <= 0.001) {
-    bwMant = SX127X_RX_BW_MANT_16;
-    bwExp = 2;
-  } else if(abs(rxBw - 166.7) <= 0.001) {
-    bwMant = SX127X_RX_BW_MANT_24;
-    bwExp = 1;
-  } else if(abs(rxBw - 200.0) <= 0.001) {
-    bwMant = SX127X_RX_BW_MANT_20;
-    bwExp = 1;
-  } else if(abs(rxBw - 250.0) <= 0.001) {
-    bwMant = SX127X_RX_BW_MANT_16;
-    bwExp = 1;
-  } else {
+  if(!((rxBw >= 2.6) && (rxBw <= 250.0))) {
     return(ERR_INVALID_RX_BANDWIDTH);
   }
   
@@ -912,19 +848,29 @@ int16_t SX127x::setRxBandwidth(float rxBw) {
     return(state);
   }
   
-  // set Rx bandwidth during AFC
-  state = _mod->SPIsetRegValue(SX127X_REG_AFC_BW, bwMant | bwExp, 4, 0);
-  if(state != ERR_NONE) {
-    return(state);
+  // calculate exponent and mantisa values
+  for(uint8_t e = 7; e >= 1; e--) {
+    for(int8_t m = 2; m >= 0; m--) {
+      float point = (SX127X_CRYSTAL_FREQ * 1000000.0)/(((4 * m) + 16) * ((uint32_t)1 << (e + 2)));
+      if(abs((rxBw * 1000.0) - point) <= 0.001) {
+        // set Rx bandwidth during AFC
+        state = _mod->SPIsetRegValue(SX127X_REG_AFC_BW, (m << 3) | e, 4, 0);
+        if(state != ERR_NONE) {
+          return(state);
+        }
+        
+        // set Rx bandwidth
+        state = _mod->SPIsetRegValue(SX127X_REG_RX_BW, (m << 3) | e, 4, 0);
+        if(state == ERR_NONE) {
+          SX127x::_rxBw = rxBw;
+        }
+        
+        return(state);
+      }
+    }
   }
   
-  // set Rx bandwidth
-  state = _mod->SPIsetRegValue(SX127X_REG_RX_BW, bwMant | bwExp, 4, 0);
-  if(state == ERR_NONE) {
-    SX127x::_rxBw = rxBw;
-  }
-  
-  return(state);
+  return(ERR_UNKNOWN);
 }
 
 int16_t SX127x::setSyncWord(uint8_t* syncWord, size_t len) {
