@@ -12,6 +12,9 @@
    For more detailed information, see the LoRaLib Wiki
    https://github.com/jgromes/LoRaLib/wiki
 
+   For full API reference, see the GitHub Pages
+   https://jgromes.github.io/LoRaLib/
+
    For more information on FSK modem, see
    https://github.com/jgromes/LoRaLib/wiki/FSK-Modem
 */
