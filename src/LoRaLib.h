@@ -6,6 +6,11 @@
   
   LoRaLib is Arduino library for %LoRa modules based on %LoRa chips by Semtech (%SX1272, %SX1276, %SX1278) and HopeRF (%RFM95, %RFM96, %RFM98).
   
+  \par Quick Links
+  Documentation for most common methods can be found in SX127x reference.\n
+  Some methods (mainly configuration) are also overridden in derived classes, such as SX1272, SX1278, RFM96 etc.\n
+  \ref status_codes have their own page.\n
+  
   \see https://github.com/jgromes/LoRaLib
   
   \copyright  Copyright (c) 2019 Jan Gromes
