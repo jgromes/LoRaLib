@@ -1,22 +1,20 @@
 ---
 name: Bug report
 about: Create a report to help us improve
-labels: 
+title: ''
+labels: ''
+assignees: ''
 
 ---
 
 **IMPORTANT: Check the wiki**
-Before submitting new issue, please check the [Wiki](https://github.com/jgromes/LoRaLib/wiki). You might find a solution to your issue there.
+Before submitting new issue, please check the [Wiki](https://github.com/jgromes/LoRaLib/wiki) and the [API documentation](https://jgromes.github.io/LoRaLib/). You might find a solution to your issue there. 
 
 **Describe the bug**
 A clear and concise description of what the bug is.
 
 **To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+Minimal Arduino sketch to reproduce the behavior. Please user Markdown to style the code to make it readable (see [Markdown Cheatsheet](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet#code)).
 
 **Expected behavior**
 A clear and concise description of what you expected to happen.

@@ -1,7 +1,9 @@
 ---
 name: Regular issue
 about: Use this template for any other issue
-labels: 
+title: ''
+labels: ''
+assignees: ''
 
 ---
 
