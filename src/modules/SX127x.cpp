@@ -852,7 +852,7 @@ int16_t SX127x::setRxBandwidth(float rxBw) {
   for(uint8_t e = 7; e >= 1; e--) {
     for(int8_t m = 2; m >= 0; m--) {
       float point = (SX127X_CRYSTAL_FREQ * 1000000.0)/(((4 * m) + 16) * ((uint32_t)1 << (e + 2)));
-      if(abs((rxBw * 1000.0) - point) <= 0.001) {
+      if(abs(rxBw - ((point / 1000.0) + 0.05)) <= 0.5) {
         // set Rx bandwidth during AFC
         state = _mod->SPIsetRegValue(SX127X_REG_AFC_BW, (m << 3) | e, 4, 0);
         if(state != ERR_NONE) {
