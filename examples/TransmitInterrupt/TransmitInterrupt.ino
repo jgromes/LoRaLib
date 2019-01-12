@@ -68,7 +68,7 @@ void setup() {
   /*
     byte byteArr[] = {0x01, 0x23, 0x45, 0x56,
                       0x78, 0xAB, 0xCD, 0xEF};
-    state = lora.transmit(byteArr, 8);
+    state = lora.startTransmit(byteArr, 8);
   */
   
   if (state != ERR_NONE) {
