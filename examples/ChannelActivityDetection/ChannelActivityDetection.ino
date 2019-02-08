@@ -18,8 +18,8 @@
 #include <LoRaLib.h>
 
 // create instance of LoRa class using SX1278 module
-// this pinout corresponds to KITE Shield
-// https://github.com/jgromes/KiteShield
+// this pinout corresponds to RadioShield
+// https://github.com/jgromes/RadioShield
 // NSS pin:   10 (4 on ESP32/ESP8266 boards)
 // DIO0 pin:  2
 // DIO1 pin:  3

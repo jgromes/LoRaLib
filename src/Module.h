@@ -40,9 +40,9 @@ class Module {
     /*!
       \brief Initialization method. Called internally when connecting to the %LoRa chip and should not be called expicitly from Arduino code.
       
-      \param interface %Module interface that should be used. Required for KiteLib compatibility, will always be set to USE_SPI.
+      \param interface %Module interface that should be used. Required for RadioLib compatibility, will always be set to USE_SPI.
       
-      \param gpio Determines which interrupt/GPIO should be used. Required for KiteLib compatibility, will always be set to INT_BOTH.
+      \param gpio Determines which interrupt/GPIO should be used. Required for RadioLib compatibility, will always be set to INT_BOTH.
     */
     void init(uint8_t interface, uint8_t gpio);
     
