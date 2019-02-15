@@ -11,7 +11,7 @@ int16_t SX127x::begin(uint8_t chipVersion, uint8_t syncWord, uint8_t currentLimi
   // try to find the SX127x chip
   if(!SX127x::findChip(chipVersion)) {
     DEBUG_PRINTLN_STR("No SX127x found!");
-    SPI.end();
+    _mod->term();
     return(ERR_CHIP_NOT_FOUND);
   } else {
     DEBUG_PRINTLN_STR("Found SX127x!");

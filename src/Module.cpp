@@ -1,10 +1,11 @@
 #include "Module.h"
 
-Module::Module(int cs, int int0, int int1) {
+Module::Module(int cs, int int0, int int1, SPIClass& spi) {
   // save pins numbers to private global variables
   _cs = cs;
   _int0 = int0;
   _int1 = int1;
+  _spi = &spi;
 }
 
 void Module::init(uint8_t interface, uint8_t gpio) {
@@ -17,7 +18,7 @@ void Module::init(uint8_t interface, uint8_t gpio) {
     case USE_SPI:
       pinMode(_cs, OUTPUT);
       digitalWrite(_cs, HIGH);
-      SPI.begin();
+      _spi->begin();
       break;
     case USE_UART:
       break;
@@ -40,6 +41,11 @@ void Module::init(uint8_t interface, uint8_t gpio) {
       pinMode(_int1, INPUT);
       break;
   }
+}
+
+void Module::term() {
+  // stop SPI
+  _spi->end();
 }
 
 int16_t Module::SPIgetRegValue(uint8_t reg, uint8_t msb, uint8_t lsb) {
@@ -110,76 +116,52 @@ int16_t Module::SPIsetRegValue(uint8_t reg, uint8_t value, uint8_t msb, uint8_t 
 }
 
 void Module::SPIreadRegisterBurst(uint8_t reg, uint8_t numBytes, uint8_t* inBytes) {
-  // pull CS low
-  digitalWrite(_cs, LOW);
-  
-  // send the register address and read command
-  SPI.transfer(reg | SPI_READ);
-  
-  // read provided number of bytes
-  for(uint8_t i = 0; i < numBytes; i++) {
-    inBytes[i] = SPI.transfer(reg);
-  }
-  
-  // stop pulling CS
-  digitalWrite(_cs, HIGH);
+  SPItransfer(SPI_READ, reg, NULL, inBytes, numBytes);
 }
 
 uint8_t Module::SPIreadRegister(uint8_t reg) {
-  uint8_t inByte;
-  
-  // pull CS low
-  digitalWrite(_cs, LOW);
-  
-  // start SPI transaction
-  SPI.beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE0));
-  
-  // send the register address and read command
-  SPI.transfer(reg | SPI_READ);
-  
-  // end SPI transaction
-  SPI.endTransaction();
-  
-  // read SPI value
-  inByte = SPI.transfer(0x00);
-  
-  // stop pulling CS
-  digitalWrite(_cs, HIGH);
-  return(inByte);
+  uint8_t resp;
+  SPItransfer(SPI_READ, reg, NULL, &resp, 1);
+  return(resp);
 }
 
 void Module::SPIwriteRegisterBurst(uint8_t reg, uint8_t* data, uint8_t numBytes) {
-  // pull CS low
-  digitalWrite(_cs, LOW);
-  
-  // send the register address and write command
-  SPI.transfer(reg | SPI_WRITE);
-  
-  // write provided number of bytes
-  for(uint8_t i = 0; i < numBytes; i++) {
-    SPI.transfer(data[i]);
-  }
-  
-  // stop pulling CS
-  digitalWrite(_cs, HIGH);
+  SPItransfer(SPI_WRITE, reg, data, NULL, numBytes);
 }
 
 void Module::SPIwriteRegister(uint8_t reg, uint8_t data) {
+  SPItransfer(SPI_WRITE, reg, &data, NULL, 1);
+}
+
+void Module::SPItransfer(uint8_t cmd, uint8_t reg, uint8_t* dataOut, uint8_t* dataIn, uint8_t numBytes) {
+  // start SPI transaction
+  _spi->beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE0));
+  
   // pull CS low
   digitalWrite(_cs, LOW);
   
-  // start SPI transaction
-  SPI.beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE0));
+  // send SPI register address with access command
+  _spi->transfer(reg | cmd);
   
-  // send the register address and write command
-  SPI.transfer(reg | SPI_WRITE);
+  // send data or get response
+  switch(cmd) {
+    case SPI_WRITE:
+      for(size_t n = 0; n < numBytes; n++) {
+        _spi->transfer(dataOut[n]);
+      }
+      break;
+    case SPI_READ:
+      for(size_t n = 0; n < numBytes; n++) {
+        dataIn[n] = _spi->transfer(0x00);
+      }
+      break;
+    default:
+      break;
+  }
   
-  // send the data
-  SPI.transfer(data);
+  // release CS
+  digitalWrite(_cs, HIGH);
   
   // end SPI transaction
-  SPI.endTransaction();
-  
-  // stop pulling CS
-  digitalWrite(_cs, HIGH);
+  _spi->endTransaction();
 }

@@ -49,6 +49,16 @@ SX1272 loraSX1272 = new LoRa(6, 4, 5);
 // DIO1 pin:  16 (A2)
 SX1276 loraSX1276 = new LoRa(14, 15, 16);
 
+// to use non-default SPI interface or software SPI
+// implementation, pass the SPI interface to the LoRa
+// constructor
+// 
+// DigitalIO library for software SPI
+// https://github.com/greiman/DigitalIO
+//#include "DigitalIO.h"
+//SoftSPI<MISO_PIN, MOSI_PIN, SCK_PIN> softSpi;
+//SX1278 softLora = new LoRa(2, 3, 10, softSpi);
+
 void setup() {
   Serial.begin(9600);
 
