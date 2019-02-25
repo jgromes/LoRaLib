@@ -58,13 +58,17 @@ void loop() {
   Serial.print("Waiting for incoming transmission ... ");
 
   // you can receive data as an Arduino String
+  // NOTE: receive() is a blocking method!
+  //       See example ReceiveInterrupt for details
+  //       on non-blocking reception method.
   String str;
   int state = lora.receive(str);
 
   // you can also receive data as byte array
   /*
-    byte byteArr[8];
-    int state = lora.receive(byteArr, 8);
+    size_t len = 8;
+    byte byteArr[len];
+    int state = lora.receive(byteArr, len);
   */
 
   if (state == ERR_NONE) {
@@ -104,4 +108,3 @@ void loop() {
   }
 
 }
-
