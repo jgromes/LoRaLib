@@ -971,6 +971,20 @@ int16_t SX127x::setFrequencyRaw(float newFreq) {
   return(state);
 }
 
+int16_t SX127x::changeModulation(uint8_t modulation)
+{
+    // check active modem
+    if(getActiveModem() != SX127X_FSK_OOK) {
+        return(ERR_WRONG_MODEM);
+    }
+    
+     // set modulation
+    int16_t state = _mod->SPIsetRegValue(SX127X_REG_OP_MODE, modulation, 6, 5, 5);
+    if(state != ERR_NONE) {
+        return(state);
+    }
+}
+
 int16_t SX127x::config() {
   // turn off frequency hopping
   int16_t state = _mod->SPIsetRegValue(SX127X_REG_HOP_PERIOD, SX127X_HOP_PERIOD_OFF);

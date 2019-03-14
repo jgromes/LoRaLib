@@ -762,6 +762,16 @@ class SX127x: public PhysicalLayer {
     */
     int16_t setPreambleLength(uint16_t preambleLength);
     
+   /*!
+      \brief Changes the modulation from between FSK and OOK for a modem initialized with
+      beginFSK()
+      
+      \param modulation Preamble length to be set (in symbols).
+      
+      \returns \ref status_codes
+    */ 
+   int16_t changeModulation(uint8_t modulation);
+    
     /*!
       \brief Gets frequency error of the latest received packet.
       
