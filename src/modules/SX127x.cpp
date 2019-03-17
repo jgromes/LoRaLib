@@ -48,14 +48,17 @@ int16_t SX127x::begin(uint8_t chipVersion, uint8_t syncWord, uint8_t currentLimi
   return(state);
 }
 
-int16_t SX127x::beginFSK(uint8_t chipVersion, float br, float freqDev, float rxBw, uint8_t currentLimit) {
+int16_t SX127x::beginFSK(uint8_t chipVersion, float br, float freqDev, float rxBw, uint8_t currentLimit, bool enableOOK) {
+  //Ensure modem is in the right FSK-like modulation mode
+  _OOKEnabled = enableOOK;
+  
   // set module properties
   _mod->init(USE_SPI, INT_BOTH);
   
   // try to find the SX127x chip
   if(!SX127x::findChip(chipVersion)) {
     DEBUG_PRINTLN_STR("No SX127x found!");
-    SPI.end();
+    _mod->term();
     return(ERR_CHIP_NOT_FOUND);
   } else {
     DEBUG_PRINTLN_STR("Found SX127x!");
@@ -784,21 +787,31 @@ int16_t SX127x::setBitRate(float br) {
     return(ERR_WRONG_MODEM);
   }
 
-  // check allowed bitrate
-  if((br < 1.2) || (br > 300.0)) {
-    return(ERR_INVALID_BIT_RATE);
+  if(_OOKEnabled)
+  {
+    // check allowed bitrate for OOK
+    if((br < 1.2) || (br > 25.0)) {
+      return(ERR_INVALID_BIT_RATE);
+    }
   }
-  
-  // set mode to STANDBY
-  int16_t state = setMode(SX127X_STANDBY);
-  if(state != ERR_NONE) {
-    return(state);
+  else
+  {
+    // check allowed bitrate for FSK
+    if((br < 1.2) || (br > 300.0)) {
+      return(ERR_INVALID_BIT_RATE);
+    }
   }
+    // set mode to STANDBY
+    int16_t state = setMode(SX127X_STANDBY);
+    if(state != ERR_NONE) {
+      return(state);
+    }
   
-  // set bit rate
-  uint16_t bitRate = 32000 / br;
-  state = _mod->SPIsetRegValue(SX127X_REG_BITRATE_MSB, (bitRate & 0xFF00) >> 8, 7, 0);
-  state |= _mod->SPIsetRegValue(SX127X_REG_BITRATE_LSB, bitRate & 0x00FF, 7, 0);
+    // set bit rate. In OOK Bitfraction/16 = 0
+    uint16_t bitRate = 32000 / br;
+    state = _mod->SPIsetRegValue(SX127X_REG_BITRATE_MSB, (bitRate & 0xFF00) >> 8, 7, 0);
+    state |= _mod->SPIsetRegValue(SX127X_REG_BITRATE_LSB, bitRate & 0x00FF, 7, 0);
+
   // TODO: fractional part of bit rate setting
   if(state == ERR_NONE) {
     SX127x::_br = br;
@@ -971,20 +984,6 @@ int16_t SX127x::setFrequencyRaw(float newFreq) {
   return(state);
 }
 
-int16_t SX127x::changeModulation(uint8_t modulation)
-{
-    // check active modem
-    if(getActiveModem() != SX127X_FSK_OOK) {
-        return(ERR_WRONG_MODEM);
-    }
-    
-     // set modulation
-    int16_t state = _mod->SPIsetRegValue(SX127X_REG_OP_MODE, modulation, 6, 5, 5);
-    if(state != ERR_NONE) {
-        return(state);
-    }
-}
-
 int16_t SX127x::config() {
   // turn off frequency hopping
   int16_t state = _mod->SPIsetRegValue(SX127X_REG_HOP_PERIOD, SX127X_HOP_PERIOD_OFF);
@@ -992,11 +991,24 @@ int16_t SX127x::config() {
 }
 
 int16_t SX127x::configFSK() {
-  // set FSK modulation
-  int16_t state = _mod->SPIsetRegValue(SX127X_REG_OP_MODE, SX127X_MODULATION_FSK, 6, 5, 5);
-  if(state != ERR_NONE) {
-    return(state);
+  //Check if we are in FSK or OOK modes
+  if(_OOKEnabled)
+  {
+      // set OOK modulation
+      int16_t state = _mod->SPIsetRegValue(SX127X_REG_OP_MODE, SX127X_MODULATION_OOK, 6, 5, 5);
+      if(state != ERR_NONE) {
+        return(state);
+      }
   }
+  else
+  {
+      // set FSK modulation
+      int16_t state = _mod->SPIsetRegValue(SX127X_REG_OP_MODE, SX127X_MODULATION_FSK, 6, 5, 5);
+      if(state != ERR_NONE) {
+        return(state);
+      }
+  }
+  
   
   // set RSSI threshold
   state = _mod->SPIsetRegValue(SX127X_REG_RSSI_THRESH, SX127X_RSSI_THRESHOLD);

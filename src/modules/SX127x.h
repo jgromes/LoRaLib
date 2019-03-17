@@ -572,9 +572,11 @@ class SX127x: public PhysicalLayer {
       
       \param currentLimit Trim value for OCP (over current protection) in mA.
       
+      \param enableOOK Flag to specify OOK mode. This modulation is similar to FSK.
+      
       \returns \ref status_codes
     */
-    int16_t beginFSK(uint8_t chipVersion, float br, float freqDev, float rxBw, uint8_t currentLimit);
+    int16_t beginFSK(uint8_t chipVersion, float br, float freqDev, float rxBw, uint8_t currentLimit, bool enableOOK);
     
     /*!
       \brief Binary transmit method. Will transmit arbitrary binary data up to 255 bytes long using %LoRa or up to 63 bytes using FSK modem.
@@ -762,16 +764,6 @@ class SX127x: public PhysicalLayer {
     */
     int16_t setPreambleLength(uint16_t preambleLength);
     
-   /*!
-      \brief Changes the modulation from between FSK and OOK for a modem initialized with
-      beginFSK()
-      
-      \param modulation Preamble length to be set (in symbols).
-      
-      \returns \ref status_codes
-    */ 
-   int16_t changeModulation(uint8_t modulation);
-    
     /*!
       \brief Gets frequency error of the latest received packet.
       
@@ -882,6 +874,7 @@ class SX127x: public PhysicalLayer {
   
   private:
     float _dataRate;
+    bool _OOKEnabled;
   
     bool findChip(uint8_t ver);
     int16_t setMode(uint8_t mode);

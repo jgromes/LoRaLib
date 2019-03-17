@@ -159,9 +159,11 @@ class SX1278: public SX127x {
       
       \param sh Gaussian shaping bandwidth-time product that will be used for data shaping. Allowed values are 0.3, 0.5 or 1.0. Set to 0 to disable data shaping.
       
+      \param enableOOK Flag to specify OOK mode. This modulation is similar to FSK.
+      
       \returns \ref status_codes
     */
-    int16_t beginFSK(float freq = 434.0, float br = 48.0, float freqDev = 50.0, float rxBw = 125.0, int8_t power = 13, uint8_t currentLimit = 100, float sh = 0.3);
+    int16_t beginFSK(float freq = 434.0, float br = 48.0, float freqDev = 50.0, float rxBw = 125.0, int8_t power = 13, uint8_t currentLimit = 100, float sh = 0.3, bool enableOOK = false);
     
     // configuration methods
     
