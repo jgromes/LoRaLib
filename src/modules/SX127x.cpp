@@ -176,11 +176,9 @@ int16_t SX127x::transmit(uint8_t* data, size_t len, uint8_t addr) {
     return(ERR_NONE);
   
   } else if(modem == SX127X_FSK_OOK) {
-    // check packet length
-    if(len >= 64) {
-      return(ERR_PACKET_TOO_LONG);
-    }
-  
+    //variables needed to handle large packets
+    size_t msgRemainder = 0;
+    size_t transmittedByteCount = 0;
     // set DIO mapping
     _mod->SPIsetRegValue(SX127X_REG_DIO_MAPPING_1, SX127X_DIO0_PACK_PACKET_SENT, 7, 6);
     
@@ -197,12 +195,49 @@ int16_t SX127x::transmit(uint8_t* data, size_t len, uint8_t addr) {
     }
     
     // write packet to FIFO
-    _mod->SPIwriteRegisterBurst(SX127X_REG_FIFO, data, len);
+    //If payload is small, no need for calculation complexity. Just send the full slice. Remove this top bit if you want a few bytes off your final firmware.
+    if(len <= SX127X_FSK_OOK_FIFOLIMIT){
+      _mod->SPIwriteRegisterBurst(SX127X_REG_FIFO, data, len);
     
-    // start transmission
-    state |= setMode(SX127X_TX);
-    if(state != ERR_NONE) {
-      return(state);
+      // start transmission
+      state |= setMode(SX127X_TX);
+      if(state != ERR_NONE) {
+        return(state);
+      }
+    }
+    else
+    {
+      //Continue sending data to radio until the full payload is transmitted. 
+      //Start by pre-filling FIFO, beginning TX mode, then refilling FIFO on the fly!
+      _mod->SPIwriteRegisterBurst(SX127X_REG_FIFO, data[transmittedByteCount], SX127X_FSK_OOK_FIFOLIMIT);
+            
+      // start transmission
+      state |= setMode(SX127X_TX);
+      if(state != ERR_NONE) {
+        return(state);
+      }
+      //Update transmittedByteCount with first slice of bytes
+      transmittedByteCount += SX127X_FSK_OOK_FIFOLIMIT;
+      //Begin refill of FIFO!
+      while(transmittedByteCount < len)
+      {
+        msgRemainder = len - transmittedByteCount;//Keep track of unsent bytes
+        //Send chunk of payload as soon as FifoEmpty is set!
+        while(_mod->SPIgetRegValue(SX127X_FLAG_FIFO_EMPTY, 6, 6)){
+          //If we still have to send more than the hardware allowed slice, send the payload in 64 byte chunks
+          if(msgRemainder > SX127X_FSK_OOK_FIFOLIMIT){
+            _mod->SPIwriteRegisterBurst(SX127X_REG_FIFO, data[transmittedByteCount], SX127X_FSK_OOK_FIFOLIMIT);
+                       
+            transmittedByteCount += SX127X_FSK_OOK_FIFOLIMIT;
+          }
+          //Send msgRemainder bytes if what's left over is less than the hardware limit 
+          else {
+            _mod->SPIwriteRegisterBurst(SX127X_REG_FIFO, data, msgRemainder);
+           
+            transmittedByteCount += msgRemainder;
+          }
+        }
+      }
     }
     
     // wait for transmission end or timeout (150 % of expected time-on-air)
@@ -285,6 +320,7 @@ int16_t SX127x::receive(uint8_t* data, size_t len) {
     return(ERR_NONE);
     
   } else if(modem == SX127X_FSK_OOK) {
+    size_t rcvByteCount = 0;
     // set DIO pin mapping
     state |= _mod->SPIsetRegValue(SX127X_REG_DIO_MAPPING_1, SX127X_DIO0_PACK_PAYLOAD_READY, 7, 6);
     
@@ -327,7 +363,31 @@ int16_t SX127x::receive(uint8_t* data, size_t len) {
       delete[] data;
       data = new uint8_t[length + 1];
     }
-    _mod->SPIreadRegisterBurst(SX127X_REG_FIFO, length, data);
+    else{
+      while(rcvByteCount < length){
+        /*Keep checking if FIFO has data (FifoEmpty = 0) and read one byte at a type to give the
+        * radio module a chance to fill FIFO. Also, FIFO might not be guaranteed to be filled with
+        * large chunks of data at a time so I will not optimize the read.
+        * If FIFO is empty, keep asking but do not read. Once FIFO is filled, keep reading
+        * until rcvByteCount == length.*/
+        while(!_mod->SPIgetRegValue(SX127X_FLAG_FIFO_EMPTY, 6, 6)){
+          /*As per the datasheet, we can do a micro optimization of the read stage once PayloadReady
+           * or CrcOk is set! At that point, we can empty FIFO in one go! Thus, we check for those flags,
+           * empty FIFO with the remainder # of bytes (length - rcvByteCount), and break the loop so we
+           * can return the packet!*/
+          if(_mod->SPIgetRegValue(SX127X_FLAG_PAYLOAD_READY, 2, 2) || \
+            _mod->SPIgetRegValue(SX127X_FLAG_CRC_OK, 1, 1))
+          ){
+            _mod->SPIreadRegisterBurst(SX127X_REG_FIFO, (length - rcvByteCount), data[rcvByteCount]);
+            rcvByteCount += (length - rcvByteCount);
+            break;
+          }
+          //Read a single byte at a time if the radio module has not finished receiving!
+          _mod->SPIreadRegisterBurst(SX127X_REG_FIFO, 1, data[rcvByteCount]);
+          rcvByteCount++;
+        }
+      }
+    }
     
     // add terminating null
     if(len == 0) {

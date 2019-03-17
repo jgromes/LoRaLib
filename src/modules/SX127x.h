@@ -226,6 +226,7 @@
 #define SX127X_MODULATION_FSK                         0b00000000  //  6     5     FSK modulation scheme
 #define SX127X_MODULATION_OOK                         0b00100000  //  6     5     OOK modulation scheme
 #define SX127X_RX                                     0b00000101  //  2     0     receiver mode
+#define SX127X_FSK_OOK_FIFOLIMIT   0x40  //64 byte limit on payload slice that FIFO accepts
 
 // SX127X_REG_BITRATE_MSB + SX127X_REG_BITRATE_LSB
 #define SX127X_BITRATE_MSB                            0x1A        //  7     0     bit rate setting: BitRate = F(XOSC)/(BITRATE + BITRATE_FRAC/16)
