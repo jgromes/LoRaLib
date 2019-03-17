@@ -1,5 +1,5 @@
 /*
-   LoRaLib Receive with Inerrupts Example
+   LoRaLib Receive with Interrupts Example
 
    This example listens for LoRa transmissions and tries to
    receive them. Once a packet is received, an interrupt is
