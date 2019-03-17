@@ -991,11 +991,12 @@ int16_t SX127x::config() {
 }
 
 int16_t SX127x::configFSK() {
+  int16_t state = ERR_NONE;
   //Check if we are in FSK or OOK modes
   if(_OOKEnabled)
   {
       // set OOK modulation
-      int16_t state = _mod->SPIsetRegValue(SX127X_REG_OP_MODE, SX127X_MODULATION_OOK, 6, 5, 5);
+      state = _mod->SPIsetRegValue(SX127X_REG_OP_MODE, SX127X_MODULATION_OOK, 6, 5, 5);
       if(state != ERR_NONE) {
         return(state);
       }
@@ -1003,7 +1004,7 @@ int16_t SX127x::configFSK() {
   else
   {
       // set FSK modulation
-      int16_t state = _mod->SPIsetRegValue(SX127X_REG_OP_MODE, SX127X_MODULATION_FSK, 6, 5, 5);
+      state = _mod->SPIsetRegValue(SX127X_REG_OP_MODE, SX127X_MODULATION_FSK, 6, 5, 5);
       if(state != ERR_NONE) {
         return(state);
       }
