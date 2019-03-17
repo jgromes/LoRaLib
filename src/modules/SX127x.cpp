@@ -377,7 +377,7 @@ int16_t SX127x::receive(uint8_t* data, size_t len) {
            * can return the packet!*/
           if(_mod->SPIgetRegValue(SX127X_FLAG_PAYLOAD_READY, 2, 2) || \
             _mod->SPIgetRegValue(SX127X_FLAG_CRC_OK, 1, 1))
-          ){
+          {
             _mod->SPIreadRegisterBurst(SX127X_REG_FIFO, (length - rcvByteCount), &data[rcvByteCount]);
             rcvByteCount += (length - rcvByteCount);
             break;
