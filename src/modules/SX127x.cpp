@@ -209,7 +209,7 @@ int16_t SX127x::transmit(uint8_t* data, size_t len, uint8_t addr) {
     {
       //Continue sending data to radio until the full payload is transmitted. 
       //Start by pre-filling FIFO, beginning TX mode, then refilling FIFO on the fly!
-      _mod->SPIwriteRegisterBurst(SX127X_REG_FIFO, data[transmittedByteCount], SX127X_FSK_OOK_FIFOLIMIT);
+      _mod->SPIwriteRegisterBurst(SX127X_REG_FIFO, &data[transmittedByteCount], SX127X_FSK_OOK_FIFOLIMIT);
             
       // start transmission
       state |= setMode(SX127X_TX);
@@ -226,13 +226,13 @@ int16_t SX127x::transmit(uint8_t* data, size_t len, uint8_t addr) {
         while(_mod->SPIgetRegValue(SX127X_FLAG_FIFO_EMPTY, 6, 6)){
           //If we still have to send more than the hardware allowed slice, send the payload in 64 byte chunks
           if(msgRemainder > SX127X_FSK_OOK_FIFOLIMIT){
-            _mod->SPIwriteRegisterBurst(SX127X_REG_FIFO, data[transmittedByteCount], SX127X_FSK_OOK_FIFOLIMIT);
+            _mod->SPIwriteRegisterBurst(SX127X_REG_FIFO, &data[transmittedByteCount], SX127X_FSK_OOK_FIFOLIMIT);
                        
             transmittedByteCount += SX127X_FSK_OOK_FIFOLIMIT;
           }
           //Send msgRemainder bytes if what's left over is less than the hardware limit 
           else {
-            _mod->SPIwriteRegisterBurst(SX127X_REG_FIFO, data, msgRemainder);
+            _mod->SPIwriteRegisterBurst(SX127X_REG_FIFO, &data[transmittedByteCount], msgRemainder);
            
             transmittedByteCount += msgRemainder;
           }
@@ -378,12 +378,12 @@ int16_t SX127x::receive(uint8_t* data, size_t len) {
           if(_mod->SPIgetRegValue(SX127X_FLAG_PAYLOAD_READY, 2, 2) || \
             _mod->SPIgetRegValue(SX127X_FLAG_CRC_OK, 1, 1))
           ){
-            _mod->SPIreadRegisterBurst(SX127X_REG_FIFO, (length - rcvByteCount), data[rcvByteCount]);
+            _mod->SPIreadRegisterBurst(SX127X_REG_FIFO, (length - rcvByteCount), &data[rcvByteCount]);
             rcvByteCount += (length - rcvByteCount);
             break;
           }
           //Read a single byte at a time if the radio module has not finished receiving!
-          _mod->SPIreadRegisterBurst(SX127X_REG_FIFO, 1, data[rcvByteCount]);
+          _mod->SPIreadRegisterBurst(SX127X_REG_FIFO, 1, &data[rcvByteCount]);
           rcvByteCount++;
         }
       }
