@@ -865,8 +865,9 @@ int16_t SX127x::setBitRate(float br) {
   int16_t state = setMode(SX127X_STANDBY);
   if(state != ERR_NONE) {
     return(state);
+  }
 
-  // set bit rate. In OOK Bitfraction/16 = 0
+  // set bit rate. In OOK Bitfraction/16 = 0. Equation: F(crystalOscillator) / [(BitRate(15,0) + (BitrateFraction) / 16)]
    uint16_t bitRate = 32000 / (br + (_mod->SPIreadRegister(SX127x_REG_BITRATE_FRACTION) / 16));
    state = _mod->SPIsetRegValue(SX127X_REG_BITRATE_MSB, (bitRate & 0xFF00) >> 8, 7, 0);
    state |= _mod->SPIsetRegValue(SX127X_REG_BITRATE_LSB, bitRate & 0x00FF, 7, 0);
