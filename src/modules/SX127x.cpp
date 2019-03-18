@@ -179,6 +179,7 @@ int16_t SX127x::transmit(uint8_t* data, size_t len, uint8_t addr) {
     //variables needed to handle large packets
     size_t msgRemainder = 0;
     size_t transmittedByteCount = 0;
+    
     // set DIO mapping
     _mod->SPIsetRegValue(SX127X_REG_DIO_MAPPING_1, SX127X_DIO0_PACK_PACKET_SENT, 7, 6);
     
@@ -223,7 +224,7 @@ int16_t SX127x::transmit(uint8_t* data, size_t len, uint8_t addr) {
       {
         msgRemainder = len - transmittedByteCount;//Keep track of unsent bytes
         //Send chunk of payload as soon as FifoEmpty is set!
-        while(_mod->SPIgetRegValue(SX127X_FLAG_FIFO_EMPTY, 6, 6)){
+        while(_mod->SPIreadRegister(SX127X_REG_IRQ_FLAGS_2) & SX127X_FLAG_FIFO_EMPTY){
           //If we still have to send more than the hardware allowed slice, send the payload in 64 byte chunks
           if(msgRemainder > SX127X_FSK_OOK_FIFOLIMIT){
             _mod->SPIwriteRegisterBurst(SX127X_REG_FIFO, &data[transmittedByteCount], SX127X_FSK_OOK_FIFOLIMIT);
@@ -363,29 +364,28 @@ int16_t SX127x::receive(uint8_t* data, size_t len) {
       delete[] data;
       data = new uint8_t[length + 1];
     }
-    else{
-      while(rcvByteCount < length){
-        /*Keep checking if FIFO has data (FifoEmpty = 0) and read one byte at a type to give the
-        * radio module a chance to fill FIFO. Also, FIFO might not be guaranteed to be filled with
-        * large chunks of data at a time so I will not optimize the read.
-        * If FIFO is empty, keep asking but do not read. Once FIFO is filled, keep reading
-        * until rcvByteCount == length.*/
-        while(!_mod->SPIgetRegValue(SX127X_FLAG_FIFO_EMPTY, 6, 6)){
-          /*As per the datasheet, we can do a micro optimization of the read stage once PayloadReady
-           * or CrcOk is set! At that point, we can empty FIFO in one go! Thus, we check for those flags,
-           * empty FIFO with the remainder # of bytes (length - rcvByteCount), and break the loop so we
-           * can return the packet!*/
-          if(_mod->SPIgetRegValue(SX127X_FLAG_PAYLOAD_READY, 2, 2) || \
-            _mod->SPIgetRegValue(SX127X_FLAG_CRC_OK, 1, 1))
-          {
-            _mod->SPIreadRegisterBurst(SX127X_REG_FIFO, (length - rcvByteCount), &data[rcvByteCount]);
-            rcvByteCount += (length - rcvByteCount);
-            break;
-          }
-          //Read a single byte at a time if the radio module has not finished receiving!
-          _mod->SPIreadRegisterBurst(SX127X_REG_FIFO, 1, &data[rcvByteCount]);
-          rcvByteCount++;
+    
+    while(rcvByteCount < length){
+      /*Keep checking if FIFO has data (FifoEmpty = 0) and read one byte at a type to give the
+      * radio module a chance to fill FIFO. Also, FIFO might not be guaranteed to be filled with
+      * large chunks of data at a time so I will not optimize the read.
+      * If FIFO is empty, keep asking but do not read. Once FIFO is filled, keep reading
+      * until rcvByteCount == length.*/
+      while(!(_mod->SPIreadRegister(SX127X_REG_IRQ_FLAGS_2) & SX127X_FLAG_FIFO_EMPTY)){
+        /*As per the datasheet, we can do a micro optimization of the read stage once PayloadReady
+        * or CrcOk is set! At that point, we can empty FIFO in one go! Thus, we check for those flags,
+        * empty FIFO with the remainder # of bytes (length - rcvByteCount), and break the loop so we
+        * can return the packet!*/
+        if(_mod->SPIreadRegister(SX127X_REG_IRQ_FLAGS_2) & SX127X_FLAG_PAYLOAD_READY || \
+          _mod->SPIreadRegister(SX127X_REG_IRQ_FLAGS_2) & SX127X_FLAG_CRC_OK)
+        {
+          _mod->SPIreadRegisterBurst(SX127X_REG_FIFO, (length - rcvByteCount), &data[rcvByteCount]);
+          rcvByteCount = length;
+          break;
         }
+        //Read a single byte at a time if the radio module has not finished receiving!
+        data[rcvByteCount] = _mod->SPIreadRegister(SX127X_REG_FIFO);
+        rcvByteCount++;
       }
     }
     
@@ -868,7 +868,7 @@ int16_t SX127x::setBitRate(float br) {
     }
   
     // set bit rate. In OOK Bitfraction/16 = 0
-    uint16_t bitRate = 32000 / br;
+    uint16_t bitRate = 32000 / (br + (_mod->SPIreadRegister(SX127x_REG_BITRATE_FRACTION) / 16));
     state = _mod->SPIsetRegValue(SX127X_REG_BITRATE_MSB, (bitRate & 0xFF00) >> 8, 7, 0);
     state |= _mod->SPIsetRegValue(SX127X_REG_BITRATE_LSB, bitRate & 0x00FF, 7, 0);
 

@@ -207,6 +207,7 @@
 #define SX127X_REG_PACKET_CONFIG_1                    0x30
 #define SX127X_REG_PACKET_CONFIG_2                    0x31
 #define SX127X_REG_PAYLOAD_LENGTH_FSK                 0x32
+#define SX127X_FSK_OOK_FIFOLIMIT                         0x40  //64 byte limit on payload slice that FIFO accepts
 #define SX127X_REG_NODE_ADRS                          0x33
 #define SX127X_REG_BROADCAST_ADRS                     0x34
 #define SX127X_REG_FIFO_THRESH                        0x35
@@ -220,13 +221,13 @@
 #define SX127X_REG_LOW_BAT                            0x3D
 #define SX127X_REG_IRQ_FLAGS_1                        0x3E
 #define SX127X_REG_IRQ_FLAGS_2                        0x3F
+#define SX127x_REG_BITRATE_FRACTION               0x5D
 
 // SX127x common FSK modem settings
 // SX127X_REG_OP_MODE
 #define SX127X_MODULATION_FSK                         0b00000000  //  6     5     FSK modulation scheme
 #define SX127X_MODULATION_OOK                         0b00100000  //  6     5     OOK modulation scheme
 #define SX127X_RX                                     0b00000101  //  2     0     receiver mode
-#define SX127X_FSK_OOK_FIFOLIMIT   0x40  //64 byte limit on payload slice that FIFO accepts
 
 // SX127X_REG_BITRATE_MSB + SX127X_REG_BITRATE_LSB
 #define SX127X_BITRATE_MSB                            0x1A        //  7     0     bit rate setting: BitRate = F(XOSC)/(BITRATE + BITRATE_FRAC/16)
