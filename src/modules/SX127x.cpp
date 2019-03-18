@@ -49,9 +49,6 @@ int16_t SX127x::begin(uint8_t chipVersion, uint8_t syncWord, uint8_t currentLimi
 }
 
 int16_t SX127x::beginFSK(uint8_t chipVersion, float br, float freqDev, float rxBw, uint8_t currentLimit, bool enableOOK) {
-  //Ensure modem is in the right FSK-like modulation mode
-  _OOKEnabled = enableOOK;
-  
   // set module properties
   _mod->init(USE_SPI, INT_BOTH);
   
@@ -107,6 +104,12 @@ int16_t SX127x::beginFSK(uint8_t chipVersion, float br, float freqDev, float rxB
   
   // disable address filtering
   state = disableAddressFiltering();
+  if(state != ERR_NONE) {
+    return(state);
+  }
+  
+  // enable/disable OOK
+  state = setOOK(enableOOK);
   
   return(state);
 }
@@ -847,32 +850,28 @@ int16_t SX127x::setBitRate(float br) {
     return(ERR_WRONG_MODEM);
   }
 
-  if(_OOKEnabled)
-  {
-    // check allowed bitrate for OOK
+  // check allowed bitrate
+  if(_ook) {
     if((br < 1.2) || (br > 25.0)) {
       return(ERR_INVALID_BIT_RATE);
     }
-  }
-  else
-  {
-    // check allowed bitrate for FSK
+  } else {
     if((br < 1.2) || (br > 300.0)) {
       return(ERR_INVALID_BIT_RATE);
     }
   }
-    // set mode to STANDBY
-    int16_t state = setMode(SX127X_STANDBY);
-    if(state != ERR_NONE) {
-      return(state);
-    }
   
-    // set bit rate. In OOK Bitfraction/16 = 0
-    uint16_t bitRate = 32000 / (br + (_mod->SPIreadRegister(SX127x_REG_BITRATE_FRACTION) / 16));
-    state = _mod->SPIsetRegValue(SX127X_REG_BITRATE_MSB, (bitRate & 0xFF00) >> 8, 7, 0);
-    state |= _mod->SPIsetRegValue(SX127X_REG_BITRATE_LSB, bitRate & 0x00FF, 7, 0);
+  // set mode to STANDBY
+  int16_t state = setMode(SX127X_STANDBY);
+  if(state != ERR_NONE) {
+    return(state);
 
-  // TODO: fractional part of bit rate setting
+  // set bit rate. In OOK Bitfraction/16 = 0
+   uint16_t bitRate = 32000 / (br + (_mod->SPIreadRegister(SX127x_REG_BITRATE_FRACTION) / 16));
+   state = _mod->SPIsetRegValue(SX127X_REG_BITRATE_MSB, (bitRate & 0xFF00) >> 8, 7, 0);
+   state |= _mod->SPIsetRegValue(SX127X_REG_BITRATE_LSB, bitRate & 0x00FF, 7, 0);
+
+  // TODO: fractional part of bit rate setting (not in OOK)
   if(state == ERR_NONE) {
     SX127x::_br = br;
   }
@@ -1030,6 +1029,26 @@ int16_t SX127x::disableAddressFiltering() {
   return(_mod->SPIsetRegValue(SX127X_REG_BROADCAST_ADRS, 0x00));
 }
 
+int16_t SX127x::setOOK(bool enableOOK) {
+  // check active modem
+  if(getActiveModem() != SX127X_FSK_OOK) {
+    return(ERR_WRONG_MODEM);
+  }
+  
+  // set OOK and if successful, save the new setting
+  int16_t state = ERR_NONE;
+  if(enableOOK) { 
+    state = _mod->SPIsetRegValue(SX127X_REG_OP_MODE, SX127X_MODULATION_OOK, 6, 5, 5);
+  } else {
+    state = _mod->SPIsetRegValue(SX127X_REG_OP_MODE, SX127X_MODULATION_FSK, 6, 5, 5);
+  }
+  if(state == ERR_NONE) {
+    _ook = enableOOK;
+  }
+  
+  return(state);
+}
+
 int16_t SX127x::setFrequencyRaw(float newFreq) {
   // set mode to standby
   int16_t state = setMode(SX127X_STANDBY);
@@ -1051,28 +1070,8 @@ int16_t SX127x::config() {
 }
 
 int16_t SX127x::configFSK() {
-  int16_t state = ERR_NONE;
-  //Check if we are in FSK or OOK modes
-  if(_OOKEnabled)
-  {
-      // set OOK modulation
-      state = _mod->SPIsetRegValue(SX127X_REG_OP_MODE, SX127X_MODULATION_OOK, 6, 5, 5);
-      if(state != ERR_NONE) {
-        return(state);
-      }
-  }
-  else
-  {
-      // set FSK modulation
-      state = _mod->SPIsetRegValue(SX127X_REG_OP_MODE, SX127X_MODULATION_FSK, 6, 5, 5);
-      if(state != ERR_NONE) {
-        return(state);
-      }
-  }
-  
-  
   // set RSSI threshold
-  state = _mod->SPIsetRegValue(SX127X_REG_RSSI_THRESH, SX127X_RSSI_THRESHOLD);
+  int16_t state = _mod->SPIsetRegValue(SX127X_REG_RSSI_THRESH, SX127X_RSSI_THRESHOLD);
   if(state != ERR_NONE) {
     return(state);
   }

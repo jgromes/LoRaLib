@@ -852,6 +852,15 @@ class SX127x: public PhysicalLayer {
     */
     int16_t disableAddressFiltering();
     
+    /*!
+      \brief Enables/disables OOK modulation instead of FSK.
+      
+      \param enableOOK Enable (true) or disable (false) OOK.
+      
+      \returns \ref status_codes
+    */
+    int16_t setOOK(bool enableOOK);
+    
     #ifdef RADIOLIB_DEBUG
       void regDump();
     #endif
@@ -865,6 +874,7 @@ class SX127x: public PhysicalLayer {
     uint8_t _cr;
     float _br;
     float _rxBw;
+    bool _ook;
     
     int16_t tx(char* data, uint8_t length);
     int16_t rxSingle(char* data, uint8_t* length);
@@ -876,7 +886,6 @@ class SX127x: public PhysicalLayer {
   
   private:
     float _dataRate;
-    bool _OOKEnabled;
   
     bool findChip(uint8_t ver);
     int16_t setMode(uint8_t mode);

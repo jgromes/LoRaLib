@@ -1,5 +1,5 @@
 /*
-   LoRaLib Transmit with Inerrupts Example
+   LoRaLib Transmit with Interrupts Example
 
    This example transmits LoRa packets with one second delays
    between them. Each packet contains up to 256 bytes

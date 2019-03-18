@@ -189,6 +189,11 @@
 */
 #define ERR_INVALID_DATA_SHAPING              -25
 
+/*! 
+  \brief The current modulation is invalid for the requested operation.
+*/
+#define ERR_INVALID_MODULATION                -26
+
 /*!
   \}
 */
