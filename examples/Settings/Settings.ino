@@ -201,7 +201,7 @@ void setup() {
 
   // disable automatic CRC check on received packets
   // NOTE: packets that do not pass the check are discarded automatically
-  if (lora.setCRC(false) != ERR_NONE) {
+  if (loraSX1278.setCRC(false) != ERR_NONE) {
     Serial.println("Unable to set CRC!");
     while (true);
   }
