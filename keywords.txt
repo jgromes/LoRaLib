@@ -62,6 +62,7 @@ disableAddressFiltering	KEYWORD2
 setDataShaping	KEYWORD2
 setOOK	KEYWORD2
 setDataShapingOOK	KEYWORD2
+setCRC	KEYWORD2
 
 #######################################
 # Constants (LITERAL1)

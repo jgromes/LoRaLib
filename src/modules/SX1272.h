@@ -238,6 +238,15 @@ class SX1272: public SX127x {
       \returns Last packet recorded signal strength indicator (RSSI).
     */
     int8_t getRSSI();
+    
+    /*!
+      \brief Enables/disables CRC check of received packets.
+      
+      \param enableCRC Enable (true) or disable (false) CRC.
+      
+      \returns \ref status_codes
+    */
+    int16_t setCRC(bool enableCRC);
   
   protected:
     int16_t setBandwidthRaw(uint8_t newBandwidth);

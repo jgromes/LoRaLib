@@ -337,6 +337,24 @@ int8_t SX1272::getRSSI() {
   return(lastPacketRSSI);
 }
 
+int16_t SX1278::setCRC(bool enableCRC) {
+  if(getActiveModem() == SX127X_LORA) {
+    // set LoRa CRC
+    if(enableCRC) {
+      return(_mod->SPIsetRegValue(SX127X_REG_MODEM_CONFIG_2, SX1278_RX_CRC_MODE_ON, 2, 2);
+    } else {
+      return(_mod->SPIsetRegValue(SX127X_REG_MODEM_CONFIG_2, SX1278_RX_CRC_MODE_OFF, 2, 2);
+    }
+  } else {
+    // set FSK CRC
+    if(enableCRC) {
+      return(_mod->SPIsetRegValue(SX127X_REG_PACKET_CONFIG_1, SX127X_CRC_ON, 4, 4);
+    } else {
+      return(_mod->SPIsetRegValue(SX127X_REG_PACKET_CONFIG_1, SX127X_CRC_OFF, 4, 4);
+    }
+  }
+}
+
 int16_t SX1272::setBandwidthRaw(uint8_t newBandwidth) {
   // set mode to standby
   int16_t state = SX127x::standby();
