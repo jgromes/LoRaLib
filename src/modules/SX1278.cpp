@@ -384,6 +384,8 @@ int16_t SX1278::setDataShapingOOK(uint8_t sh) {
     default:
       return(ERR_INVALID_DATA_SHAPING);
   }
+  
+  return(state);
 }
 
 int8_t SX1278::getRSSI() {
