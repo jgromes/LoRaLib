@@ -77,7 +77,7 @@ void setup() {
   }
 
   // FSK modulation can be changed to OOK
-  // NOTE: When using OOK, the maximum bit rate is only 32.768 kbps!
+  // NOTE: When using OOK, the maximum bit rate is only 25 kbps!
   //       Also, data shaping changes from Gaussian filter to
   //       simple filter with cutoff frequency. Make sure to call
   //       setDataShapingOOK() to set the correct shaping!
