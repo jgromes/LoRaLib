@@ -214,6 +214,7 @@ int16_t SX127x::transmit(uint8_t* data, size_t len, uint8_t addr) {
     while(!digitalRead(_mod->getInt0())) {
       if(millis() - start > timeout) {
         clearIRQFlags();
+        standby();
         return(ERR_TX_TIMEOUT);
       }
     }
@@ -221,7 +222,10 @@ int16_t SX127x::transmit(uint8_t* data, size_t len, uint8_t addr) {
     // clear interrupt flags
     clearIRQFlags();
     
-    return(ERR_NONE);
+    // set mode to standby to disable transmitter
+    state |= standby();
+    
+    return(state);
   }
   
   return(ERR_UNKNOWN);
