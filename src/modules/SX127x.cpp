@@ -792,7 +792,7 @@ int16_t SX127x::setBitRate(float br) {
 
   // check allowed bitrate
   if(_ook) {
-    if((br < 1.2) || (br > 25.0)) {
+    if((br < 1.2) || (br > 32.768)) {
       return(ERR_INVALID_BIT_RATE);
     }
   } else {

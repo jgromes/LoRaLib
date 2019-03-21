@@ -77,7 +77,7 @@ void setup() {
   }
 
   // FSK modulation can be changed to OOK
-  // NOTE: When using OOK, the maximum bit rate is only 25 kbps!
+  // NOTE: When using OOK, the maximum bit rate is only 32.768 kbps!
   //       Also, data shaping changes from Gaussian filter to
   //       simple filter with cutoff frequency. Make sure to call
   //       setDataShapingOOK() to set the correct shaping!
@@ -174,7 +174,7 @@ void loop() {
   }
 
   // using the direct mode, it is possible to transmit
-  // FM notes with Arduino tone() function
+  // FM tones with Arduino tone() function
   
   // it is recommended to set data shaping to 0
   // (no shaping) when transmitting audio
