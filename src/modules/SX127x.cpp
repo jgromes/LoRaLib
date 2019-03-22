@@ -916,7 +916,7 @@ int16_t SX127x::setSyncWord(uint8_t* syncWord, size_t len) {
   }
   
   // set sync word
-  _mod->SPIwriteRegisterBurst(SX127X_SYNC_VALUE_1, syncWord, len);
+  _mod->SPIwriteRegisterBurst(SX127X_REG_SYNC_VALUE_1, syncWord, len);
   return(ERR_NONE);
 }
 
