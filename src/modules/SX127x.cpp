@@ -812,7 +812,7 @@ int16_t SX127x::setBitRate(float br) {
   }
 
   // set bit rate
-  uint16_t bitRate = 32000 / br;
+  uint16_t bitRate = (SX127X_CRYSTAL_FREQ * 1000.0) / br;
   state = _mod->SPIsetRegValue(SX127X_REG_BITRATE_MSB, (bitRate & 0xFF00) >> 8, 7, 0);
   state |= _mod->SPIsetRegValue(SX127X_REG_BITRATE_LSB, bitRate & 0x00FF, 7, 0);
 
