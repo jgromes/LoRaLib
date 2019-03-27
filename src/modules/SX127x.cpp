@@ -580,7 +580,7 @@ int16_t SX127x::startTransmit(uint8_t* data, size_t len, uint8_t addr) {
 
 int16_t SX127x::readData(String& str, size_t len) {
   // create temporary array to store received data
-  char* data = new char[len];
+  char* data = new char[len + 1];
   int16_t state = SX127x::readData((uint8_t*)data, len);
   
   // if packet was received successfully, copy data into String
