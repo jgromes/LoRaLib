@@ -263,6 +263,9 @@ int16_t SX127x::receive(uint8_t* data, size_t len) {
     
     // check integrity CRC
     if(_mod->SPIgetRegValue(SX127X_REG_IRQ_FLAGS, 5, 5) == SX127X_CLEAR_IRQ_FLAG_PAYLOAD_CRC_ERROR) {
+      // clear interrupt flags
+      clearIRQFlags();
+    
       return(ERR_CRC_MISMATCH);
     }
     
@@ -597,6 +600,9 @@ int16_t SX127x::readData(uint8_t* data, size_t len) {
   if(modem == SX127X_LORA) {
     // check integrity CRC
     if(_mod->SPIgetRegValue(SX127X_REG_IRQ_FLAGS, 5, 5) == SX127X_CLEAR_IRQ_FLAG_PAYLOAD_CRC_ERROR) {
+      // clear interrupt flags
+      clearIRQFlags();
+      
       return(ERR_CRC_MISMATCH);
     }
     
