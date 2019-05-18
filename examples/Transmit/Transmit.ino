@@ -58,7 +58,7 @@ void loop() {
   // NOTE: transmit() is a blocking method!
   //       See example TransmitInterrupt for details
   //       on non-blocking transmission method.
-  int state = lora.transmit(F("Hello World!"));
+  int state = lora.transmit("Hello World!");
 
   // you can also transmit byte array up to 256 bytes long
   /*
