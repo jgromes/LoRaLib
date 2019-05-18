@@ -469,6 +469,7 @@ int16_t SX127x::startTransmit(uint8_t* data, size_t len, uint8_t addr) {
 
 int16_t SX127x::readData(uint8_t* data, size_t len) {
   int16_t modem = getActiveModem();
+  size_t length;
   if(modem == SX127X_LORA) {
     // check integrity CRC
     if(_mod->SPIgetRegValue(SX127X_REG_IRQ_FLAGS, 5, 5) == SX127X_CLEAR_IRQ_FLAG_PAYLOAD_CRC_ERROR) {
@@ -479,14 +480,14 @@ int16_t SX127x::readData(uint8_t* data, size_t len) {
     }
 
     // get packet length
-    size_t length = len;
+    length = len;
     if(_sf != 6) {
       length = _mod->SPIgetRegValue(SX127X_REG_RX_NB_BYTES);
     }
 
   } else if(modem == SX127X_FSK_OOK) {
     // get packet length
-    size_t length = _mod->SPIreadRegister(SX127X_REG_FIFO);
+    length = _mod->SPIreadRegister(SX127X_REG_FIFO);
 
     // check address filtering
     uint8_t filter = _mod->SPIgetRegValue(SX127X_REG_PACKET_CONFIG_1, 2, 1);
