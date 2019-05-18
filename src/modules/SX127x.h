@@ -686,9 +686,11 @@ class SX127x: public PhysicalLayer {
     /*!
       \brief Interrupt-driven receive method. DIO0 will be activated when full valid packet is received.
 
+      \param mode Receive mode to be used. Defaults to RxContinuous.
+
       \returns \ref status_codes
     */
-    int16_t startReceive();
+    int16_t startReceive(uint8_t mode = SX127X_RXCONTINUOUS);
 
     /*!
       \brief Reads data that was received after calling startReceive method.
