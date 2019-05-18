@@ -1,12 +1,12 @@
 /*
    LoRaLib Channel Activity Detection Example
-   
-   This example scans the current LoRa channel and detects 
-   valid LoRa preambles. Preamble is the first part of 
-   LoRa transmission, so this can be used to check 
-   if the LoRa channel is free, or if you should start 
+
+   This example scans the current LoRa channel and detects
+   valid LoRa preambles. Preamble is the first part of
+   LoRa transmission, so this can be used to check
+   if the LoRa channel is free, or if you should start
    receiving a message.
-   
+
    For more detailed information, see the LoRaLib Wiki
    https://github.com/jgromes/LoRaLib/wiki
 
@@ -50,19 +50,19 @@ void setup() {
 }
 
 void loop() {
-  Serial.print("Scanning channel for LoRa preamble ... ");
+  Serial.print(F("Scanning channel for LoRa preamble ... "));
 
   // start scanning current channel
   int state = lora.scanChannel();
-  
+
   if(state == PREAMBLE_DETECTED) {
     // LoRa preamble was detected
-    Serial.println(" detected preamble!");
-    
+    Serial.println(F(" detected preamble!"));
+
   } else if(state == CHANNEL_FREE) {
     // no preamble was detected, channel is free
-    Serial.println(" channel is free!");
-    
+    Serial.println(F(" channel is free!"));
+
   }
 
   // wait 100 ms before new scan

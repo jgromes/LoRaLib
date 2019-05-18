@@ -3,7 +3,7 @@
 
    This example listens for LoRa transmissions and tries to
    receive them. To successfully receive data, the following
-   settings have to be the same on both transmitter 
+   settings have to be the same on both transmitter
    and receiver:
     - carrier frequency
     - bandwidth
@@ -55,7 +55,7 @@ void setup() {
 }
 
 void loop() {
-  Serial.print("Waiting for incoming transmission ... ");
+  Serial.print(F("Waiting for incoming transmission ... "));
 
   // you can receive data as an Arduino String
   // NOTE: receive() is a blocking method!
@@ -73,37 +73,37 @@ void loop() {
 
   if (state == ERR_NONE) {
     // packet was successfully received
-    Serial.println("success!");
+    Serial.println(F("success!"));
 
     // print data of the packet
-    Serial.print("Data:\t\t\t");
+    Serial.print(F("Data:\t\t\t"));
     Serial.println(str);
 
-    // print RSSI (Received Signal Strength Indicator) 
+    // print RSSI (Received Signal Strength Indicator)
     // of the last received packet
-    Serial.print("RSSI:\t\t\t");
+    Serial.print(F("RSSI:\t\t\t"));
     Serial.print(lora.getRSSI());
-    Serial.println(" dBm");
+    Serial.println(F(" dBm"));
 
-    // print SNR (Signal-to-Noise Ratio) 
+    // print SNR (Signal-to-Noise Ratio)
     // of the last received packet
-    Serial.print("SNR:\t\t\t");
+    Serial.print(F("SNR:\t\t\t"));
     Serial.print(lora.getSNR());
-    Serial.println(" dB");
+    Serial.println(F(" dB"));
 
     // print frequency error
     // of the last received packet
-    Serial.print("Frequency error:\t");
+    Serial.print(F("Frequency error:\t"));
     Serial.print(lora.getFrequencyError());
-    Serial.println(" Hz");
+    Serial.println(F(" Hz"));
 
   } else if (state == ERR_RX_TIMEOUT) {
     // timeout occurred while waiting for a packet
-    Serial.println("timeout!");
+    Serial.println(F("timeout!"));
 
   } else if (state == ERR_CRC_MISMATCH) {
     // packet was received, but is malformed
-    Serial.println("CRC error!");
+    Serial.println(F("CRC error!"));
 
   }
 

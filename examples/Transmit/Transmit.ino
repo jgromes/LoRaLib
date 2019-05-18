@@ -51,14 +51,14 @@ void setup() {
 }
 
 void loop() {
-  Serial.print("Sending packet ... ");
+  Serial.print(F("Sending packet ... "));
 
   // you can transmit C-string or Arduino string up to
   // 256 characters long
   // NOTE: transmit() is a blocking method!
   //       See example TransmitInterrupt for details
   //       on non-blocking transmission method.
-  int state = lora.transmit("Hello World!");
+  int state = lora.transmit(F("Hello World!"));
 
   // you can also transmit byte array up to 256 bytes long
   /*
@@ -70,20 +70,20 @@ void loop() {
 
   if (state == ERR_NONE) {
     // the packet was successfully transmitted
-    Serial.println(" success!");
+    Serial.println(F(" success!"));
 
     // print measured data rate
-    Serial.print("Datarate:\t");
+    Serial.print(F("Datarate:\t"));
     Serial.print(lora.getDataRate());
-    Serial.println(" bps");
+    Serial.println(F(" bps"));
 
   } else if (state == ERR_PACKET_TOO_LONG) {
     // the supplied packet was longer than 256 bytes
-    Serial.println(" too long!");
+    Serial.println(F(" too long!"));
 
   } else if (state == ERR_TX_TIMEOUT) {
     // timeout occurred while transmitting packet
-    Serial.println(" timeout!");
+    Serial.println(F(" timeout!"));
 
   }
 
