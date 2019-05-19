@@ -505,9 +505,7 @@ int16_t SX127x::readData(uint8_t* data, size_t len) {
   _mod->SPIreadRegisterBurst(SX127X_REG_FIFO, length, data);
 
   // add terminating null
-  if(len == 0) {
-    data[length] = 0;
-  }
+  data[length] = 0;
 
   // clear interrupt flags
   clearIRQFlags();
@@ -651,7 +649,7 @@ int16_t SX127x::setBitRate(float br) {
     return(ERR_WRONG_MODEM);
   }
 
-  // check allowed bitrate
+  // check allowed bit rate
   if(_ook) {
     if((br < 1.2) || (br > 32.768)) {
       return(ERR_INVALID_BIT_RATE);
@@ -673,7 +671,7 @@ int16_t SX127x::setBitRate(float br) {
   state = _mod->SPIsetRegValue(SX127X_REG_BITRATE_MSB, (bitRate & 0xFF00) >> 8, 7, 0);
   state |= _mod->SPIsetRegValue(SX127X_REG_BITRATE_LSB, bitRate & 0x00FF, 7, 0);
 
-  // TODO: fractional part of bit rate setting (not in OOK)
+  // TODO fractional part of bit rate setting (not in OOK)
   if(state == ERR_NONE) {
     SX127x::_br = br;
   }
@@ -722,7 +720,7 @@ int16_t SX127x::setRxBandwidth(float rxBw) {
     return(state);
   }
 
-  // calculate exponent and mantisa values
+  // calculate exponent and mantissa values
   for(uint8_t e = 7; e >= 1; e--) {
     for(int8_t m = 2; m >= 0; m--) {
       float point = (SX127X_CRYSTAL_FREQ * 1000000.0)/(((4 * m) + 16) * ((uint32_t)1 << (e + 2)));
@@ -954,7 +952,7 @@ int16_t SX127x::setActiveModem(uint8_t modem) {
   // set mode to SLEEP
   int16_t state = setMode(SX127X_SLEEP);
 
-  // set LoRa mode
+  // set modem
   state |= _mod->SPIsetRegValue(SX127X_REG_OP_MODE, modem, 7, 7, 5);
 
   // set mode to STANDBY
