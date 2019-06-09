@@ -215,7 +215,6 @@ int16_t SX127x::receive(uint8_t* data, size_t len) {
         return(ERR_RX_TIMEOUT);
       }
     }
-
   } else if(modem == SX127X_FSK_OOK) {
     // calculate timeout (500 % of expected time-one-air)
     size_t maxLen = len;
@@ -229,7 +228,6 @@ int16_t SX127x::receive(uint8_t* data, size_t len) {
     if(state != ERR_NONE) {
       return(state);
     }
-    
     // wait for packet reception or timeout
     uint32_t start = millis();
     while(!digitalRead(_mod->getInt0())) {
@@ -238,7 +236,6 @@ int16_t SX127x::receive(uint8_t* data, size_t len) {
         return(ERR_RX_TIMEOUT);
       }
     }
-
   }
 
   // read the received data

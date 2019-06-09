@@ -840,7 +840,6 @@ class SX127x: public PhysicalLayer {
     */
     int16_t getPacketLength(size_t& length);
 
-
     #ifdef RADIOLIB_DEBUG
       void regDump();
     #endif
