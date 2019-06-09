@@ -30,3 +30,7 @@
 
 # Arduino Library Development file
 .development
+
+# Atom
+*.tags
+*.tags1

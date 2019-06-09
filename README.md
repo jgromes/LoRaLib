@@ -11,7 +11,7 @@ If you're looking for an open-source shield to use with this library, it has its
 
 **DISCLAIMER: This library is provided 'AS IS'. See `license.txt` for details.**
 
-This library enables easy long range communaction with SX127x family of LoRa modules. It was designed to be used with LoRenz Rev.B shields. However, they are not required and this library can be used with any LoRa module, as long as it is based on of the supported LoRa chips.
+This library enables easy long range communication using the SX127x family of LoRa modules. It was designed to be used with LoRenz Rev.B shields. However, they are not required and this library can be used with any LoRa module, as long as it is based on of the supported LoRa chips.
 
 Currently supported chips:
 * SX1272 and SX1273

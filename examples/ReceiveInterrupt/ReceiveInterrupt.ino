@@ -4,7 +4,7 @@
    This example listens for LoRa transmissions and tries to
    receive them. Once a packet is received, an interrupt is
    triggered. To successfully receive data, the following
-   settings have to be the same on both transmitter 
+   settings have to be the same on both transmitter
    and receiver:
     - carrier frequency
     - bandwidth
@@ -31,7 +31,7 @@
 // DIO1 pin:  3
 // IMPORTANT: because this example uses external interrupts,
 //            DIO0 MUST be connected to Arduino pin 2 or 3.
-//            DIO1 MAY be connected to any free pin 
+//            DIO1 MAY be connected to any free pin
 //            or left floating.
 SX1278 lora = new LoRa;
 
@@ -58,10 +58,10 @@ void setup() {
     while (true);
   }
 
-  // set the function that will be called 
+  // set the function that will be called
   // when new packet is received
   lora.setDio0Action(setFlag);
-  
+
   // start listening for LoRa packets
   Serial.print(F("Starting to listen ... "));
   state = lora.startReceive();
@@ -73,8 +73,8 @@ void setup() {
     while (true);
   }
 
-  // NOTE: 'listen' mode will be disabled 
-  // automatically by calling any of the 
+  // NOTE: 'listen' mode will be disabled
+  // automatically by calling any of the
   // following methods:
   //
   // lora.standby()
@@ -117,44 +117,44 @@ void loop() {
 
     // reset flag
     receivedFlag = false;
-    
+
     // you can read received data as an Arduino String
     String str;
     int state = lora.readData(str);
-  
+
     // you can also read received data as byte array
     /*
       byte byteArr[8];
       int state = lora.readData(byteArr, 8);
     */
-    
+
     if (state == ERR_NONE) {
       // packet was successfully received
-      Serial.println("Received packet!");
-  
+      Serial.println(F("Received packet!"));
+
       // print data of the packet
-      Serial.print("Data:\t\t\t");
+      Serial.print(F("Data:\t\t\t"));
       Serial.println(str);
-  
-      // print RSSI (Received Signal Strength Indicator) 
-      Serial.print("RSSI:\t\t\t");
+
+      // print RSSI (Received Signal Strength Indicator)
+      Serial.print(F("RSSI:\t\t\t"));
       Serial.print(lora.getRSSI());
-      Serial.println(" dBm");
-  
-      // print SNR (Signal-to-Noise Ratio) 
-      Serial.print("SNR:\t\t\t");
+      Serial.println(F(" dBm"));
+
+      // print SNR (Signal-to-Noise Ratio)
+      Serial.print(F("SNR:\t\t\t"));
       Serial.print(lora.getSNR());
-      Serial.println(" dB");
+      Serial.println(F(" dB"));
 
       // print frequency error
-      Serial.print("Frequency error:\t");
+      Serial.print(F("Frequency error:\t"));
       Serial.print(lora.getFrequencyError());
-      Serial.println(" Hz");
-  
+      Serial.println(F(" Hz"));
+
     } else if (state == ERR_CRC_MISMATCH) {
       // packet was received, but is malformed
-      Serial.println("CRC error!");
-  
+      Serial.println(F("CRC error!"));
+
     }
 
     // we're ready to receive more packets,
