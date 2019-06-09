@@ -48,7 +48,7 @@ int16_t SX127x::begin(uint8_t chipVersion, uint8_t syncWord, uint8_t currentLimi
   return(state);
 }
 
-int16_t SX127x::beginFSK(uint8_t chipVersion, float br, float freqDev, float rxBw, uint8_t currentLimit, bool enableOOK) {
+int16_t SX127x::beginFSK(uint8_t chipVersion, float br, float freqDev, float rxBw, uint8_t currentLimit, uint16_t preambleLength, bool enableOOK) {
   // set module properties
   _mod->init(USE_SPI, INT_BOTH);
 
@@ -91,6 +91,12 @@ int16_t SX127x::beginFSK(uint8_t chipVersion, float br, float freqDev, float rxB
 
   // set over current protection
   state = SX127x::setCurrentLimit(currentLimit);
+  if(state != ERR_NONE) {
+    return(state);
+  }
+
+  // set preamble length
+  state = SX127x::setPreambleLength(preambleLength);
   if(state != ERR_NONE) {
     return(state);
   }
@@ -550,23 +556,33 @@ int16_t SX127x::setCurrentLimit(uint8_t currentLimit) {
 }
 
 int16_t SX127x::setPreambleLength(uint16_t preambleLength) {
-  // check active modem
-  if(getActiveModem() != SX127X_LORA) {
-    return(ERR_WRONG_MODEM);
-  }
-
-  // check allowed range
-  if(preambleLength < 6) {
-    return(ERR_INVALID_PREAMBLE_LENGTH);
-  }
-
   // set mode to standby
   int16_t state = setMode(SX127X_STANDBY);
+  if(state != ERR_NONE) {
+    return(state);
+  }
 
-  // set preamble length
-  state |= _mod->SPIsetRegValue(SX127X_REG_PREAMBLE_MSB, (preambleLength & 0xFF00) >> 8);
-  state |= _mod->SPIsetRegValue(SX127X_REG_PREAMBLE_LSB, preambleLength & 0x00FF);
-  return(state);
+  // check active modem
+  uint8_t modem = getActiveModem();
+  if(modem == SX127X_LORA) {
+    // check allowed range
+    if(preambleLength < 6) {
+      return(ERR_INVALID_PREAMBLE_LENGTH);
+    }
+
+    // set preamble length
+    state = _mod->SPIsetRegValue(SX127X_REG_PREAMBLE_MSB, (preambleLength & 0xFF00) >> 8);
+    state |= _mod->SPIsetRegValue(SX127X_REG_PREAMBLE_LSB, preambleLength & 0x00FF);
+    return(state);
+
+  } else if(modem == SX127X_FSK_OOK) {
+    // set preamble length
+    state = _mod->SPIsetRegValue(SX127X_REG_PREAMBLE_MSB_FSK, (preambleLength & 0xFF00) >> 8);
+    state |= _mod->SPIsetRegValue(SX127X_REG_PREAMBLE_LSB_FSK, preambleLength & 0x00FF);
+    return(state);
+  }
+
+  return(ERR_UNKNOWN);
 }
 
 float SX127x::getFrequencyError(bool autoCorrect) {
@@ -740,7 +756,6 @@ int16_t SX127x::setRxBandwidth(float rxBw) {
       }
     }
   }
-
   return(ERR_UNKNOWN);
 }
 
@@ -879,8 +894,14 @@ int16_t SX127x::configFSK() {
   _mod->SPIwriteRegister(SX127X_REG_IRQ_FLAGS_2, SX127X_FLAG_FIFO_OVERRUN);
 
   // set packet configuration
-  state = _mod->SPIsetRegValue(SX127X_REG_PACKET_CONFIG_1, SX127X_PACKET_VARIABLE | SX127X_DC_FREE_NONE | SX127X_CRC_ON | SX127X_CRC_AUTOCLEAR_ON, 7, 3);
+  state = _mod->SPIsetRegValue(SX127X_REG_PACKET_CONFIG_1, SX127X_PACKET_VARIABLE | SX127X_DC_FREE_WHITENING | SX127X_CRC_ON | SX127X_CRC_AUTOCLEAR_ON | SX127X_ADDRESS_FILTERING_OFF | SX127X_CRC_WHITENING_TYPE_CCITT, 7, 0);
   state |= _mod->SPIsetRegValue(SX127X_REG_PACKET_CONFIG_2, SX127X_DATA_MODE_PACKET | SX127X_IO_HOME_OFF, 6, 5);
+  if(state != ERR_NONE) {
+    return(state);
+  }
+
+  // set preamble polarity
+  state =_mod->SPIsetRegValue(SX127X_REG_SYNC_CONFIG, SX127X_PREAMBLE_POLARITY_55, 5, 5);
   if(state != ERR_NONE) {
     return(state);
   }
@@ -901,7 +922,7 @@ int16_t SX127x::configFSK() {
   }
 
   // enable preamble detector and set preamble length
-  state = _mod->SPIsetRegValue(SX127X_REG_PREAMBLE_DETECT, SX127X_PREAMBLE_DETECTOR_ON | SX127X_PREAMBLE_DETECTOR_1_BYTE | SX127X_PREAMBLE_DETECTOR_TOL);
+  state = _mod->SPIsetRegValue(SX127X_REG_PREAMBLE_DETECT, SX127X_PREAMBLE_DETECTOR_ON | SX127X_PREAMBLE_DETECTOR_2_BYTE | SX127X_PREAMBLE_DETECTOR_TOL);
   state |= _mod->SPIsetRegValue(SX127X_REG_PREAMBLE_MSB_FSK, SX127X_PREAMBLE_SIZE_MSB);
   state |= _mod->SPIsetRegValue(SX127X_REG_PREAMBLE_LSB_FSK, SX127X_PREAMBLE_SIZE_LSB);
   if(state != ERR_NONE) {
