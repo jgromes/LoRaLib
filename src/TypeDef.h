@@ -177,6 +177,11 @@
 #define ERR_INVALID_MODULATION                -26
 
 /*!
+  \brief The c-string buffer failed to be allocated. No RAM? new failed? Invalid pointer passed?
+*/
+#define ERR_INVALID_MEMORYBUFFER           -27
+
+/*!
   \}
 */
 

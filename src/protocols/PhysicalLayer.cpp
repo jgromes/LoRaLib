@@ -50,30 +50,118 @@ int16_t PhysicalLayer::startTransmit(const char* str, uint8_t addr) {
 
 int16_t PhysicalLayer::readData(String& str, size_t len) {
   // create temporary array to store received data
-  char* data = new char[len + 1];
-  int16_t state = readData((uint8_t*)data, len);
-
-  // if packet was received successfully, copy data into String
-  if(state == ERR_NONE) {
-    str = String(data);
+  uint8_t* data = nullptr;
+  int16_t state = 0;
+  size_t length = 0;
+  
+  if(len == 0)
+  {
+    //We can query the packet length now because the packet should have been received earlier
+    getPacketLength(length);
+    //Build a temporary buffer
+    data = new uint8_t[length + 1];
+    // read the received data
+    if(data)
+    {
+      state = (readData(data, length));
+      if(state != ERR_NONE)
+        return state;
+    }
+    else
+    {
+      return ERR_INVALID_MEMORYBUFFER;
+    }
+    //guards against dynamic allocation issue #51 and #30
+    data[length] = 0;
+    //initialize the string
+    str = String((char*)data);
+    //clean up
+    delete[] data;
   }
-
-  delete[] data;
-  return(state);
+  else
+  {
+    //if the string object is non-zero, let's treat it like a regular binary receive event
+    //Build a temporary buffer
+    data = new uint8_t[len];
+    // read the received data
+    if(data)
+    {
+      state = (readData(data, len));
+      if(state != ERR_NONE)
+        return state;
+    }
+    else
+    {
+      return ERR_INVALID_MEMORYBUFFER;
+    }
+    //Copy c-string
+    for(size_t i = 0; i < len; i++)
+    {
+      str[i] = data[i];
+    }
+    //clean up
+    delete[] data;
+  }
+  
+  return(ERR_NONE);
 }
 
 int16_t PhysicalLayer::receive(String& str, size_t len) {
   // create temporary array to store received data
-  char* data = new char[len + 1];
-  int16_t state = receive((uint8_t*)data, len);
-
-  // if packet was received successfully, copy data into String
-  if(state == ERR_NONE) {
-    str = String(data);
+  uint8_t* data = nullptr;
+  int16_t state = 0;
+  size_t length = 0;
+  
+  if(len == 0)
+  {
+    //We can query the packet length now because the packet should have been received earlier
+    getPacketLength(length);
+    //Build a temporary buffer
+    data = new uint8_t[length + 1];
+    // read the received data
+    if(data)
+    {
+      state = (receive(data, length));
+      if(state != ERR_NONE)
+        return state;
+    }
+    else
+    {
+      return ERR_INVALID_MEMORYBUFFER;
+    }
+    //guards against dynamic allocation issue #51 and #30
+    data[length] = 0;
+    //initialize the string
+    str = String((char*)data);
+    //clean up
+    delete[] data;
   }
-
-  delete[] data;
-  return(state);
+  else
+  {
+    //if the string object is non-zero, let's treat it like a regular binary receive event
+    //Build a temporary buffer
+    data = new uint8_t[len];
+    // read the received data
+    if(data)
+    {
+      state = (receive(data, len));
+      if(state != ERR_NONE)
+        return state;
+    }
+    else
+    {
+      return ERR_INVALID_MEMORYBUFFER;
+    }
+    //Copy c-string
+    for(size_t i = 0; i < len; i++)
+    {
+      str[i] = data[i];
+    }
+    //clean up
+    delete[] data;
+  }
+  
+  return(ERR_NONE);
 }
 
 float PhysicalLayer::getCrystalFreq() {
