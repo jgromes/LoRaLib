@@ -1,8 +1,9 @@
 #include "PhysicalLayer.h"
 
-PhysicalLayer::PhysicalLayer(float crysFreq, uint8_t divExp) {
+PhysicalLayer::PhysicalLayer(float crysFreq, uint8_t divExp, size_t maxPacketLength) {
   _crystalFreq = crysFreq;
   _divExponent = divExp;
+  _maxPacketLength = maxPacketLength;
 }
 
 int16_t PhysicalLayer::transmit(__FlashStringHelper* fstr, uint8_t addr) {
@@ -49,68 +50,65 @@ int16_t PhysicalLayer::startTransmit(const char* str, uint8_t addr) {
 }
 
 int16_t PhysicalLayer::readData(String& str, size_t len) {
-  // create temporary array to store received data
-  uint8_t* data = nullptr;
   int16_t state = ERR_NONE;
-  
+
   if(len == 0) {
-    // We can query the packet length now because the packet should have been received earlier
+    // query packet length
     len = getPacketLength();
-  }  
-  
-    // Build a temporary buffer
-    data = new uint8_t[len + 1];
-    
-    // read the received data
-    if(data) {
-      state = readData(data, len);
-    }
-    else {
-      state = ERR_MEMORY_ALLOCATION_FAILED;
-    }
-    
-    // add null terminator
-    data[len] = 0;
-    
-    // initialize Arduino String class
-    str = String((char*)data);
-    
-    // deallocate temporary buffer
-    delete[] data;
-  
+  }
+
+  // build a temporary buffer
+  uint8_t* data = new uint8_t[len + 1];
+  if(!data) {
+    return(ERR_MEMORY_ALLOCATION_FAILED);
+  }
+
+  // read the received data
+  state = readData(data, len);
+
+  // add null terminator
+  data[len] = 0;
+
+  // initialize Arduino String class
+  str = String((char*)data);
+
+  // deallocate temporary buffer
+  delete[] data;
+
   return(state);
 }
 
 int16_t PhysicalLayer::receive(String& str, size_t len) {
-  // create temporary array to store received data
-  uint8_t* data = nullptr;
   int16_t state = ERR_NONE;
-  
+
   if(len == 0) {
-    // We can query the packet length now because the packet should have been received earlier
+    // unknown packet length, set to maximum
+    len = _maxPacketLength;
+  }
+
+  // build a temporary buffer
+  uint8_t* data = new uint8_t[len + 1];
+  if(!data) {
+    return(ERR_MEMORY_ALLOCATION_FAILED);
+  }
+
+  // read the received data
+  state = receive(data, len);
+
+  if(state == ERR_NONE) {
+    // read the number of actually received bytes
     len = getPacketLength();
-  }  
-  
-    // Build a temporary buffer
-    data = new uint8_t[len + 1];
-    
-    // read the received data
-    if(data) {
-      state = receive(data, len);
-    }
-    else {
-      state = ERR_MEMORY_ALLOCATION_FAILED;
-    }
-    
+
     // add null terminator
     data[len] = 0;
-    
+
     // initialize Arduino String class
     str = String((char*)data);
-    
-    // deallocate temporary buffer
-    delete[] data;
-  
+  }
+
+  // deallocate temporary buffer
+  delete[] data;
+
   return(state);
 }
 
