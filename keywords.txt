@@ -7,7 +7,7 @@
 #######################################
 
 LoRaLib	KEYWORD1
-LoRa	KEYWORD1
+LoRa		KEYWORD1
 
 SX1272	KEYWORD1
 SX1273	KEYWORD1
@@ -27,14 +27,14 @@ RFM98	KEYWORD1
 begin	KEYWORD2
 beginFSK	KEYWORD2
 transmit	KEYWORD2
-receive	KEYWORD2
+receive		KEYWORD2
 sleep	KEYWORD2
 standby	KEYWORD2
 scanChannel	KEYWORD2
 setDio0Action	KEYWORD2
 setDio1Action	KEYWORD2
 startTransmit	KEYWORD2
-startReceive	KEYWORD2
+startReceive		KEYWORD2
 readData	KEYWORD2
 transmitDirect	KEYWORD2
 receiveDirect	KEYWORD2
@@ -51,8 +51,9 @@ setPreambleLength	KEYWORD2
 setGain	KEYWORD2
 getFrequencyError	KEYWORD2
 getRSSI	KEYWORD2
-getSNR	KEYWORD2
-getDataRate	KEYWORD2
+getSNR		KEYWORD2
+getDataRate		KEYWORD2
+getPacketLength	KEYWORD2
 setBitRate	KEYWORD2
 setRxBandwidth	KEYWORD2
 setFrequencyDeviation	KEYWORD2
@@ -60,7 +61,7 @@ setNodeAddress	KEYWORD2
 setBroadcastAddress	KEYWORD2
 disableAddressFiltering	KEYWORD2
 setDataShaping	KEYWORD2
-setOOK	KEYWORD2
+setOOK		KEYWORD2
 setDataShapingOOK	KEYWORD2
 setCRC	KEYWORD2
 
@@ -93,3 +94,4 @@ ERR_INVALID_FREQUENCY_DEVIATION	LITERAL1
 ERR_INVALID_SYNC_WORD	LITERAL1
 ERR_INVALID_DATA_SHAPING	LITERAL1
 ERR_INVALID_MODULATION	LITERAL1
+ERR_MEMORY_ALLOCATION_FAILED LITERAL1

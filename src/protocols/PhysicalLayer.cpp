@@ -53,28 +53,29 @@ int16_t PhysicalLayer::readData(String& str, size_t len) {
   uint8_t* data = nullptr;
   int16_t state = ERR_NONE;
   
-  if(len == 0)
-  {
-    //We can query the packet length now because the packet should have been received earlier
-    getPacketLength(len);
+  if(len == 0) {
+    // We can query the packet length now because the packet should have been received earlier
+    len = getPacketLength();
   }  
   
-    //Build a temporary buffer
+    // Build a temporary buffer
     data = new uint8_t[len + 1];
+    
     // read the received data
-    if(data)
-    {
-      state = (readData(data, len));
+    if(data) {
+      state = readData(data, len);
     }
-    else
-    {
-      state = ERR_INVALID_MEMORYBUFFER;
+    else {
+      state = ERR_MEMORY_ALLOCATION_FAILED;
     }
-    //guards against dynamic allocation issue #51 and #30
+    
+    // add null terminator
     data[len] = 0;
-    //initialize the string
+    
+    // initialize Arduino String class
     str = String((char*)data);
-    //clean up
+    
+    // deallocate temporary buffer
     delete[] data;
   
   return(state);
@@ -85,28 +86,29 @@ int16_t PhysicalLayer::receive(String& str, size_t len) {
   uint8_t* data = nullptr;
   int16_t state = ERR_NONE;
   
-  if(len == 0)
-  {
-    //We can query the packet length now because the packet should have been received earlier
-    getPacketLength(len);
+  if(len == 0) {
+    // We can query the packet length now because the packet should have been received earlier
+    len = getPacketLength();
   }  
   
-    //Build a temporary buffer
+    // Build a temporary buffer
     data = new uint8_t[len + 1];
+    
     // read the received data
-    if(data)
-    {
-      state = (receive(data, len));
+    if(data) {
+      state = receive(data, len);
     }
-    else
-    {
-      state = ERR_INVALID_MEMORYBUFFER;
+    else {
+      state = ERR_MEMORY_ALLOCATION_FAILED;
     }
-    //guards against dynamic allocation issue #51 and #30
+    
+    // add null terminator
     data[len] = 0;
-    //initialize the string
+    
+    // initialize Arduino String class
     str = String((char*)data);
-    //clean up
+    
+    // deallocate temporary buffer
     delete[] data;
   
   return(state);

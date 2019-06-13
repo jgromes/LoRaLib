@@ -81,7 +81,7 @@ class PhysicalLayer {
 
       \returns \ref status_codes
     */
-   int16_t receive(String& str, size_t len = 0) ;
+    int16_t receive(String& str, size_t len = 0);
 
     /*!
       \brief Binary receive method. Must be implemented in module class.
@@ -140,7 +140,7 @@ class PhysicalLayer {
 
       \returns \ref status_codes
     */
-   int16_t readData(String& str, size_t len = 0);
+    int16_t readData(String& str, size_t len = 0);
 
     /*!
       \brief Reads data that was received after calling startReceive method.
@@ -200,11 +200,9 @@ class PhysicalLayer {
     /*!
       \brief Query modem for the packet length of received payload.
 
-      \param length Reference to variable in which to store the packet length 
-
-      \returns \ref status_codes
+      \returns \ref packet length
     */
-   virtual int16_t getPacketLength(size_t& length) = 0;
+    virtual size_t getPacketLength() = 0;
 
   private:
     float _crystalFreq;

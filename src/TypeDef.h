@@ -177,9 +177,9 @@
 #define ERR_INVALID_MODULATION                -26
 
 /*!
-  \brief The c-string buffer failed to be allocated. No RAM? new failed? Invalid pointer passed?
+  \brief Failed to allocate memory for temporary buffer. This can be cause by not enough RAM or by passing invalid pointer.
 */
-#define ERR_INVALID_MEMORYBUFFER           -27
+#define ERR_MEMORY_ALLOCATION_FAILED           -27
 
 /*!
   \}
