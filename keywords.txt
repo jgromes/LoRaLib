@@ -39,6 +39,7 @@ readData	KEYWORD2
 transmitDirect	KEYWORD2
 receiveDirect	KEYWORD2
 packetMode	KEYWORD2
+getPacketLength	KEYWORD2
 
 setBandwidth	KEYWORD2
 setSpreadingFactor	KEYWORD2
