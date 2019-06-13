@@ -196,11 +196,11 @@ class PhysicalLayer {
       \returns Frequency divider exponent.
     */
     uint8_t getDivExponent();
-    
+
     /*!
       \brief Query modem for the packet length of received payload.
 
-      \returns \ref packet length
+      \returns Length of last received packet in bytes.
     */
     virtual size_t getPacketLength() = 0;
 
