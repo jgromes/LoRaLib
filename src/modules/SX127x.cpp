@@ -2,6 +2,7 @@
 
 SX127x::SX127x(Module* mod) : PhysicalLayer(SX127X_CRYSTAL_FREQ, SX127X_DIV_EXPONENT) {
   _mod = mod;
+  _packetLengthQueried = false;
 }
 
 int16_t SX127x::begin(uint8_t chipVersion, uint8_t syncWord, uint8_t currentLimit, uint16_t preambleLength) {
@@ -197,6 +198,7 @@ int16_t SX127x::transmit(uint8_t* data, size_t len, uint8_t addr) {
 int16_t SX127x::receive(uint8_t* data, size_t len) {
   // set mode to standby
   int16_t state = setMode(SX127X_STANDBY);
+  size_t length = 0;
 
   int16_t modem = getActiveModem();
   if(modem == SX127X_LORA) {
@@ -213,10 +215,6 @@ int16_t SX127x::receive(uint8_t* data, size_t len) {
         return(ERR_RX_TIMEOUT);
       }
     }
-
-    // read the received data
-    return(readData(data, len));
-
   } else if(modem == SX127X_FSK_OOK) {
     // calculate timeout (500 % of expected time-one-air)
     size_t maxLen = len;
@@ -230,7 +228,6 @@ int16_t SX127x::receive(uint8_t* data, size_t len) {
     if(state != ERR_NONE) {
       return(state);
     }
-
     // wait for packet reception or timeout
     uint32_t start = millis();
     while(!digitalRead(_mod->getInt0())) {
@@ -239,12 +236,12 @@ int16_t SX127x::receive(uint8_t* data, size_t len) {
         return(ERR_RX_TIMEOUT);
       }
     }
-
-    // read the received data
-    return(readData(data, len));
   }
 
-  return(ERR_UNKNOWN);
+  // read the received data
+  state = readData(data, len);
+  
+  return(state);
 }
 
 int16_t SX127x::scanChannel() {
@@ -474,7 +471,12 @@ int16_t SX127x::startTransmit(uint8_t* data, size_t len, uint8_t addr) {
 
 int16_t SX127x::readData(uint8_t* data, size_t len) {
   int16_t modem = getActiveModem();
-  size_t length = len;
+  size_t length = 0;
+
+    // We can query the packet length now because the packet should have been received earlier
+    // Unused value but makes sure to clear the value from the FIFO if in FSK mode
+    length = getPacketLength();
+    
   if(modem == SX127X_LORA) {
     // check integrity CRC
     if(_mod->SPIgetRegValue(SX127X_REG_IRQ_FLAGS, 5, 5) == SX127X_CLEAR_IRQ_FLAG_PAYLOAD_CRC_ERROR) {
@@ -483,16 +485,7 @@ int16_t SX127x::readData(uint8_t* data, size_t len) {
 
       return(ERR_CRC_MISMATCH);
     }
-
-    // get packet length
-    if(_sf != 6) {
-      length = _mod->SPIgetRegValue(SX127X_REG_RX_NB_BYTES);
-    }
-
   } else if(modem == SX127X_FSK_OOK) {
-    // get packet length
-    length = _mod->SPIreadRegister(SX127X_REG_FIFO);
-
     // check address filtering
     uint8_t filter = _mod->SPIgetRegValue(SX127X_REG_PACKET_CONFIG_1, 2, 1);
     if((filter == SX127X_ADDRESS_FILTERING_NODE) || (filter == SX127X_ADDRESS_FILTERING_NODE_BROADCAST)) {
@@ -502,16 +495,18 @@ int16_t SX127x::readData(uint8_t* data, size_t len) {
 
   // read packet data
   if(len == 0) {
-    // argument len equal to zero indicates String call, which means dynamically allocated data array
-    // dispose of the original and create a new one
-    delete[] data;
-    data = new uint8_t[length + 1];
+    // argument len equal to zero indicates failed memory allocation
+    return ERR_MEMORY_ALLOCATION_FAILED;
   }
-  _mod->SPIreadRegisterBurst(SX127X_REG_FIFO, length, data);
+  
+  _mod->SPIreadRegisterBurst(SX127X_REG_FIFO, len, data);
 
-  // add terminating null
-  data[length] = 0;
-
+  // clear FIFO if length > len and in FSK mode
+  clearFIFO(length - len);
+  
+  // clear internal flag so getPacketLength can return the length for the next packet
+    _packetLengthQueried = false;
+  
   // clear interrupt flags
   clearIRQFlags();
 
@@ -877,6 +872,26 @@ int16_t SX127x::setFrequencyRaw(float newFreq) {
   return(state);
 }
 
+size_t SX127x::getPacketLength() {
+  int16_t modem = getActiveModem();
+  
+  if(modem == SX127X_LORA) {
+    // get packet length
+    if(_sf != 6) {
+      return _mod->SPIgetRegValue(SX127X_REG_RX_NB_BYTES);
+    }
+
+  } else if(modem == SX127X_FSK_OOK) {
+    // get packet length
+    if(_packetLengthQueried == false) {
+      _packetLength = _mod->SPIreadRegister(SX127X_REG_FIFO);
+      _packetLengthQueried = true;
+    }
+  }
+  
+  return  _packetLength;
+}
+
 int16_t SX127x::config() {
   // turn off frequency hopping
   int16_t state = _mod->SPIsetRegValue(SX127X_REG_HOP_PERIOD, SX127X_HOP_PERIOD_OFF);
@@ -987,6 +1002,19 @@ void SX127x::clearIRQFlags() {
   } else if(modem == SX127X_FSK_OOK) {
     _mod->SPIwriteRegister(SX127X_REG_IRQ_FLAGS_1, 0b11111111);
     _mod->SPIwriteRegister(SX127X_REG_IRQ_FLAGS_2, 0b11111111);
+  }
+}
+
+void SX127x::clearFIFO(size_t count) {
+  int16_t modem = getActiveModem();
+  uint8_t c = 0;
+  
+  // clear the FIFO of n bytes
+  if(modem == SX127X_FSK_OOK) {
+    while(count > 0) {
+      c = _mod->SPIreadRegister(SX127X_REG_FIFO);
+      count--;
+    }
   }
 }
 

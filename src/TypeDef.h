@@ -177,6 +177,11 @@
 #define ERR_INVALID_MODULATION                -26
 
 /*!
+  \brief Failed to allocate memory for temporary buffer. This can be cause by not enough RAM or by passing invalid pointer.
+*/
+#define ERR_MEMORY_ALLOCATION_FAILED           -27
+
+/*!
   \}
 */
 

@@ -50,29 +50,67 @@ int16_t PhysicalLayer::startTransmit(const char* str, uint8_t addr) {
 
 int16_t PhysicalLayer::readData(String& str, size_t len) {
   // create temporary array to store received data
-  char* data = new char[len + 1];
-  int16_t state = readData((uint8_t*)data, len);
-
-  // if packet was received successfully, copy data into String
-  if(state == ERR_NONE) {
-    str = String(data);
-  }
-
-  delete[] data;
+  uint8_t* data = nullptr;
+  int16_t state = ERR_NONE;
+  
+  if(len == 0) {
+    // We can query the packet length now because the packet should have been received earlier
+    len = getPacketLength();
+  }  
+  
+    // Build a temporary buffer
+    data = new uint8_t[len + 1];
+    
+    // read the received data
+    if(data) {
+      state = readData(data, len);
+    }
+    else {
+      state = ERR_MEMORY_ALLOCATION_FAILED;
+    }
+    
+    // add null terminator
+    data[len] = 0;
+    
+    // initialize Arduino String class
+    str = String((char*)data);
+    
+    // deallocate temporary buffer
+    delete[] data;
+  
   return(state);
 }
 
 int16_t PhysicalLayer::receive(String& str, size_t len) {
   // create temporary array to store received data
-  char* data = new char[len + 1];
-  int16_t state = receive((uint8_t*)data, len);
-
-  // if packet was received successfully, copy data into String
-  if(state == ERR_NONE) {
-    str = String(data);
-  }
-
-  delete[] data;
+  uint8_t* data = nullptr;
+  int16_t state = ERR_NONE;
+  
+  if(len == 0) {
+    // We can query the packet length now because the packet should have been received earlier
+    len = getPacketLength();
+  }  
+  
+    // Build a temporary buffer
+    data = new uint8_t[len + 1];
+    
+    // read the received data
+    if(data) {
+      state = receive(data, len);
+    }
+    else {
+      state = ERR_MEMORY_ALLOCATION_FAILED;
+    }
+    
+    // add null terminator
+    data[len] = 0;
+    
+    // initialize Arduino String class
+    str = String((char*)data);
+    
+    // deallocate temporary buffer
+    delete[] data;
+  
   return(state);
 }
 

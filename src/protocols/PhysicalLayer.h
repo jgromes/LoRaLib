@@ -77,7 +77,7 @@ class PhysicalLayer {
 
       \param str Address of Arduino String to save the received data.
 
-      \param len Expected number of characters in the message.
+      \param len Expected number of characters in the message. Leave as 0 if expecting a unknown size packet
 
       \returns \ref status_codes
     */
@@ -196,6 +196,13 @@ class PhysicalLayer {
       \returns Frequency divider exponent.
     */
     uint8_t getDivExponent();
+    
+    /*!
+      \brief Query modem for the packet length of received payload.
+
+      \returns \ref packet length
+    */
+    virtual size_t getPacketLength() = 0;
 
   private:
     float _crystalFreq;

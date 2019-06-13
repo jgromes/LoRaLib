@@ -695,7 +695,7 @@ class SX127x: public PhysicalLayer {
     int16_t startReceive(uint8_t mode = SX127X_RXCONTINUOUS);
 
     /*!
-      \brief Reads data that was received after calling startReceive method.
+      \brief Reads data that was received after calling startReceive method. This method reads len characters.
 
       \param data Pointer to array to save the received binary data.
 
@@ -829,6 +829,13 @@ class SX127x: public PhysicalLayer {
       \returns \ref status_codes
     */
     int16_t setOOK(bool enableOOK);
+    
+     /*!
+      \brief Query modem for the packet length of received payload.
+
+      \returns packet length
+    */
+    size_t getPacketLength();
 
     #ifdef RADIOLIB_DEBUG
       void regDump();
@@ -850,14 +857,18 @@ class SX127x: public PhysicalLayer {
     int16_t configFSK();
     int16_t getActiveModem();
     int16_t directMode();
+    
 
   private:
     float _dataRate;
+    size_t _packetLength;
+    bool _packetLengthQueried; // FSK packet length is the first byte in FIFO, length can only be queried once
 
     bool findChip(uint8_t ver);
     int16_t setMode(uint8_t mode);
     int16_t setActiveModem(uint8_t modem);
     void clearIRQFlags();
+    void clearFIFO(size_t count); // used mostly to clear remaining bytes in FIFO after a packet read
 };
 
 #endif
