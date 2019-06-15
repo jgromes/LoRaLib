@@ -61,6 +61,9 @@ void loop() {
   // NOTE: receive() is a blocking method!
   //       See example ReceiveInterrupt for details
   //       on non-blocking reception method.
+  // NOTE: for spreading factor 6, the packet length
+  //       must be known in advance, and provided to
+  //       receive() method!
   String str;
   int state = lora.receive(str);
 

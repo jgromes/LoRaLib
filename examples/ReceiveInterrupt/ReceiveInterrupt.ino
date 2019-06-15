@@ -63,6 +63,9 @@ void setup() {
   lora.setDio0Action(setFlag);
 
   // start listening for LoRa packets
+  // NOTE: for spreading factor 6, the packet length
+  //       must be known in advance, and provided to both
+  //       startReceive() and readData() methods!
   Serial.print(F("Starting to listen ... "));
   state = lora.startReceive();
   if (state == ERR_NONE) {

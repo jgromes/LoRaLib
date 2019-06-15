@@ -202,7 +202,7 @@ int16_t SX127x::receive(uint8_t* data, size_t len) {
   int16_t modem = getActiveModem();
   if(modem == SX127X_LORA) {
     // set mode to receive
-    state = startReceive(SX127X_RXSINGLE);
+    state = startReceive(len, SX127X_RXSINGLE);
     if(state != ERR_NONE) {
       return(state);
     }
@@ -220,7 +220,7 @@ int16_t SX127x::receive(uint8_t* data, size_t len) {
     uint32_t timeout = (uint32_t)((((float)(len * 8)) / (_br * 1000.0)) * 5000.0);
 
     // set mode to receive
-    state = startReceive(SX127X_RX);
+    state = startReceive(len, SX127X_RX);
     if(state != ERR_NONE) {
       return(state);
     }
@@ -351,7 +351,7 @@ int16_t SX127x::packetMode() {
   return(_mod->SPIsetRegValue(SX127X_REG_PACKET_CONFIG_2, SX127X_DATA_MODE_PACKET, 6, 6));
 }
 
-int16_t SX127x::startReceive(uint8_t mode) {
+int16_t SX127x::startReceive(uint8_t len, uint8_t mode) {
   // set mode to standby
   int16_t state = setMode(SX127X_STANDBY);
 
@@ -359,6 +359,11 @@ int16_t SX127x::startReceive(uint8_t mode) {
   if(modem == SX127X_LORA) {
     // set DIO pin mapping
     state |= _mod->SPIsetRegValue(SX127X_REG_DIO_MAPPING_1, SX127X_DIO0_RX_DONE | SX127X_DIO1_RX_TIMEOUT, 7, 4);
+
+    // set expected packet length for SF6
+    if(_sf = 6) {
+      state |= _mod->SPIsetRegValue(SX127X_REG_PAYLOAD_LENGTH, len);
+    }
 
     // clear interrupt flags
     clearIRQFlags();
@@ -876,9 +881,13 @@ size_t SX127x::getPacketLength(bool update) {
   int16_t modem = getActiveModem();
 
   if(modem == SX127X_LORA) {
-    // get packet length for SF7 - SF12
     if(_sf != 6) {
+      // get packet length for SF7 - SF12
       return(_mod->SPIreadRegister(SX127X_REG_RX_NB_BYTES));
+
+    } else {
+      // return the maximum value for SF6
+      return(SX127X_MAX_PACKET_LENGTH);
     }
 
   } else if(modem == SX127X_FSK_OOK) {
