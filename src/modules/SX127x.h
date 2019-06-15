@@ -834,9 +834,11 @@ class SX127x: public PhysicalLayer {
      /*!
       \brief Query modem for the packet length of received payload.
 
+      \param update Update received packet length. Will return cached value when set to false.
+
       \returns Length of last received packet in bytes.
     */
-    size_t getPacketLength();
+    size_t getPacketLength(bool update = true);
 
     #ifdef RADIOLIB_DEBUG
       void regDump();

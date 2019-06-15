@@ -200,11 +200,13 @@ class PhysicalLayer {
     uint8_t getDivExponent();
 
     /*!
-      \brief Query modem for the packet length of received payload.
+     \brief Query modem for the packet length of received payload.
 
-      \returns Length of last received packet in bytes.
-    */
-    virtual size_t getPacketLength() = 0;
+     \param update Update received packet length. Will return cached value when set to false.
+
+     \returns Length of last received packet in bytes.
+   */
+   virtual size_t getPacketLength(bool update = true) = 0;
 
   private:
     float _crystalFreq;

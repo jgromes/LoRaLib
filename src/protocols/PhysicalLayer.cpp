@@ -52,25 +52,31 @@ int16_t PhysicalLayer::startTransmit(const char* str, uint8_t addr) {
 int16_t PhysicalLayer::readData(String& str, size_t len) {
   int16_t state = ERR_NONE;
 
-  if(len == 0) {
-    // query packet length
-    len = getPacketLength();
+  // read the number of actually received bytes
+  size_t length = getPacketLength();
+
+  if((len < length) && (len != 0)) {
+    // user requested less bytes than were received, this is allowed (but frowned upon)
+    // requests for more data than were received will only return the number of actually received bytes (unlike PhysicalLayer::receive())
+    length = len;
   }
 
   // build a temporary buffer
-  uint8_t* data = new uint8_t[len + 1];
+  uint8_t* data = new uint8_t[length + 1];
   if(!data) {
     return(ERR_MEMORY_ALLOCATION_FAILED);
   }
 
   // read the received data
-  state = readData(data, len);
+  state = readData(data, length);
 
-  // add null terminator
-  data[len] = 0;
+  if(state == ERR_NONE) {
+    // add null terminator
+    data[length] = 0;
 
-  // initialize Arduino String class
-  str = String((char*)data);
+    // initialize Arduino String class
+    str = String((char*)data);
+  }
 
   // deallocate temporary buffer
   delete[] data;
@@ -81,26 +87,31 @@ int16_t PhysicalLayer::readData(String& str, size_t len) {
 int16_t PhysicalLayer::receive(String& str, size_t len) {
   int16_t state = ERR_NONE;
 
+  // user can override the length of data to read
+  size_t length = len;
+
   if(len == 0) {
     // unknown packet length, set to maximum
-    len = _maxPacketLength;
+    length = _maxPacketLength;
   }
 
   // build a temporary buffer
-  uint8_t* data = new uint8_t[len + 1];
+  uint8_t* data = new uint8_t[length + 1];
   if(!data) {
     return(ERR_MEMORY_ALLOCATION_FAILED);
   }
 
-  // read the received data
-  state = receive(data, len);
+  // attempt packet reception
+  state = receive(data, length);
 
   if(state == ERR_NONE) {
-    // read the number of actually received bytes
-    len = getPacketLength();
+    // read the number of actually received bytes (for unknown packets)
+    if(len == 0) {
+      length = getPacketLength(false);
+    }
 
     // add null terminator
-    data[len] = 0;
+    data[length] = 0;
 
     // initialize Arduino String class
     str = String((char*)data);
