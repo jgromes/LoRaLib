@@ -9,6 +9,7 @@
 // SX127x physical layer properties
 #define SX127X_CRYSTAL_FREQ                           32.0
 #define SX127X_DIV_EXPONENT                           19
+#define SX127X_MAX_PACKET_LENGTH                      256
 
 // SX127x series common LoRa registers
 #define SX127X_REG_FIFO                               0x00
@@ -829,11 +830,11 @@ class SX127x: public PhysicalLayer {
       \returns \ref status_codes
     */
     int16_t setOOK(bool enableOOK);
-    
+
      /*!
       \brief Query modem for the packet length of received payload.
 
-      \returns packet length
+      \returns Length of last received packet in bytes.
     */
     size_t getPacketLength();
 
@@ -857,7 +858,7 @@ class SX127x: public PhysicalLayer {
     int16_t configFSK();
     int16_t getActiveModem();
     int16_t directMode();
-    
+
 
   private:
     float _dataRate;

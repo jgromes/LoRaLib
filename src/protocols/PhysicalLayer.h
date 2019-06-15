@@ -21,8 +21,10 @@ class PhysicalLayer {
       \param crysFreq Frequency of crystal oscillator inside the module in MHz.
 
       \param divExp Exponent of module frequency divider.
+
+      \param maxPacketLength Maximum length of packet that can be received by the module-
     */
-    PhysicalLayer(float crysFreq, uint8_t divExp);
+    PhysicalLayer(float crysFreq, uint8_t divExp, size_t maxPacketLength);
 
     // basic methods
 
@@ -207,6 +209,7 @@ class PhysicalLayer {
   private:
     float _crystalFreq;
     uint8_t _divExponent;
+    size_t _maxPacketLength;
 };
 
 #endif
