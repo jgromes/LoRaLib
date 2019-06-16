@@ -361,7 +361,7 @@ int16_t SX127x::startReceive(uint8_t len, uint8_t mode) {
     state |= _mod->SPIsetRegValue(SX127X_REG_DIO_MAPPING_1, SX127X_DIO0_RX_DONE | SX127X_DIO1_RX_TIMEOUT, 7, 4);
 
     // set expected packet length for SF6
-    if(_sf = 6) {
+    if(_sf == 6) {
       state |= _mod->SPIsetRegValue(SX127X_REG_PAYLOAD_LENGTH, len);
     }
 
