@@ -52,9 +52,9 @@
 #define ERR_CHIP_NOT_FOUND                    -2
 
 /*!
-  \brief Deprecated.
+  \brief Failed to allocate memory for temporary buffer. This can be cause by not enough RAM or by passing invalid pointer.
 */
-#define ERR_EEPROM_NOT_INITIALIZED            -3
+#define ERR_MEMORY_ALLOCATION_FAILED          -3
 
 /*!
   \brief Packet supplied to transmission method was longer than 255 bytes.
@@ -175,11 +175,6 @@
   \brief The current modulation is invalid for the requested operation.
 */
 #define ERR_INVALID_MODULATION                -26
-
-/*!
-  \brief Failed to allocate memory for temporary buffer. This can be cause by not enough RAM or by passing invalid pointer.
-*/
-#define ERR_MEMORY_ALLOCATION_FAILED           -27
 
 /*!
   \}
