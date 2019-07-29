@@ -1,9 +1,6 @@
-sudo: false
-
 env:
   global:
-    # keep Arduino IDE version at 1.8.1 until https://github.com/per1234/arduino-ci-script/issues/1 is resolved
-    - ARDUINO_IDE_VERSION="1.8.1"
+    - ARDUINO_IDE_VERSION="1.8.9"
   matrix:
     - BOARD="arduino:avr:uno"
     - BOARD="arduino:avr:leonardo"
@@ -17,7 +14,15 @@ before_install:
   - tar xf arduino-$ARDUINO_IDE_VERSION-linux64.tar.xz
   - mv arduino-$ARDUINO_IDE_VERSION $HOME/arduino-ide
   - export PATH=$PATH:$HOME/arduino-ide
-  
+
+  # firewall Arduino IDE noise (https://github.com/per1234/arduino-ci-script/issues/1#issuecomment-504158113)
+  - sudo iptables -P INPUT DROP
+  - sudo iptables -P FORWARD DROP
+  - sudo iptables -P OUTPUT ACCEPT
+  - sudo iptables -A INPUT -i lo -j ACCEPT
+  - sudo iptables -A OUTPUT -o lo -j ACCEPT
+  - sudo iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+
   # install 3rd party boards
   - arduino --pref "boardsmanager.additional.urls=http://arduino.esp8266.com/stable/package_esp8266com_index.json,https://dl.espressif.com/dl/package_esp32_index.json" --save-prefs 2>&1
   - if [[ "$BOARD" =~ "esp8266:esp8266:" ]]; then
@@ -56,7 +61,7 @@ script:
       cd ..;
       doxygen Doxyfile;
     fi
-    
+
 # deploy Doxygen docs on master branch and only when building for Arduino UNO
 deploy:
   provider: pages
