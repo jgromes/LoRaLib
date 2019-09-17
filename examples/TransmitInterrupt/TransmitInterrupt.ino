@@ -75,7 +75,7 @@ void setup() {
   */
 }
 
-// flag to indicate that a packet was received
+// flag to indicate that a packet was sent
 volatile bool transmittedFlag = false;
 
 // disable interrupt when it's not needed
