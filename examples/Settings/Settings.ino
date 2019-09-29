@@ -51,13 +51,14 @@ SX1276 loraSX1276 = new LoRa(14, 15, 16);
 
 // to use non-default SPI interface or software SPI
 // implementation, pass the SPI interface to the LoRa
-// constructor
+// constructor - this interface must be compatible
+// with Arduino SPIClass!
 //
-// DigitalIO library for software SPI
-// https://github.com/greiman/DigitalIO
-//#include "DigitalIO.h"
-//SoftSPI<MISO_PIN, MOSI_PIN, SCK_PIN> softSpi;
-//SX1278 softLora = new LoRa(2, 3, 10, softSpi);
+// Software SPI library
+// https://github.com/MajenkoLibraries/SoftSPI
+//#include "SoftSPI.h"
+//SoftSPI mySPI(4, 5, 6) ;
+//SX1278 softLora = new LoRa(2, 3, 10, mySPI);
 
 void setup() {
   Serial.begin(9600);
