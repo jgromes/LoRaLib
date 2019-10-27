@@ -468,6 +468,9 @@ int16_t SX127x::startTransmit(uint8_t* data, size_t len, uint8_t addr) {
 int16_t SX127x::readData(uint8_t* data, size_t len) {
   int16_t modem = getActiveModem();
   size_t length = len;
+  
+  // put module to standby
+  standby();
 
   if(modem == SX127X_LORA) {
     // len set to maximum indicates unknown packet length, read the number of actually received bytes
