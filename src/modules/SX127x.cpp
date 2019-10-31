@@ -468,7 +468,7 @@ int16_t SX127x::startTransmit(uint8_t* data, size_t len, uint8_t addr) {
 int16_t SX127x::readData(uint8_t* data, size_t len) {
   int16_t modem = getActiveModem();
   size_t length = len;
-  
+
   // put module to standby
   standby();
 
@@ -891,6 +891,33 @@ size_t SX127x::getPacketLength(bool update) {
   }
 
   return(_packetLength);
+}
+
+int16_t SX127x::setRSSIConfig(uint8_t smoothingSamples, int8_t offset) {
+  // check active modem
+  if(getActiveModem() != SX127X_FSK_OOK) {
+    return(ERR_WRONG_MODEM);
+  }
+
+  // set mode to standby
+  int16_t state = standby();
+  if(state != ERR_NONE) {
+    return(state);
+  }
+
+  // check provided values
+  if(!(smoothingSamples <= 7)) {
+    return(ERR_INVALID_NUM_SAMPLES);
+  }
+
+  if(!((offset >= -16) && (offset <= 15))) {
+    return(ERR_INVALID_RSSI_OFFSET);
+  }
+
+  // set new register values
+  state = _mod->SPIsetRegValue(SX127X_REG_RSSI_CONFIG, offset, 7, 3);
+  state |= _mod->SPIsetRegValue(SX127X_REG_RSSI_CONFIG, smoothingSamples, 2, 0);
+  return(state);
 }
 
 int16_t SX127x::config() {

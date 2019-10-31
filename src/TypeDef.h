@@ -177,6 +177,16 @@
 #define ERR_INVALID_MODULATION                -26
 
 /*!
+  \brief The supplied number of RSSI samples is invalid.
+*/
+#define ERR_INVALID_NUM_SAMPLES               -27
+
+/*!
+  \brief The supplied RSSI offset is invalid.
+*/
+#define ERR_INVALID_RSSI_OFFSET               -28
+
+/*!
   \}
 */
 
