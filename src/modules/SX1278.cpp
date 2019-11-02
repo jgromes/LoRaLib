@@ -433,8 +433,17 @@ float SX1278::getRSSI() {
     return(lastPacketRSSI);
 
   } else {
-    // just read the value for FSK
-    return((float)_mod->SPIgetRegValue(SX127X_REG_RSSI_VALUE) / 2.0);
+    // enable listen mode
+    startReceive();
+
+    // read the value for FSK
+    float rssi = (float)_mod->SPIgetRegValue(SX127X_REG_RSSI_VALUE_FSK) / -2.0;
+
+    // set mode back to standby
+    standby();
+
+    // return the value
+    return(rssi);
   }
 }
 
