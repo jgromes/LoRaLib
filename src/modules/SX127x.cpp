@@ -117,6 +117,12 @@ int16_t SX127x::beginFSK(uint8_t chipVersion, float br, float freqDev, float rxB
 
   // enable/disable OOK
   state = setOOK(enableOOK);
+  if(state != ERR_NONE) {
+    return(state);
+  }
+
+  // set default RSSI measurement config
+  state = setRSSIConfig(2);
 
   return(state);
 }
