@@ -854,6 +854,15 @@ class SX127x: public PhysicalLayer {
     */
     int16_t setRSSIConfig(uint8_t smoothingSamples, int8_t offset = 0);
 
+    /*!
+      \brief Sets transmission encoding. Only available in FSK mode.
+
+      \param encoding Encoding to be used. Set to 0 for NRZ, 1 for Manchester and 2 for whitening.
+
+      \returns \ref status_codes
+    */
+    int16_t setEncoding(uint8_t encoding);
+
     #ifdef RADIOLIB_DEBUG
       void regDump();
     #endif

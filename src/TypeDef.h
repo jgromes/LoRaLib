@@ -187,6 +187,11 @@
 #define ERR_INVALID_RSSI_OFFSET               -28
 
 /*!
+  \brief The supplied encoding is invalid.
+*/
+#define ERR_INVALID_ENCODING                  -29
+
+/*!
   \}
 */
 

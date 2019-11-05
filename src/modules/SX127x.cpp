@@ -123,6 +123,12 @@ int16_t SX127x::beginFSK(uint8_t chipVersion, float br, float freqDev, float rxB
 
   // set default RSSI measurement config
   state = setRSSIConfig(2);
+  if(state != ERR_NONE) {
+    return(state);
+  }
+
+  // set default encoding
+  state = setEncoding(0);
 
   return(state);
 }
@@ -924,6 +930,25 @@ int16_t SX127x::setRSSIConfig(uint8_t smoothingSamples, int8_t offset) {
   state = _mod->SPIsetRegValue(SX127X_REG_RSSI_CONFIG, offset, 7, 3);
   state |= _mod->SPIsetRegValue(SX127X_REG_RSSI_CONFIG, smoothingSamples, 2, 0);
   return(state);
+}
+
+int16_t SX127x::setEncoding(uint8_t encoding) {
+  // check active modem
+  if(getActiveModem() != SX127X_FSK_OOK) {
+    return(ERR_WRONG_MODEM);
+  }
+
+  // set encoding
+  switch(encoding) {
+    case 0:
+      return(_mod->SPIsetRegValue(SX127X_REG_PACKET_CONFIG_1, SX127X_DC_FREE_NONE, 6, 5));
+    case 1:
+      return(_mod->SPIsetRegValue(SX127X_REG_PACKET_CONFIG_1, SX127X_DC_FREE_NONE, 6, 5));
+    case 2:
+      return(_mod->SPIsetRegValue(SX127X_REG_PACKET_CONFIG_1, SX127X_DC_FREE_NONE, 6, 5));
+    default:
+      return(ERR_INVALID_ENCODING);
+  }
 }
 
 int16_t SX127x::config() {
