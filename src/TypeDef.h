@@ -4,7 +4,7 @@
 #if ARDUINO >= 100
   #include "Arduino.h"
 #else
-  #include "WProgram.h"
+  #error "Unsupported Arduino version (< 1.0.0)"
 #endif
 
 //#define RADIOLIB_DEBUG
