@@ -7,11 +7,13 @@
   #error "Unsupported Arduino version (< 1.0.0)"
 #endif
 
+#define RADIOLIB_DEBUG_PORT  Serial
+
 //#define RADIOLIB_DEBUG
 
 #ifdef RADIOLIB_DEBUG
-  #define RADIOLIB_DEBUG_PRINT(...) { Serial.print(__VA_ARGS__); }
-  #define RADIOLIB_DEBUG_PRINTLN(...) { Serial.println(__VA_ARGS__); }
+  #define RADIOLIB_DEBUG_PRINT(...) { RADIOLIB_DEBUG_PORT.print(__VA_ARGS__); }
+  #define RADIOLIB_DEBUG_PRINTLN(...) { RADIOLIB_DEBUG_PORT.println(__VA_ARGS__); }
 #else
   #define RADIOLIB_DEBUG_PRINT(...) {}
   #define RADIOLIB_DEBUG_PRINTLN(...) {}
