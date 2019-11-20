@@ -1,10 +1,10 @@
 #ifndef _RADIOLIB_SX127X_H
 #define _RADIOLIB_SX127X_H
 
-#include "TypeDef.h"
-#include "Module.h"
+#include "../../TypeDef.h"
+#include "../../Module.h"
 
-#include "../protocols/PhysicalLayer.h"
+#include "../../protocols/PhysicalLayer/PhysicalLayer.h"
 
 // SX127x physical layer properties
 #define SX127X_CRYSTAL_FREQ                           32.0

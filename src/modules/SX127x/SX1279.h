@@ -1,15 +1,15 @@
-#ifndef _RADIOLIB_SX1276_H
-#define _RADIOLIB_SX1276_H
+#ifndef _RADIOLIB_SX1279_H
+#define _RADIOLIB_SX1279_H
 
-#include "TypeDef.h"
+#include "../../TypeDef.h"
 #include "SX1278.h"
 
 /*!
-  \class SX1276
+  \class SX1279
 
-  \brief Derived class for %SX1276 modules. Overrides some methods from SX1278 due to different parameter ranges.
+  \brief Derived class for %SX1279 modules. Overrides some methods from SX1278 due to different parameter ranges.
 */
-class SX1276: public SX1278 {
+class SX1279: public SX1278 {
   public:
 
     // constructor
@@ -19,14 +19,14 @@ class SX1276: public SX1278 {
 
       \param mod Instance of Module that will be used to communicate with the %LoRa chip.
     */
-    SX1276(Module* mod);
+    SX1279(Module* mod);
 
     // basic methods
 
     /*!
       \brief %LoRa modem initialization method. Must be called at least once from Arduino sketch to initialize the module.
 
-      \param freq Carrier frequency in MHz. Allowed values range from 137.0 MHz to 1020.0 MHz.
+      \param freq Carrier frequency in MHz. Allowed values range from 137.0 MHz to 960.0 MHz.
 
       \param bw %LoRa link bandwidth in kHz. Allowed values are 10.4, 15.6, 20.8, 31.25, 41.7, 62.5, 125, 250 and 500 kHz.
 
@@ -54,7 +54,7 @@ class SX1276: public SX1278 {
     // configuration methods
 
     /*!
-      \brief Sets carrier frequency. Allowed values range from 137.0 MHz to 1020.0 MHz.
+      \brief Sets carrier frequency. Allowed values range from 137.0 MHz to 960.0 MHz.
 
       \param freq Carrier frequency to be set in MHz.
 

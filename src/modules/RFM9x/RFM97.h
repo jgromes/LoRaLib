@@ -1,10 +1,10 @@
 #ifndef _RADIOLIB_RFM97_H
 #define _RADIOLIB_RFM97_H
 
-#include "TypeDef.h"
-#include "Module.h"
-#include "SX127x.h"
-#include "SX1278.h"
+#include "../../TypeDef.h"
+#include "../../Module.h"
+#include "../SX127x/SX127x.h"
+#include "../SX127x/SX1278.h"
 #include "RFM95.h"
 
 /*!

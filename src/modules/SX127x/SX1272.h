@@ -1,8 +1,8 @@
 #ifndef _RADIOLIB_SX1272_H
 #define _RADIOLIB_SX1272_H
 
-#include "TypeDef.h"
-#include "Module.h"
+#include "../../TypeDef.h"
+#include "../../Module.h"
 #include "SX127x.h"
 
 // SX1272 specific register map
@@ -262,7 +262,7 @@ class SX1272: public SX127x {
 #ifndef RADIOLIB_GODMODE
   private:
 #endif
-    
+
 };
 
 #endif

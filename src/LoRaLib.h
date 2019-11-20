@@ -23,17 +23,16 @@
   #warning "God mode active, I hope it was intentional. Buckle up, lads."
 #endif
 
-#include "modules/SX1272.h"
-#include "modules/SX1273.h"
+#include "modules/SX127x/SX1272.h"
+#include "modules/SX127x/SX1273.h"
+#include "modules/SX127x/SX1278.h"
+#include "modules/SX127x/SX1276.h"
+#include "modules/SX127x/SX1277.h"
+#include "modules/SX127x/SX1279.h"
 
-#include "modules/SX1278.h"
-#include "modules/SX1276.h"
-#include "modules/SX1277.h"
-#include "modules/SX1279.h"
-
-#include "modules/RFM95.h"
-#include "modules/RFM96.h"
-#include "modules/RFM97.h"
+#include "modules/RFM9x/RFM95.h"
+#include "modules/RFM9x/RFM96.h"
+#include "modules/RFM9x/RFM97.h"
 
 /*!
   \class LoRa

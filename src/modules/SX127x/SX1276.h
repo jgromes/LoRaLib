@@ -1,20 +1,15 @@
-#ifndef _RADIOLIB_RFM96_H
-#define _RADIOLIB_RFM96_H
+#ifndef _RADIOLIB_SX1276_H
+#define _RADIOLIB_SX1276_H
 
-#include "TypeDef.h"
-#include "Module.h"
-#include "SX127x.h"
+#include "../../TypeDef.h"
 #include "SX1278.h"
 
-// SX127X_REG_VERSION
-#define RFM9X_CHIP_VERSION                            0x12  // according to datasheet, this should be 0x11, but all modules seem to have 0x12
-
 /*!
-  \class RFM96
+  \class SX1276
 
-  \brief Derived class for %RFM96 modules. Overrides some methods from SX1278 due to different parameter ranges.
+  \brief Derived class for %SX1276 modules. Overrides some methods from SX1278 due to different parameter ranges.
 */
-class RFM96: public SX1278 {
+class SX1276: public SX1278 {
   public:
 
     // constructor
@@ -24,14 +19,14 @@ class RFM96: public SX1278 {
 
       \param mod Instance of Module that will be used to communicate with the %LoRa chip.
     */
-    RFM96(Module* mod);
+    SX1276(Module* mod);
 
     // basic methods
 
     /*!
       \brief %LoRa modem initialization method. Must be called at least once from Arduino sketch to initialize the module.
 
-      \param freq Carrier frequency in MHz. Allowed values range from 433.0 MHz to 470.0 MHz.
+      \param freq Carrier frequency in MHz. Allowed values range from 137.0 MHz to 1020.0 MHz.
 
       \param bw %LoRa link bandwidth in kHz. Allowed values are 10.4, 15.6, 20.8, 31.25, 41.7, 62.5, 125, 250 and 500 kHz.
 
@@ -59,7 +54,7 @@ class RFM96: public SX1278 {
     // configuration methods
 
     /*!
-      \brief Sets carrier frequency. Allowed values range from 433.0 MHz to 470.0 MHz.
+      \brief Sets carrier frequency. Allowed values range from 137.0 MHz to 1020.0 MHz.
 
       \param freq Carrier frequency to be set in MHz.
 
@@ -72,12 +67,5 @@ class RFM96: public SX1278 {
 #endif
 
 };
-
-/*!
-  \class RFM98
-
-  \brief Only exists as alias for RFM96, since there seems to be no difference between %RFM96 and %RFM98 modules.
-*/
-using RFM98 = RFM96;
 
 #endif

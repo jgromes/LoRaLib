@@ -1,15 +1,15 @@
-#ifndef _RADIOLIB_SX1277_H
-#define _RADIOLIB_SX1277_H
+#ifndef _RADIOLIB_SX1273_H
+#define _RADIOLIB_SX1273_H
 
-#include "TypeDef.h"
-#include "SX1278.h"
+#include "../../TypeDef.h"
+#include "SX1272.h"
 
 /*!
-  \class SX1277
+  \class SX1273
 
-  \brief Derived class for %SX1277 modules. Overrides some methods from SX1278 due to different parameter ranges.
+  \brief Derived class for %SX1273 modules. Overrides some methods from SX1272 due to different parameter ranges.
 */
-class SX1277: public SX1278 {
+class SX1273: public SX1272 {
   public:
 
     // constructor
@@ -19,16 +19,16 @@ class SX1277: public SX1278 {
 
       \param mod Instance of Module that will be used to communicate with the %LoRa chip.
     */
-    SX1277(Module* mod);
+    SX1273(Module* mod);
 
     // basic methods
 
     /*!
       \brief %LoRa modem initialization method. Must be called at least once from Arduino sketch to initialize the module.
 
-      \param freq Carrier frequency in MHz. Allowed values range from 137.0 MHz to 1020.0 MHz.
+      \param freq Carrier frequency in MHz. Allowed values range from 860.0 MHz to 1020.0 MHz.
 
-      \param bw %LoRa link bandwidth in kHz. Allowed values are 10.4, 15.6, 20.8, 31.25, 41.7, 62.5, 125, 250 and 500 kHz.
+      \param bw %LoRa link bandwidth in kHz. Allowed values are 125, 250 and 500 kHz.
 
       \param sf %LoRa link spreading factor. Allowed values range from 6 to 9.
 
@@ -49,18 +49,9 @@ class SX1277: public SX1278 {
 
       \returns \ref status_codes
     */
-    int16_t begin(float freq = 434.0, float bw = 125.0, uint8_t sf = 9, uint8_t cr = 7, uint8_t syncWord = SX127X_SYNC_WORD, int8_t power = 17, uint8_t currentLimit = 100, uint16_t preambleLength = 8, uint8_t gain = 0);
+    int16_t begin(float freq = 915.0, float bw = 125.0, uint8_t sf = 9, uint8_t cr = 7, uint8_t syncWord = SX127X_SYNC_WORD, int8_t power = 17, uint8_t currentLimit = 100, uint16_t preambleLength = 8, uint8_t gain = 0);
 
     // configuration methods
-
-    /*!
-      \brief Sets carrier frequency. Allowed values range from 137.0 MHz to 1020.0 MHz.
-
-      \param freq Carrier frequency to be set in MHz.
-
-      \returns \ref status_codes
-    */
-    int16_t setFrequency(float freq);
 
     /*!
       \brief Sets %LoRa link spreading factor. Allowed values range from 6 to 9. Only available in %LoRa mode.

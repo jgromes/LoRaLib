@@ -1,10 +1,10 @@
 #ifndef _RADIOLIB_RFM95_H
 #define _RADIOLIB_RFM95_H
 
-#include "TypeDef.h"
-#include "Module.h"
-#include "SX127x.h"
-#include "SX1278.h"
+#include "../../TypeDef.h"
+#include "../../Module.h"
+#include "../SX127x/SX127x.h"
+#include "../SX127x/SX1278.h"
 
 // SX127X_REG_VERSION
 #define RFM95_CHIP_VERSION                            0x11
@@ -66,7 +66,7 @@ class RFM95: public SX1278 {
       \returns \ref status_codes
     */
     int16_t setFrequency(float freq);
-    
+
 #ifndef RADIOLIB_GODMODE
   private:
 #endif
