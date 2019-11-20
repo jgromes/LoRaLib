@@ -159,7 +159,9 @@ class Module {
     */
     int getInt1() const { return(_int1); }
 
+#ifndef RADIOLIB_GODMODE
   private:
+#endif
     int _cs;
     int _int0;
     int _int1;

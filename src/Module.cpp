@@ -11,28 +11,28 @@ Module::Module(int cs, int int0, int int1, SPIClass& spi) {
 void Module::init(uint8_t interface, uint8_t gpio) {
   // select interface
   switch(interface) {
-    case USE_SPI:
+    case RADIOLIB_USE_SPI:
       pinMode(_cs, OUTPUT);
       digitalWrite(_cs, HIGH);
       _spi->begin();
       break;
-    case USE_UART:
+    case RADIOLIB_USE_UART:
       break;
-    case USE_I2C:
+    case RADIOLIB_USE_I2C:
       break;
   }
 
   // select GPIO
   switch(gpio) {
-    case INT_NONE:
+    case RADIOLIB_INT_NONE:
       break;
-    case INT_0:
+    case RADIOLIB_INT_0:
       pinMode(_int0, INPUT);
       break;
-    case INT_1:
+    case RADIOLIB_INT_1:
       pinMode(_int1, INPUT);
       break;
-    case INT_BOTH:
+    case RADIOLIB_INT_BOTH:
       pinMode(_int0, INPUT);
       pinMode(_int1, INPUT);
       break;
