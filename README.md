@@ -1,8 +1,10 @@
 # LoRaLib [![Build Status](https://travis-ci.org/jgromes/LoRaLib.svg?branch=master)](https://travis-ci.org/jgromes/LoRaLib)
 
-## Arduino library for LoRa modules based on LoRa chips by Semtech (SX1272, SX1276, SX1278) and HopeRF (RFM95, RFM96, RFM98)
+## End-of-Life Warning: LoRaLib support will be discontinued in the near future, use [RadioLib](https://github.com/jgromes/RadioLib) instead! Full explanation and rationale can be found [here](https://github.com/jgromes/LoRaLib/blob/master/EOL.md).
 
-## See the [Wiki](https://github.com/jgromes/LoRaLib/wiki) for further information. See the [GitHub Pages](https://jgromes.github.io/LoRaLib) for detailed and up-to-date API reference.
+### Arduino library for LoRa modules based on LoRa chips by Semtech (SX1272, SX1276, SX1278) and HopeRF (RFM95, RFM96, RFM98)
+
+### See the [Wiki](https://github.com/jgromes/LoRaLib/wiki) for further information. See the [GitHub Pages](https://jgromes.github.io/LoRaLib) for detailed and up-to-date API reference.
 
 ### This is not the shield you are looking for!
 If you're looking for an open-source shield to use with this library, it has its own repository: [https://github.com/jgromes/LoRenz](https://github.com/jgromes/LoRenz)
