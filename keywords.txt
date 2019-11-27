@@ -67,6 +67,8 @@ setDataShapingOOK	KEYWORD2
 setCRC	KEYWORD2
 setRSSIConfig	KEYWORD2
 setEncoding	KEYWORD2
+fixedPacketLengthMode	KEYWORD2
+variablePacketLengthMode	KEYWORD2
 
 #######################################
 # Constants (LITERAL1)
