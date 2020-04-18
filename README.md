@@ -1,6 +1,10 @@
-# LoRaLib [![Build Status](https://travis-ci.org/jgromes/LoRaLib.svg?branch=master)](https://travis-ci.org/jgromes/LoRaLib)
+# End-of-Life Notice: LoRaLib is now unsupported, use [RadioLib](https://github.com/jgromes/RadioLib) instead!
 
-## End-of-Life Warning: LoRaLib support will be discontinued in the near future, use [RadioLib](https://github.com/jgromes/RadioLib) instead! Full explanation and rationale can be found [here](https://github.com/jgromes/LoRaLib/blob/master/EOL.md).
+### Full explanation and rationale can be found [here](https://github.com/jgromes/LoRaLib/blob/master/EOL.md).
+
+---
+
+# LoRaLib [![Build Status](https://travis-ci.org/jgromes/LoRaLib.svg?branch=master)](https://travis-ci.org/jgromes/LoRaLib)
 
 ### Arduino library for LoRa modules based on LoRa chips by Semtech (SX1272, SX1276, SX1278) and HopeRF (RFM95, RFM96, RFM98)
 
